@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+   <meta name="author"  content="Joseph Archer" />
+   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> <!-- Added Bootstrap -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> <!-- Added FontAwSome -->
+   <link rel="stylesheet" type="text/css" href="UI.css">
+   <script type="text/javascript" src="dist/scripts/LexicalAnalyzer.js"></script>
+   <script type="text/javascript" src="dist/scripts/Main.js"></script>
+   <script type="text/javascript" src="dist/scripts/Utils.js"></script>
+   <script type="text/javascript" src="dist/scripts/Globals.js"></script>
+   <title>
+     Joe's Compiler
+   </title>
+</head>
+<body>
+  <div id="header">
+    <p>Joe's Compiler</p>
+  </div>
+  <div id="main">
+    <div id="programInputSection">
+      <p>Program Input</p>
+      <textarea id="programInput" 
+                placeholder="Type your code here..."></textarea>
+   </div>
+   <div id="buttonBar">
+    <button id="compileButton"
+            type="button" 
+            style="width: 150px;" 
+            class="btn btn-default" onclick="JOEC.Main.startCompiler();">Compile</button>
+
+    <button id="stopButton"
+            type="button" 
+            style="width: 150px; margin-top: 15px;" 
+            class="btn btn-default" onclick="JOEC.Main.stopCompiler();" disabled >Stop</button>
+   </div>
+   <div id="programOutputSection">
+      <p>Program Output</p>
+      <textarea id="programOutput" 
+                placeholder="Output will appear here..."></textarea>
+   </div>
+  </div>
+  <div id="consoleSection">
+     <p>Console</p>
+     <textarea readonly id="console"></textarea>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+var _isRunning: boolean = false;

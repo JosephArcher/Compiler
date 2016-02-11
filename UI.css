@@ -1,0 +1,59 @@
+#header {
+	text-align: center; 
+	font-size: 35pt; 
+	margin-top: 25px;
+}
+#main {
+	margin: 0 auto;
+	width: 800px;
+	height: 550px;
+}
+#programInputSection { 
+	width: 300px;
+	float: left; 
+ 	overflow-y: auto;
+ 	text-align:center;
+}
+#programInput {
+	width: 300px; 
+	height: 500px; 
+	resize: none; 
+	padding: 5px; 
+	border: 3px solid #cccccc; 
+	outline: none;
+	font-family:Tahoma,sans-serif;
+}
+#buttonBar {
+	width: 150px; 
+	float: left;
+	margin-left: 25px; 
+	margin-top:250px;
+}
+#programOutputSection {
+	width: 300px; 
+	float: right;
+	text-align:center;
+}
+#programOutput {
+	width: 300px; 
+	height: 500px; 
+	resize: none; 
+	padding: 5px; 
+	border: 3px solid #cccccc; 
+	outline: none;
+	font-family:Tahoma,sans-serif;
+}
+#consoleSection {
+	margin: 0 auto;
+	width: 800px;
+	text-align:center;
+}
+#console {
+	width: 800px; 
+	height: 250px; 
+	resize: none; 
+	padding: 5px; 
+	border: 3px solid #cccccc; 
+	outline: none;
+	font-family:Tahoma,sans-serif;
+}
