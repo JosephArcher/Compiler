@@ -9,6 +9,9 @@ var JOEC;
         Main.startCompiler = function () {
             // Mark the compiler as running
             _isRunning = true;
+            // Init the Alphabet
+            JOEC.Utils.initAlphabet();
+            console.log(_alphabet);
             // Disable the Compile Button to prevent spam
             var compileButton = document.getElementById("compileButton");
             compileButton.disabled = true;
@@ -41,6 +44,8 @@ var JOEC;
             stopButton.disabled = true;
             // Update the user
             this.createNewUpdateMessage("Current Compilation was stopped by the user!");
+        };
+        Main.loadProgram = function () {
         };
         Main.createNewErrorMessage = function (msg) {
             var consoleHTML = document.getElementById("console");

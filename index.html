@@ -4,12 +4,17 @@
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
    <meta name="author"  content="Joseph Archer" />
    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> <!-- Added Bootstrap -->
+ 
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> <!-- Added FontAwSome -->
-   <link rel="stylesheet" type="text/css" href="UI.css">
+   <link rel="stylesheet" type="text/css" href="UI.css"> <!-- Some of my own CSS -->
+
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
    <script type="text/javascript" src="dist/scripts/LexicalAnalyzer.js"></script>
    <script type="text/javascript" src="dist/scripts/Main.js"></script>
    <script type="text/javascript" src="dist/scripts/Utils.js"></script>
    <script type="text/javascript" src="dist/scripts/Globals.js"></script>
+   <script type="text/javascript" src="dist/scripts/Token.js"></script>
    <title>
      Joe's Compiler
    </title>
@@ -34,6 +39,13 @@
             type="button" 
             style="width: 150px; margin-top: 15px;" 
             class="btn btn-default" onclick="JOEC.Main.stopCompiler();" disabled >Stop</button>
+
+    <button id="loadButton"
+            type="button" 
+            style="width: 150px; margin-top: 15px;"
+            data-toggle="modal" 
+            data-target="#myModal"
+            class="btn btn-default" onclick="JOEC.Main.loadProgram();" >Load...</button>
    </div>
    <div id="programOutputSection">
       <p>Program Output</p>
@@ -41,6 +53,23 @@
                 placeholder="Output will appear here..."></textarea>
    </div>
   </div>
+  <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Program Loader</h4>
+          </div>
+          <div class="modal-body">
+          <button type="button" class="btn btn-primary">Program 1</button>
+          <button type="button" class="btn btn-primary">Program 2</button>
+          <button type="button" class="btn btn-primary">Program 3</button>
+          <button type="button" class="btn btn-primary">Program 4</button>
+          </div>
+        </div>
+      </div>
+    </div>
   <div id="consoleSection">
      <p>Console</p>
      <textarea readonly id="console"></textarea>
