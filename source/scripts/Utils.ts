@@ -54,6 +54,12 @@ module JOEC {
 			_alphabet["+"] = { pos: 42 };
 			_alphabet[" "] = { pos: 43 };
 			_alphabet["="] = { pos: 44 };
+
+			console.log(_alphabet[" "]);
+		}
+		public static getCharacterPosition(character: string): number {
+			var joe = _alphabet[character].pos;
+			return joe;
 		}
 	}
 }

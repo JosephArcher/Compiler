@@ -8,13 +8,16 @@
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> <!-- Added FontAwSome -->
    <link rel="stylesheet" type="text/css" href="UI.css"> <!-- Some of my own CSS -->
 
-       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
    <script type="text/javascript" src="dist/scripts/LexicalAnalyzer.js"></script>
    <script type="text/javascript" src="dist/scripts/Main.js"></script>
    <script type="text/javascript" src="dist/scripts/Utils.js"></script>
    <script type="text/javascript" src="dist/scripts/Globals.js"></script>
    <script type="text/javascript" src="dist/scripts/Token.js"></script>
+   <script type="text/javascript" src="dist/scripts/TestPrograms.js"></script>
+
    <title>
      Joe's Compiler
    </title>
@@ -45,7 +48,7 @@
             style="width: 150px; margin-top: 15px;"
             data-toggle="modal" 
             data-target="#myModal"
-            class="btn btn-default" onclick="JOEC.Main.loadProgram();" >Load...</button>
+            class="btn btn-default">Load...</button>
    </div>
    <div id="programOutputSection">
       <p>Program Output</p>
@@ -62,10 +65,13 @@
             <h4 class="modal-title" id="myModalLabel">Program Loader</h4>
           </div>
           <div class="modal-body">
-          <button type="button" class="btn btn-primary">Program 1</button>
-          <button type="button" class="btn btn-primary">Program 2</button>
-          <button type="button" class="btn btn-primary">Program 3</button>
-          <button type="button" class="btn btn-primary">Program 4</button>
+            <button type="button" class="btn btn-primary" onclick="testProgram1();">Program 1</button>
+            <button type="button" class="btn btn-primary" onclick="testProgram2();">Program 2</button>
+            <button type="button" class="btn btn-primary" onclick="testProgram3();">Program 3</button>
+            <button type="button" class="btn btn-primary" onclick="testProgram4();">Program 4</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Okay</button>
           </div>
         </div>
       </div>

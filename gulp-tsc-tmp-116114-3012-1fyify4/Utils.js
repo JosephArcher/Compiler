@@ -54,11 +54,11 @@ var JOEC;
             _alphabet["+"] = { pos: 42 };
             _alphabet[" "] = { pos: 43 };
             _alphabet["="] = { pos: 44 };
-            console.log(_alphabet[" "]);
         };
         Utils.getCharacterPosition = function (character) {
-            var joe = _alphabet[character].pos;
-            return joe;
+            var pos = _alphabet[character].pos;
+            console.log("The pos is " + pos);
+            return pos;
         };
         return Utils;
     })();

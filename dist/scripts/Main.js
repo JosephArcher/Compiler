@@ -45,8 +45,6 @@ var JOEC;
             // Update the user
             this.createNewUpdateMessage("Current Compilation was stopped by the user!");
         };
-        Main.loadProgram = function () {
-        };
         Main.createNewErrorMessage = function (msg) {
             var consoleHTML = document.getElementById("console");
             consoleHTML.innerHTML = consoleHTML.value + "\n ERROR:" + msg;

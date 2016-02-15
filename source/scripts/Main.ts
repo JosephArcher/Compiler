@@ -60,10 +60,6 @@ module JOEC {
 			// Update the user
 			this.createNewUpdateMessage("Current Compilation was stopped by the user!");
 		}
-		public static loadProgram() {
-
-			
-		}
 		public static createNewErrorMessage(msg) {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
 			consoleHTML.innerHTML = consoleHTML.value + "\n ERROR:" + msg;
