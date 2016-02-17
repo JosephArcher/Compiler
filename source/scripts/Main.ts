@@ -40,10 +40,44 @@ module JOEC {
 			LA.generateTokens(sourceCode);
 
 			// TODO: Before moving on to the next step need to check the status of the LA to see if any errors have occured
+			if(LA.hasErrors){
+				this.createNewErrorMessage("Compilation Failed :( ");
+
+				// X Mark
+				var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
+				lexremoveUI.style.visibility = "visible";
+
+				this.stopCompiler();
+				return;
+			}
+
+			// Finish off the lexer and update the UI for the User
+			this.createNewUpdateMessage("Lex Completed");
+
+			// Check Mark
+			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
+			lexCheckUI.style.visibility = "visible";
+
+			// X Mark
+			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
+			lexremoveUI.style.visibility = "hidden";
 
 			// Create a new Parser
 			this.createNewUpdateMessage("Creating Parser");
 			//var Parser = new Parser();
+
+			// Finish off the Parser and update the UI for the User
+			this.createNewUpdateMessage("Parser Completed");
+			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
+			parseCheckUI.style.visibility = "visible";
+
+
+		}
+		public static stopButton() {
+
+			// Update the user
+			this.createNewUpdateMessage("Current Compilation was stopped by the user!");
+			this.stopCompiler();
 		}
 		public static stopCompiler() {
 			// Mark the compiler as off
@@ -56,9 +90,6 @@ module JOEC {
 			// Disable the stop button because no program is being compiled anymore
 			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
 			stopButton.disabled = true;
-
-			// Update the user
-			this.createNewUpdateMessage("Current Compilation was stopped by the user!");
 		}
 		public static createNewErrorMessage(msg) {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");

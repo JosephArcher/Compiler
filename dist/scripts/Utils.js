@@ -57,8 +57,12 @@ var JOEC;
             console.log(_alphabet[" "]);
         };
         Utils.getCharacterPosition = function (character) {
-            var joe = _alphabet[character].pos;
-            return joe;
+            if (_alphabet[character]) {
+                var joe = _alphabet[character].pos;
+                return joe;
+            }
+            console.log("Unknown character found");
+            return null;
         };
         return Utils;
     })();

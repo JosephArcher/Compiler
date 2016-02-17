@@ -8,6 +8,9 @@ module JOEC {
 
 		public sourceCode: string = ""; // The source code to be compiled
 		public tokenArray = []; // Holds in order all of the tokens that have been created
+		public hasErrors: boolean = false;
+		private lineNumber: number = 1; // The current line number
+		private currentCharacters = "";
 
 		constructor() {
 			// Create the transition table
@@ -33,57 +36,57 @@ module JOEC {
 				case 1:
 					console.log("$ Found");
 					this.tokenArray.push(new Token("Dollar Sign"));
-					Main.createNewUpdateMessage("$ Token Created!");
+					Main.createNewUpdateMessage("$ Token Found on line " + this.lineNumber);
 					break;
 				case 2:
 					console.log("{ Found");
 					this.tokenArray.push(new Token("Left Bracket"));
-					Main.createNewUpdateMessage("{ Token Created!");
+					Main.createNewUpdateMessage("{ Token Found on line " + this.lineNumber);
 					break;
 				case 3:
 					console.log("} Found");
 					this.tokenArray.push(new Token("Right Backet"));
-					Main.createNewUpdateMessage("} Token Created!");
+					Main.createNewUpdateMessage("} Token Found on line " + this.lineNumber);
 					break;
 				case 4:
 					console.log("( Found");
 					this.tokenArray.push(new Token("Left Para"));
-					Main.createNewUpdateMessage("( Token Created!");
+					Main.createNewUpdateMessage("( Token Found on line " + this.lineNumber);
 					break;
 				case 5:
 					console.log(") Found");
 					this.tokenArray.push(new Token("Right Para"));
-					Main.createNewUpdateMessage(") Token Created!");
+					Main.createNewUpdateMessage(") Token Found on line " + this.lineNumber);
 					break;
 				case 6:
 					console.log("! Found");
 					this.tokenArray.push(new Token("EPoint"));
-					Main.createNewUpdateMessage("! Token Created!");
+					Main.createNewUpdateMessage("! Token Found on line " + this.lineNumber);
 					break;
 				case 7:
 					console.log("+ Found");
 					this.tokenArray.push(new Token("EPoint"));
-					Main.createNewUpdateMessage("+ Token Created!");
+					Main.createNewUpdateMessage("+ Token Found on line " + this.lineNumber);
 					break;
 				case 8:
 					console.log("= Found");
 					this.tokenArray.push(new Token("Assignment"));
-					Main.createNewUpdateMessage("= Token Created!");
+					Main.createNewUpdateMessage("= Token Found on line " + this.lineNumber);
 					break;
 				case 11:
 					console.log("int type Found");
 					this.tokenArray.push(new Token("type"));
-					Main.createNewUpdateMessage("int Token Created!");
+					Main.createNewUpdateMessage("int Token Found on line " + this.lineNumber);
 					break;
 				case 16:
 					console.log("print keyword Found");
 					this.tokenArray.push(new Token("keyword"));
-					Main.createNewUpdateMessage("PRINT Token Created!");
+					Main.createNewUpdateMessage("print Token Found on line " + this.lineNumber);
 					break;
 				case 17:
 					console.log("Digit Found");
 					this.tokenArray.push(new Token("digit"));
-					Main.createNewUpdateMessage("DIGIT FOUND");
+					Main.createNewUpdateMessage("digit Token Found on line " + this.lineNumber);
 					break;
 				default:
 					return false;
@@ -93,7 +96,7 @@ module JOEC {
 		public generateTokens(sourceCode:string) {
 
 			// Create variables
-			var lineNumber: number = 1; // The current line number
+
 			var currentState: number = 0; // The current state
 			var nextState: number;
 			var nextCharacter: string;
@@ -105,19 +108,27 @@ module JOEC {
 
 				// Check to see if the next character is a line number and if so then increase the counter and get next character
 				if (sourceCode.charCodeAt(i) == 10) {
-					lineNumber++;
+					this.lineNumber++;
 				}
 				else {
 
 				// Get the next character value
 				nextCharacter = sourceCode.charAt(i);
 
-				holder = holder + nextCharacter;
+				this.currentCharacters = this.currentCharacters + nextCharacter;
 
 				console.log("Next Character: " + nextCharacter);
 
 				// Get the table position of the character
 				nextTablePosition = Utils.getCharacterPosition(nextCharacter);
+
+				// Check to see if there is an error
+				if(nextTablePosition == null) {
+					Main.createNewErrorMessage("Unknown character " + this.currentCharacters + " found on line " + this.lineNumber);
+					this.hasErrors = true;
+					return;
+
+				}
 
 				console.log(nextTablePosition + " NTP");
 
@@ -127,7 +138,7 @@ module JOEC {
 				// Check the new state to see if it is an accepting state
 				if (this.checkForAcceptState(nextState)) {
 					currentState = 0;
-					holder = "";
+					this.currentCharacters = "";
 				}
 				else {
 					console.log("else if firing");
@@ -139,10 +150,10 @@ module JOEC {
 		public createTransitionTable() {
 
 			_transitionTable = [ 
-						 // 00 * 01 * 02 * 03 * 04 * 05 * 06 * 07 * 08 * 09 * 10 * 11 * 12 * 13 * 14 * 15 * 16 * 17 * 18 * 19 * 20 * 21 * 22 * 23 * 24 * 25 * 26 * 27 * 28 * 29 * 30 * 31 * 32 * 33 * 34 * 35 * 36 * 37 * 38 * 39 * 40 * 41 * 42 * 43 * 44   *	
-						 //  a *  b *  c *  d *  e *  f *  g *  h *  i *  j *  k *  l *  m *  n *  o *  p *  q *  r *  s *  t *  u *  v *  w *  x *  y *  z *  0 *  1 *  2 *  3 *  4 *  5 *  6 *  7 *  8 *  9 *  $ *  { *  } *  ( *  ) *  ! *  + *    *  =   *
-				/* 00 */  [  0 , 18 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  9 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 , 12 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 ,  1 ,  2 ,  3 ,  4 ,  5 ,  6 ,  7 ,  0 ,  8 ],                                                                                  
-				/* 01 */  [  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+						 // 00 * 01 * 02 * 03 * 04 * 05 * 06 * 07 * 08 * 09 * 10 * 11 * 12 * 13 * 14 * 15 * 16 * 17 * 18 * 19 * 20 * 21 * 22 * 23 * 24 * 25 * 26 * 27 * 28 * 29 * 30 * 31 * 32 * 33 * 34 * 35 * 36 * 37 * 38 * 39 * 40 * 41 * 42 * 43 * 44 * 45 *	
+						 //  a *  b *  c *  d *  e *  f *  g *  h *  i *  j *  k *  l *  m *  n *  o *  p *  q *  r *  s *  t *  u *  v *  w *  x *  y *  z *  0 *  1 *  2 *  3 *  4 *  5 *  6 *  7 *  8 *  9 *  $ *  { *  } *  ( *  ) *  ! *  + *    *  =   "  *
+				/* 00 */  [  0 , 18 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  9 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 , 12 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 , 17 ,  1 ,  2 ,  3 ,  4 ,  5 ,  6 ,  7 ,  0 ,  8 , 0],                                                                                  
+				/* 01 */  [  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 , 0],
 				/* 02 */  [  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
 				/* 03 */  [  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
 				/* 04 */  [  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],                                                                                  

@@ -5,4 +5,129 @@ Spring 2016
 
 ============
 
+Crafting a Compiler
+-------------------
+
+1.11
+-----
+
+
+
+3.1
+-----
+
+Q. Assume the following text is presented to a C scanner
+
+	main() {
+		const float payment = 384.00;
+		float bal;
+		int month = 0;
+		bal = 15000;
+		while(bal > 0){
+			printf("Month: %2d Balance: %10.2f\n", month, bal);
+			bal=bal-payment+0.015*bal;
+			month=month+1;
+		}
+	}
+
+What token sequence is produced? For which tokens must extra information be retunred in addition to the token code?
+
+1. main     - > Keyword
+2. (        - > Left Para
+3. )        - > Right Para
+4. {        - > Left Bracket
+5. const    - > Keyword
+6 float     - > type
+7. payment  - > identifier
+8. =        - > Assignment Symbol
+9. 384.00   - > decimal
+10. ;       - > statement ender
+11. float   - > type
+12. bal     - > identifier
+13. ;       - > statement ender
+14. int     - > type
+15. mont h  - > identifer
+16. =       - > Assignement Symbol
+17. 0       - > number
+18. ;       - > statement ender
+19. bal     - > identifier
+20. =       - > Assignement Symbol
+21. 15000   - > number
+22. ;       - > statement ender
+23. while   - > Keyword
+24. (       - > Left Para
+25. bal     - > identifier
+26. >       - > number
+27. 0       - > number
+28. )       - > Right Para
+29. {       - > Left Bracket
+30. printf  - > Keyword
+31. "..."   - > String
+32. ,       - > Comma
+33. month   - > identifier
+34. ,       - > Comma
+35. bal     - > identifier
+36. )       - > Right Para
+37. ;       - > statement ender
+38. bal     - > identifier  
+39. =       - > Assignement Symbol
+40. bal     - > identifier
+41. -       - > minus-sign
+42. payment - > identifier
+43. +       - > plus-sign
+44. 0.015   - > number
+45. *       - > multi-sign
+46. bal     - > identifier
+47. ;       - > statement ender
+48. month   - > identifier
+49. =       - > Assignement Symbol
+50. month   - > identifier
+51. +       - > plus-sign
+52. 1       - > number
+53. ;       - > statement ender
+54. }       - > Right Bracket
+55. }       - > Right Bracket
+
+
+Dragon Bible
+-------------
+
+
+1.1.4
+------
+Q. A compiler that translate a high-level language into another high level language is called a source-to-source translator. What advantages are there to using C as a target language for a compiler.
+
+A. 
+
+1.6.1
+-----
+
+Q. For the block-structured C code of Fig.1.13(a), indicate the values assigned to w, x, y, and z.
+
+ int w, x, y, z;
+ int i = 4;
+ int j = 5;
+
+ {
+   int j = 7;
+   i = 6;
+   w = i + j; // W = 7 + 6 (13)
+ }
+
+ x = i + j; // X = 6 + 5 (11)
+
+ { 
+   int i = 8;
+   y = i + j; // Y = 8 + 5 (13)
+ }
+
+ z = i + j; // z = 5 + 6 (11)
+
+A.
+
+W = 13
+X = 11
+Y = 13
+z = 11
+
 

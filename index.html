@@ -32,7 +32,15 @@
       <textarea id="programInput" 
                 placeholder="Type your code here..."></textarea>
    </div>
-   <div id="buttonBar">
+
+   <div id="buttonBar"> 
+      <div id="statusBar">
+        <p> Lex   <span id="lexCheck"  class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
+        <p> Parse <span id="parseCheck" class="glyphicon glyphicon-ok right "></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
+        <p> Sem. Analysis   <span id="lexCheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right"  hidden="hidden">  </span> </p>
+        <p> Code Gen <span id="parseCheck" class="glyphicon glyphicon-ok right"></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
+   </div>
+   
     <button id="compileButton"
             type="button" 
             style="width: 150px;" 
@@ -41,7 +49,7 @@
     <button id="stopButton"
             type="button" 
             style="width: 150px; margin-top: 15px;" 
-            class="btn btn-default" onclick="JOEC.Main.stopCompiler();" disabled >Stop</button>
+            class="btn btn-default" onclick="JOEC.Main.stopButton();" disabled >Stop</button>
 
     <button id="loadButton"
             type="button" 

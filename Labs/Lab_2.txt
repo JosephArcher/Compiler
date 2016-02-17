@@ -1,0 +1,32 @@
+Joe Archer
+Lab 2
+Compilers
+Spring 2016
+
+============
+
+Crafting a Compiler
+-------------------
+
+3.3
+Q. Write regular expressions that define the strings recognized by the FA's in Figure 3.33 on page 107.
+
+3.4
+Q.Write DFA's that recognize the tokens defined by the following regualr expressions
+
+A.
+B.
+C.
+D.
+
+3.15
+
+Q. Show the NFA that would be created for the following expression using the techniques of Section 3.8
+
+
+Dragon Bible
+-------------
+
+3.3.4
+
+Q. Most languages are case sensitive, so keywords can be written only one way, and the regular expressions describing their lexeme is very simple. However, some languages, like SQL, are case insensitive, so a keyword can be written either in lowercase or in uppercase, or in any mixture of cases. Thus, the SQL keyword SELECT can also be written select, Select, or sElEcT, for instance. Show how to write a regular expression for a keyword in a case-insensitive language. Illustrate the idea by writing the expression for "select" in SQL.

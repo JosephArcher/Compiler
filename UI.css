@@ -29,6 +29,12 @@
 	margin-left: 25px; 
 	margin-top:250px;
 }
+#statusBar {
+	margin-top: -150px;
+}
+.right {
+	float: right;
+}
 #programOutputSection {
 	width: 300px; 
 	float: right;
@@ -56,4 +62,18 @@
 	border: 3px solid #cccccc; 
 	outline: none;
 	font-family:Tahoma,sans-serif;
+}
+#lexCheck {
+	margin-left: 10px;
+	visibility: hidden;
+}
+#parseCheck {
+	margin-left: 10px;
+	visibility: hidden;
+}
+#lexError {
+	visibility: hidden;
+}
+#parseError {
+		visibility: hidden;
 }

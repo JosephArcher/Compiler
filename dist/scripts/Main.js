@@ -29,9 +29,34 @@ var JOEC;
             this.createNewUpdateMessage("Starting Token Generation");
             LA.generateTokens(sourceCode);
             // TODO: Before moving on to the next step need to check the status of the LA to see if any errors have occured
+            if (LA.hasErrors) {
+                this.createNewErrorMessage("Compilation Failed :( ");
+                // X Mark
+                var lexremoveUI = document.getElementById("lexError");
+                lexremoveUI.style.visibility = "visible";
+                this.stopCompiler();
+                return;
+            }
+            // Finish off the lexer and update the UI for the User
+            this.createNewUpdateMessage("Lex Completed");
+            // Check Mark
+            var lexCheckUI = document.getElementById("lexCheck");
+            lexCheckUI.style.visibility = "visible";
+            // X Mark
+            var lexremoveUI = document.getElementById("lexError");
+            lexremoveUI.style.visibility = "hidden";
             // Create a new Parser
             this.createNewUpdateMessage("Creating Parser");
             //var Parser = new Parser();
+            // Finish off the Parser and update the UI for the User
+            this.createNewUpdateMessage("Parser Completed");
+            var parseCheckUI = document.getElementById("parseCheck");
+            parseCheckUI.style.visibility = "visible";
+        };
+        Main.stopButton = function () {
+            // Update the user
+            this.createNewUpdateMessage("Current Compilation was stopped by the user!");
+            this.stopCompiler();
         };
         Main.stopCompiler = function () {
             // Mark the compiler as off
@@ -42,8 +67,6 @@ var JOEC;
             // Disable the stop button because no program is being compiled anymore
             var stopButton = document.getElementById("stopButton");
             stopButton.disabled = true;
-            // Update the user
-            this.createNewUpdateMessage("Current Compilation was stopped by the user!");
         };
         Main.createNewErrorMessage = function (msg) {
             var consoleHTML = document.getElementById("console");
