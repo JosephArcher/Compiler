@@ -13,5 +13,11 @@ module JOEC {
 			this.kind = _kind;
 			this.value = _value;
 		}
+		public getValue(){
+			return this.value;
+		}
+		public getKind(){
+			return this.kind;
+		}
 	}
 }

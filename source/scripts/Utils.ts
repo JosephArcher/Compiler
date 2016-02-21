@@ -54,6 +54,7 @@ module JOEC {
 			_alphabet["+"] = { pos: 42 };
 			_alphabet[" "] = { pos: 43 };
 			_alphabet["="] = { pos: 44 };
+			_alphabet["\""] = { pos: 45 };
 
 			console.log(_alphabet[" "]);
 		}
