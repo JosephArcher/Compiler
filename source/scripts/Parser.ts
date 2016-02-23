@@ -86,7 +86,6 @@ module JOEC {
 		*/
 		public parseStatementList() {
 
-
 			if(this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "Type" || this.currentToken.getValue() == "if" ){
 
 				// Statement
@@ -95,12 +94,11 @@ module JOEC {
 				// StatementList
 				this.parseStatementList();
 			}
-			else {
+			else  {
 
 				// Do Nothing
 				return;
 			}
-
 		}
 		/**
 		* Statement
@@ -209,6 +207,7 @@ module JOEC {
 		*/
 		public parseExpression(){
 
+			console.log("Expression");
 			// INT
 			if(this.currentToken.getKind() == "Digit"){
 				this.parseIntegerExpression();
@@ -218,7 +217,8 @@ module JOEC {
 				this.parseStringExpression();
 			}
 			// BOOLEAN
-			else if(this.currentToken.getKind() == "BoolVal"){
+			else if(this.currentToken.getKind() == "BoolVal" || this.currentToken.getValue() == "(" ){
+				console.log("BOOLEAN");
 				this.parseBooleanExpression();
 			}
 			// ID
@@ -262,8 +262,9 @@ module JOEC {
 		*/
 		public parseBooleanExpression(){
 
+			console.log("Boolean Express");
 			if(this.currentToken.getValue() == "("){
-
+				console.log("Para found");
 				this.matchCharacter("(");
 
 				this.parseExpression();

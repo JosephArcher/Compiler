@@ -161,6 +161,7 @@ var JOEC;
         * Expression
         */
         Parser.prototype.parseExpression = function () {
+            console.log("Expression");
             // INT
             if (this.currentToken.getKind() == "Digit") {
                 this.parseIntegerExpression();
@@ -168,7 +169,8 @@ var JOEC;
             else if (this.currentToken.getKind() == "String") {
                 this.parseStringExpression();
             }
-            else if (this.currentToken.getKind() == "BoolVal") {
+            else if (this.currentToken.getKind() == "BoolVal" || this.currentToken.getValue() == "(") {
+                console.log("BOOLEAN");
                 this.parseBooleanExpression();
             }
             else if (this.currentToken.getKind() == "Identifier") {
@@ -202,7 +204,9 @@ var JOEC;
         * Boolean Expression
         */
         Parser.prototype.parseBooleanExpression = function () {
+            console.log("Boolean Express");
             if (this.currentToken.getValue() == "(") {
+                console.log("Para found");
                 this.matchCharacter("(");
                 this.parseExpression();
                 this.parseBooleanOperator();
