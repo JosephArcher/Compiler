@@ -112,7 +112,7 @@ var JOEC;
                 case 17:
                     console.log("Digit Found");
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("digit Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewUpdateMessage("Digit" + this.currentCharacters.trim() + "Found on line " + this.lineNumber);
                     break;
                 // String
                 case 31:
@@ -126,7 +126,7 @@ var JOEC;
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.trim()));
                     JOEC.Utils.createNewUpdateMessage("ID  " + this.currentCharacters + " Token Found on line " + this.lineNumber);
                     break;
-                // Boolean value
+                // Boolean value ( true | false )
                 case 36:
                     console.log("BoolVal Found");
                     this.tokenArray.push(new JOEC.Token("BoolVal", this.lineNumber, this.currentCharacters.trim()));
@@ -136,27 +136,37 @@ var JOEC;
                 case 41:
                     console.log("If Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("If " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewUpdateMessage("if " + this.currentCharacters + " Token Found on line " + this.lineNumber);
                     break;
                 // Invalid Keyword Fix
                 case 42:
                     console.log("Invalid Keyword Fix");
+                    console.log(this.currentCharacters);
                     // Loop over the current characters and make an identifier out of each
                     for (var i = 0; i < this.currentCharacters.length; i++) {
-                        // Check to see if the character is a space
-                        if (this.currentCharacters.charAt(i) == " ") {
-                        }
-                        else if (this.isSymbol(this.currentCharacters.charAt(i))) {
-                            this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                            JOEC.Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
-                        }
-                        else if (this.isDigit(this.currentCharacters.charAt(i))) {
-                            this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                            JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                        // Check to see if this is the last time and if so write out the current string
+                        if (i == this.currentCharacters.length - 1) {
+                            console.log("THIS SHIT NEEDS TO GO BACK! " + this.currentCharacters.charAt(this.currentCharacters.length - 1));
+                            // ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
+                            this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
                         }
                         else {
-                            this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                            JOEC.Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                            // Check to see if the character is a space
+                            if (this.currentCharacters.charAt(i) == " ") {
+                            }
+                            else if (this.isSymbol(this.currentCharacters.charAt(i))) {
+                                this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
+                                JOEC.Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+                            }
+                            else if (this.isDigit(this.currentCharacters.charAt(i))) {
+                                console.log("DIGIT BROKE? 1");
+                                this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
+                                JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                            }
+                            else {
+                                this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
+                                JOEC.Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                            }
                         }
                     }
                     break;
@@ -167,7 +177,7 @@ var JOEC;
         };
         LexicalAnalyzer.prototype.writeOutCharacter = function (toWrite) {
             console.log("write out leftover Fix");
-            // Loop over the current characters and make an identifier out of each
+            // Loop over the current characters and make an identifier out of each and place and last character read back into the source
             for (var i = 0; i < this.currentCharacters.length; i++) {
                 // Check to see if the character is a space
                 if (this.currentCharacters.charAt(i) == " ") {
@@ -178,7 +188,7 @@ var JOEC;
                 }
                 else if (this.isDigit(this.currentCharacters.charAt(i))) {
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
                 else {
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
@@ -240,7 +250,7 @@ var JOEC;
             _transitionTable = [
                 // 00 * 01 * 02 * 03 * 04 * 05 * 06 * 07 * 08 * 09 * 10 * 11 * 12 * 13 * 14 * 15 * 16 * 17 * 18 * 19 * 20 * 21 * 22 * 23 * 24 * 25 * 26 * 27 * 28 * 29 * 30 * 31 * 32 * 33 * 34 * 35 * 36 * 37 * 38 * 39 * 40 * 41 * 42 * 43 * 44 * 45	
                 //  a *  b *  c *  d *  e *  f *  g *  h *  i *  j *  k *  l *  m *  n *  o *  p *  q *  r *  s *  t *  u *  v *  w *  x *  y *  z *  0 *  1 *  2 *  3 *  4 *  5 *  6 *  7 *  8 *  9 *  $ *  { *  } *  ( *  ) *  ! *  + *    *  = *  " 
-                /* 00 */ [32, 18, 32, 32, 32, 0, 32, 32, 9, 32, 32, 32, 32, 32, 32, 12, 32, 32, 24, 33, 32, 32, 0, 32, 32, 32, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 1, 2, 3, 4, 5, 6, 7, 0, 8, 30],
+                /* 00 */ [32, 18, 32, 32, 32, 37, 32, 32, 9, 32, 32, 32, 32, 32, 32, 12, 32, 32, 24, 33, 32, 32, 0, 32, 32, 32, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 1, 2, 3, 4, 5, 6, 7, 0, 8, 30],
                 /* 01 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 02 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 03 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -249,8 +259,8 @@ var JOEC;
                 /* 06 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 07 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 08 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 09 */ [0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0],
-                /* 10 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                /* 09 */ [42, 42, 42, 42, 42, 41, 42, 42, 42, 42, 42, 42, 42, 10, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 10 */ [42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 11 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 12 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 13 */ [0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -261,9 +271,9 @@ var JOEC;
                 /* 18 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 19, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 19 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 20, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 20 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 21, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
-                /* 21 */ [0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 22 */ [23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 23 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                /* 21 */ [42, 42, 42, 42, 22, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 22 */ [23, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 23 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 11, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 24 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 25, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 24, 42, 42],
                 /* 25 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 26 */ [0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -277,10 +287,10 @@ var JOEC;
                 /* 34 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 35 */ [0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 36 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 37 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 38 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 39 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 40 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                /* 37 */ [38, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 38 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 39, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 39 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 40, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
+                /* 40 */ [42, 42, 42, 42, 36, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 41 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 42 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 43 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
