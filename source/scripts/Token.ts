@@ -5,12 +5,13 @@ module JOEC {
 
 
 		public kind: string;
-		public value: string;
 		public lineNumber: number;
+		public value: string;
 
-		public constructor(_kind: string, _value?: string) {
+		public constructor(_kind: string, _lineNumber: number, _value?: string) {
 
 			this.kind = _kind;
+			this.lineNumber = _lineNumber;
 			this.value = _value;
 		}
 		public getValue(){
@@ -18,6 +19,9 @@ module JOEC {
 		}
 		public getKind(){
 			return this.kind;
+		}
+		public getLineNumber(){
+			return this.lineNumber;
 		}
 	}
 }

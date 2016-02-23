@@ -27,21 +27,19 @@ module JOEC {
 			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
 			stopButton.disabled = false;
 
-			this.createNewUpdateMessage("Starting Compilation! \n \n ");
-			this.createNewUpdateMessage("Starting Lexical Analysis!");
+			Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
+			Utils.createNewUpdateMessage("Starting Lexical Analysis!");
 
 			// Create a new Lexical Analzer
-			var LA = new LexicalAnalyzer();
-
-			// Get the Source Code
-			var sourceCode = LA.getSourceCode()
+			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
 			// Start to generate tokens
-			LA.generateTokens(sourceCode);
+			LA.generateTokens();
 
+			// Check for errors
 			if(LA.hasErrors) {
 
-				this.createNewErrorMessage("Compilation Failed :( ");
+				Utils.createNewErrorMessage("Compilation Failed :( ");
 
 				// X Mark
 				var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
@@ -56,12 +54,12 @@ module JOEC {
 
 			if (lastToken.getValue() != "$") {
 
-				this.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
-				LA.tokenArray.push(new Token("EOF", "$"));
+				Utils.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
+				LA.tokenArray.push(new Token("EOF", -1, "$"));
 			}
 
 			// Finish off the lexer and update the UI for the User
-			this.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+			Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
 
 			// Check Mark
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
@@ -72,24 +70,37 @@ module JOEC {
 			lexremoveUI.style.visibility = "hidden";
 
 			// Create a new Parser
-			this.createNewUpdateMessage("Creating Parser");
+			Utils.createNewUpdateMessage("Creating Parser");
 			var Par = new Parser();
+
+			// Start her up
 			Par.startParse(LA.tokenArray);
 
+			// Check for errors
+			if(Par.hasErrors) {
+
+				Utils.createNewErrorMessage("Compilation Failed :( ");
+
+				// X Mark
+				var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
+				parseremoveUI.style.visibility = "visible";
+
+				this.stopCompiler();
+ 
+				return;
+
+			}
 			// Finish off the Parser and update the UI for the User
-			this.createNewUpdateMessage("Parser Completed");
+			Utils.createNewUpdateMessage("Parser Completed");
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";
-
-
 		}
-		public static stopButton() {
 
-			// Update the user
-			this.createNewUpdateMessage("Current Compilation was stopped by the user!");
-			this.stopCompiler();
-		}
+		/**
+		* Stops the current compilation
+		*/
 		public static stopCompiler() {
+
 			// Mark the compiler as off
 			_isRunning = false;
 
@@ -101,17 +112,6 @@ module JOEC {
 			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
 			stopButton.disabled = true;
 		}
-		public static createNewErrorMessage(msg) {
-			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
-			consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
-		}
-		public static createNewWarningMessage(msg) {
-			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
-			consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
-		}
-		public static createNewUpdateMessage(msg) {
-			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
-			consoleHTML.innerHTML = consoleHTML.value + "\n Update :  " + msg;
-		}
+		
 	}
 }

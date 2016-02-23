@@ -21,16 +21,15 @@ var JOEC;
             // Enable the Stop Button to allow user to stop the current compilation
             var stopButton = document.getElementById("stopButton");
             stopButton.disabled = false;
-            this.createNewUpdateMessage("Starting Compilation! \n \n ");
-            this.createNewUpdateMessage("Starting Lexical Analysis!");
+            JOEC.Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
+            JOEC.Utils.createNewUpdateMessage("Starting Lexical Analysis!");
             // Create a new Lexical Analzer
-            var LA = new JOEC.LexicalAnalyzer();
-            // Get the Source Code
-            var sourceCode = LA.getSourceCode();
+            var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Start to generate tokens
-            LA.generateTokens(sourceCode);
+            LA.generateTokens();
+            // Check for errors
             if (LA.hasErrors) {
-                this.createNewErrorMessage("Compilation Failed :( ");
+                JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
                 // X Mark
                 var lexremoveUI = document.getElementById("lexError");
                 lexremoveUI.style.visibility = "visible";
@@ -40,11 +39,11 @@ var JOEC;
             // Check to see if the $(EOF) is the last token is the array and if not correct the error and emit a warning
             var lastToken = LA.tokenArray[LA.tokenArray.length - 1];
             if (lastToken.getValue() != "$") {
-                this.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
-                LA.tokenArray.push(new JOEC.Token("EOF", "$"));
+                JOEC.Utils.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
+                LA.tokenArray.push(new JOEC.Token("EOF", -1, "$"));
             }
             // Finish off the lexer and update the UI for the User
-            this.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+            JOEC.Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
             // Check Mark
             var lexCheckUI = document.getElementById("lexCheck");
             lexCheckUI.style.visibility = "visible";
@@ -52,19 +51,27 @@ var JOEC;
             var lexremoveUI = document.getElementById("lexError");
             lexremoveUI.style.visibility = "hidden";
             // Create a new Parser
-            this.createNewUpdateMessage("Creating Parser");
+            JOEC.Utils.createNewUpdateMessage("Creating Parser");
             var Par = new JOEC.Parser();
+            // Start her up
             Par.startParse(LA.tokenArray);
+            // Check for errors
+            if (Par.hasErrors) {
+                JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
+                // X Mark
+                var parseremoveUI = document.getElementById("parseError");
+                parseremoveUI.style.visibility = "visible";
+                this.stopCompiler();
+                return;
+            }
             // Finish off the Parser and update the UI for the User
-            this.createNewUpdateMessage("Parser Completed");
+            JOEC.Utils.createNewUpdateMessage("Parser Completed");
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";
         };
-        Main.stopButton = function () {
-            // Update the user
-            this.createNewUpdateMessage("Current Compilation was stopped by the user!");
-            this.stopCompiler();
-        };
+        /**
+        * Stops the current compilation
+        */
         Main.stopCompiler = function () {
             // Mark the compiler as off
             _isRunning = false;
@@ -74,18 +81,6 @@ var JOEC;
             // Disable the stop button because no program is being compiled anymore
             var stopButton = document.getElementById("stopButton");
             stopButton.disabled = true;
-        };
-        Main.createNewErrorMessage = function (msg) {
-            var consoleHTML = document.getElementById("console");
-            consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
-        };
-        Main.createNewWarningMessage = function (msg) {
-            var consoleHTML = document.getElementById("console");
-            consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
-        };
-        Main.createNewUpdateMessage = function (msg) {
-            var consoleHTML = document.getElementById("console");
-            consoleHTML.innerHTML = consoleHTML.value + "\n Update :  " + msg;
         };
         return Main;
     })();

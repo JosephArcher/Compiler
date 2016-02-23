@@ -69,5 +69,25 @@ module JOEC {
 			console.log("Unknown character found");
 			return null;
 		}
+		/**	
+		* Get the Source Code
+		*/
+		public static getSourceCode(): string {
+
+			var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
+			return sourceCodeHTML.value;
+		}
+		public static createNewErrorMessage(msg) {
+			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
+			consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
+		}
+		public static createNewWarningMessage(msg) {
+			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
+			consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
+		}
+		public static createNewUpdateMessage(msg) {
+			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
+			consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
+		}
 	}
 }

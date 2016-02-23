@@ -1,8 +1,9 @@
 var JOEC;
 (function (JOEC) {
     var Token = (function () {
-        function Token(_kind, _value) {
+        function Token(_kind, _lineNumber, _value) {
             this.kind = _kind;
+            this.lineNumber = _lineNumber;
             this.value = _value;
         }
         Token.prototype.getValue = function () {
@@ -10,6 +11,9 @@ var JOEC;
         };
         Token.prototype.getKind = function () {
             return this.kind;
+        };
+        Token.prototype.getLineNumber = function () {
+            return this.lineNumber;
         };
         return Token;
     })();

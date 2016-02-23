@@ -65,6 +65,25 @@ var JOEC;
             console.log("Unknown character found");
             return null;
         };
+        /**
+        * Get the Source Code
+        */
+        Utils.getSourceCode = function () {
+            var sourceCodeHTML = document.getElementById("programInput");
+            return sourceCodeHTML.value;
+        };
+        Utils.createNewErrorMessage = function (msg) {
+            var consoleHTML = document.getElementById("console");
+            consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
+        };
+        Utils.createNewWarningMessage = function (msg) {
+            var consoleHTML = document.getElementById("console");
+            consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
+        };
+        Utils.createNewUpdateMessage = function (msg) {
+            var consoleHTML = document.getElementById("console");
+            consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
+        };
         return Utils;
     })();
     JOEC.Utils = Utils;

@@ -4,82 +4,109 @@
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
 
+/**
+* Parser 
+*/
 module JOEC {
 
 	export class Parser {	
-	
+		
 		public currentToken: JOEC.Token;
+
+		// False if no error | True if any error
 		public hasErrors: boolean = false;
+
+		// Holds the Tokens
 		public tokenQueue = new Queue();
 
-		constructor() {
+		// Constructor
+		constructor() {}
 
-		}
 		/**
 		*	Called to start the parser
 		*/
-		public startParse(tokenArray){
-			console.log(tokenArray);
+		public startParse(tokenArray) {
+
 			var len = tokenArray.length;
+
 			for (var i = 0; i < len; i++){
-				console.log(i);
 				this.tokenQueue.enqueue(tokenArray[i]);
 			}
+
+			// Parse Program
 			this.parseProgram();
 
 		}
-		public matchCharacter(theCharacter: string) {
+		/**
+		* Used to match the current token and then get the 
+		*/
+		public matchCharacter(toMatch: string) {
 
-			if(this.currentToken.getValue() == theCharacter){
+			if(this.currentToken.getValue() == toMatch){
 
-				console.log("A match was found for " + theCharacter);
+				console.log("A match was found for " + toMatch);
 				this.currentToken = this.tokenQueue.dequeue();
 			}
 			else{
 				console.log("Error no match was found");
-				Main.createNewErrorMessage("Expecting " + theCharacter + " but found " + this.currentToken.getValue());
+				Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
+				this.hasErrors = true;
 			}
 		}
 		/**
-		*
+		* Program
 		*/
 		public parseProgram () {
 
-			console.log(this.tokenQueue);
 			// Get the first character
 			this.currentToken= <JOEC.Token> this.tokenQueue.dequeue();
 
-			console.log(this.currentToken);
 			// Block
 			this.parseBlock();
 
 			// Dollar Sign
-			if(this.currentToken.getValue() == '$'){
-				this.matchCharacter('$');
-			}
-
+			this.matchCharacter('$');
 		}
+		/**
+		* Block
+		*/
 		public parseBlock() {
 
-				this.matchCharacter('{');
-				this.parseStatementList();
-				this.matchCharacter('}');
-		}
-		public parseStatementList(){
-			console.log(this.currentToken.getValue());
+			// {
+			this.matchCharacter('{');
 
-			if(this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "type" || this.currentToken.getValue() == "if" ){
+			// Statement List
+			this.parseStatementList();
+
+			// }
+			this.matchCharacter('}');
+		}
+		/**
+		* Statement List
+		*/
+		public parseStatementList() {
+
+
+			if(this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "Type" || this.currentToken.getValue() == "if" ){
+
+				// Statement
 				this.parseStatement();
+
+				// StatementList
 				this.parseStatementList();
 			}
-			else{
+			else {
+
+				// Do Nothing
 				return;
 			}
 
 		}
+		/**
+		* Statement
+		*/
 		public parseStatement() {
 
-			console.log("statement");
 			// Print Statement
 			if(this.currentToken.getValue() == "print"){
 				this.parsePrintStatement();
@@ -89,7 +116,7 @@ module JOEC {
 				this.parseAssignmentStatement();
 			}
 			// Var Decl
-			else if(this.currentToken.getKind() == "type"){
+			else if(this.currentToken.getKind() == "Type"){
 				this.parseVarDecl();
 			}
 			// While Statement
@@ -105,6 +132,9 @@ module JOEC {
 				this.parseBlock();
 			}
 		}
+		/**
+		* Print Statement
+		*/
 		public parsePrintStatement(){
 
 			// Print
@@ -113,115 +143,163 @@ module JOEC {
 			// Match (
 			this.matchCharacter("(");
 
-			// EXPR
-			this.parseExpr();
+			// Expression
+			this.parseExpression();
 
 			// Match )
 			this.matchCharacter(")");
 
 		}
+		/**
+		* Assignment Statement
+		*/
 		public parseAssignmentStatement(){
 
-			console.log("Parsing Assignment Statement");
-			// ID
-			this.parseId();
+			// Identifier
+			this.parseIdentifier();
 
+			// =
 			this.matchCharacter("=");
 
-			// Expr
-			this.parseExpr();
+			// Expression
+			this.parseExpression();
 		}
+		/**
+		* Variable Declaration Statement
+		*/
 		public parseVarDecl() {
+
+			// Type
 			this.parseType();
-			this.parseId();
+
+			// Identifier
+			this.parseIdentifier();
 		}
+		/**
+		* While Statement
+		*/
 		public parseWhileStatement(){
 
+			// While
 			this.matchCharacter("while")
 
-			this.parseBooleanExpr();
+			// Boolean Expression
+			this.parseBooleanExpression();
 
+			// Block
 			this.parseBlock();
 
 		}
+		/**
+		* If Statement
+		*/
 		public parseIfStatement(){
 
+			// If
 			this.matchCharacter("if");
 
-			this.parseBooleanExpr();
+			// Boolean Expression
+			this.parseBooleanExpression();
 
+			// Block
 			this.parseBlock();
-
 		}
-		public parseExpr(){
+		/**
+		* Expression
+		*/
+		public parseExpression(){
 
 			// INT
-			if(this.currentToken.getKind() == "digit"){
-				this.parseIntExpr();
+			if(this.currentToken.getKind() == "Digit"){
+				this.parseIntegerExpression();
 			}
 			// STRING
-			else if(this.currentToken.getValue() == "\""){
-				this.parseStringExpr();
+			else if(this.currentToken.getKind() == "String"){
+				this.parseStringExpression();
 			}
 			// BOOLEAN
-			else if(this.currentToken.getKind() == "boolVal"){
-				this.parseBooleanExpr();
+			else if(this.currentToken.getKind() == "BoolVal"){
+				this.parseBooleanExpression();
 			}
 			// ID
 			else if (this.currentToken.getKind() == "Identifier") {
-				this.parseId();
+				this.parseIdentifier();
 			}
 		}
-		public parseIntExpr(){
+		/**
+		* Int Expression
+		*/
+		public parseIntegerExpression(){
+
 			// Parse Digit
 			this.parseDigit();
 
 			// Check to see what next
 			if(this.currentToken.getValue() == "+"){
-				this.parseIntOp();
-				this.parseExpr();
+				this.parseIntegerOperator();
+				this.parseExpression();
 			}
 
 		}
-		public parseStringExpr(){
+		/**
+		* String Expression
+		*/
+		public parseStringExpression(){
 
-			this.matchCharacter("\"");
 
-			this.parseCharList();
+			var currentToken = this.currentToken.getValue();
+			this.matchCharacter(currentToken);
 
-			this.matchCharacter("\"");
+			//this.matchCharacter("\"");
+
+			// while (CurrentCharacter)
+			//this.parseCharacterList();
+
+			//this.matchCharacter("\"");
 		}
-		public parseBooleanExpr(){
+		/**
+		* Boolean Expression
+		*/
+		public parseBooleanExpression(){
 
 			if(this.currentToken.getValue() == "("){
 
 				this.matchCharacter("(");
 
-				this.parseExpr();
+				this.parseExpression();
 
-				this.parseBoolOp();
+				this.parseBooleanOperator();
 
-				this.parseExpr();
+				this.parseExpression();
 
 				this.matchCharacter(")");
 			}
 			else{
-				this.parseBoolVal();
+				this.parseBooleanValue();
 			}
 		}
-		public parseId(){
-			console.log("ID");
+		/**
+		* Identifier
+		*/
+		public parseIdentifier() {
+
 			if (this.currentToken.getKind() == "Identifier") {
 				var currentValue = this.currentToken.getValue();
 				this.matchCharacter(currentValue);
 			}
 
 		}
-		public parseCharList(){
+		/**
+		* Character List
+		*/
+		public parseCharacterList() {
 
 			
 		}
-		public parseType(){
+		/**
+		* Type
+		*/
+		public parseType() {
 			if(this.currentToken.getValue() == "int"){
 				this.matchCharacter("int");
 			}
@@ -232,32 +310,65 @@ module JOEC {
 				this.matchCharacter("boolean");
 			}
 		}
-		public parseChar(){
+		/**
+		* Character
+		*/
+		public parseCharacter(){
 
 		}
+		/**
+		* Digit
+		*/
 		public parseDigit(){
 
-			if (this.currentToken.getKind() == "digit") {
+			if (this.currentToken.getKind() == "Digit") {
 				var currentValue = this.currentToken.getValue();
 				this.matchCharacter(currentValue);
 			}
 		}
-		public parseBoolOp(){
+		/**
+		* Boolean Operator
+		*/
+		public parseBooleanOperator() {
+
+			if(this.currentToken.getValue() == "=") {
+
+				// =
+				this.matchCharacter("=");
+
+				// =
+				this.matchCharacter("=");
+
+			}
+			else { 
+
+				// !
+				this.matchCharacter("!");
+
+				// =
+				this.matchCharacter("=");
+			}
 
 		}
-		public parseBoolVal(){
-			console.log("OUTSIDE");
+		/**
+		* Boolean Value
+		*/
+		public parseBooleanValue() {
+			
 			if(this.currentToken.getKind() == "BoolVal"){
-				console.log("inside");
+				
 				var currentValue = this.currentToken.getValue();
+
 				this.matchCharacter(currentValue);
 			}
-
-
-
 		}
-		public parseIntOp(){
+		/**
+		* Integer Operator
+		*/
+		public parseIntegerOperator() {
 
+			// +
+			this.matchCharacter("+");
 		}
 	}
 }

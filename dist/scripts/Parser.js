@@ -3,67 +3,85 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
+/**
+* Parser
+*/
 var JOEC;
 (function (JOEC) {
     var Parser = (function () {
+        // Constructor
         function Parser() {
+            // False if no error | True if any error
             this.hasErrors = false;
+            // Holds the Tokens
             this.tokenQueue = new JOEC.Queue();
         }
         /**
         *	Called to start the parser
         */
         Parser.prototype.startParse = function (tokenArray) {
-            console.log(tokenArray);
             var len = tokenArray.length;
             for (var i = 0; i < len; i++) {
-                console.log(i);
                 this.tokenQueue.enqueue(tokenArray[i]);
             }
+            // Parse Program
             this.parseProgram();
         };
-        Parser.prototype.matchCharacter = function (theCharacter) {
-            if (this.currentToken.getValue() == theCharacter) {
-                console.log("A match was found for " + theCharacter);
+        /**
+        * Used to match the current token and then get the
+        */
+        Parser.prototype.matchCharacter = function (toMatch) {
+            if (this.currentToken.getValue() == toMatch) {
+                console.log("A match was found for " + toMatch);
                 this.currentToken = this.tokenQueue.dequeue();
             }
             else {
                 console.log("Error no match was found");
-                JOEC.Main.createNewErrorMessage("Expecting " + theCharacter + " but found " + this.currentToken.getValue());
+                JOEC.Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
+                this.hasErrors = true;
             }
         };
         /**
-        *
+        * Program
         */
         Parser.prototype.parseProgram = function () {
-            console.log(this.tokenQueue);
             // Get the first character
             this.currentToken = this.tokenQueue.dequeue();
-            console.log(this.currentToken);
             // Block
             this.parseBlock();
             // Dollar Sign
-            if (this.currentToken.getValue() == '$') {
-                this.matchCharacter('$');
-            }
+            this.matchCharacter('$');
         };
+        /**
+        * Block
+        */
         Parser.prototype.parseBlock = function () {
+            // {
             this.matchCharacter('{');
+            // Statement List
             this.parseStatementList();
+            // }
             this.matchCharacter('}');
         };
+        /**
+        * Statement List
+        */
         Parser.prototype.parseStatementList = function () {
-            console.log(this.currentToken.getValue());
-            if (this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "type" || this.currentToken.getValue() == "if") {
+            if (this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "Type" || this.currentToken.getValue() == "if") {
+                // Statement
                 this.parseStatement();
+                // StatementList
                 this.parseStatementList();
             }
             else {
+                // Do Nothing
                 return;
             }
         };
+        /**
+        * Statement
+        */
         Parser.prototype.parseStatement = function () {
-            console.log("statement");
             // Print Statement
             if (this.currentToken.getValue() == "print") {
                 this.parsePrintStatement();
@@ -71,7 +89,7 @@ var JOEC;
             else if (this.currentToken.getKind() == "Identifier") {
                 this.parseAssignmentStatement();
             }
-            else if (this.currentToken.getKind() == "type") {
+            else if (this.currentToken.getKind() == "Type") {
                 this.parseVarDecl();
             }
             else if (this.currentToken.getValue() == "while") {
@@ -84,88 +102,134 @@ var JOEC;
                 this.parseBlock();
             }
         };
+        /**
+        * Print Statement
+        */
         Parser.prototype.parsePrintStatement = function () {
             // Print
             this.matchCharacter("print");
             // Match (
             this.matchCharacter("(");
-            // EXPR
-            this.parseExpr();
+            // Expression
+            this.parseExpression();
             // Match )
             this.matchCharacter(")");
         };
+        /**
+        * Assignment Statement
+        */
         Parser.prototype.parseAssignmentStatement = function () {
-            console.log("Parsing Assignment Statement");
-            // ID
-            this.parseId();
+            // Identifier
+            this.parseIdentifier();
+            // =
             this.matchCharacter("=");
-            // Expr
-            this.parseExpr();
+            // Expression
+            this.parseExpression();
         };
+        /**
+        * Variable Declaration Statement
+        */
         Parser.prototype.parseVarDecl = function () {
+            // Type
             this.parseType();
-            this.parseId();
+            // Identifier
+            this.parseIdentifier();
         };
+        /**
+        * While Statement
+        */
         Parser.prototype.parseWhileStatement = function () {
+            // While
             this.matchCharacter("while");
-            this.parseBooleanExpr();
+            // Boolean Expression
+            this.parseBooleanExpression();
+            // Block
             this.parseBlock();
         };
+        /**
+        * If Statement
+        */
         Parser.prototype.parseIfStatement = function () {
+            // If
             this.matchCharacter("if");
-            this.parseBooleanExpr();
+            // Boolean Expression
+            this.parseBooleanExpression();
+            // Block
             this.parseBlock();
         };
-        Parser.prototype.parseExpr = function () {
+        /**
+        * Expression
+        */
+        Parser.prototype.parseExpression = function () {
             // INT
-            if (this.currentToken.getKind() == "digit") {
-                this.parseIntExpr();
+            if (this.currentToken.getKind() == "Digit") {
+                this.parseIntegerExpression();
             }
-            else if (this.currentToken.getValue() == "\"") {
-                this.parseStringExpr();
+            else if (this.currentToken.getKind() == "String") {
+                this.parseStringExpression();
             }
-            else if (this.currentToken.getKind() == "boolVal") {
-                this.parseBooleanExpr();
+            else if (this.currentToken.getKind() == "BoolVal") {
+                this.parseBooleanExpression();
             }
             else if (this.currentToken.getKind() == "Identifier") {
-                this.parseId();
+                this.parseIdentifier();
             }
         };
-        Parser.prototype.parseIntExpr = function () {
+        /**
+        * Int Expression
+        */
+        Parser.prototype.parseIntegerExpression = function () {
             // Parse Digit
             this.parseDigit();
             // Check to see what next
             if (this.currentToken.getValue() == "+") {
-                this.parseIntOp();
-                this.parseExpr();
+                this.parseIntegerOperator();
+                this.parseExpression();
             }
         };
-        Parser.prototype.parseStringExpr = function () {
-            this.matchCharacter("\"");
-            this.parseCharList();
-            this.matchCharacter("\"");
+        /**
+        * String Expression
+        */
+        Parser.prototype.parseStringExpression = function () {
+            var currentToken = this.currentToken.getValue();
+            this.matchCharacter(currentToken);
+            //this.matchCharacter("\"");
+            // while (CurrentCharacter)
+            //this.parseCharacterList();
+            //this.matchCharacter("\"");
         };
-        Parser.prototype.parseBooleanExpr = function () {
+        /**
+        * Boolean Expression
+        */
+        Parser.prototype.parseBooleanExpression = function () {
             if (this.currentToken.getValue() == "(") {
                 this.matchCharacter("(");
-                this.parseExpr();
-                this.parseBoolOp();
-                this.parseExpr();
+                this.parseExpression();
+                this.parseBooleanOperator();
+                this.parseExpression();
                 this.matchCharacter(")");
             }
             else {
-                this.parseBoolVal();
+                this.parseBooleanValue();
             }
         };
-        Parser.prototype.parseId = function () {
-            console.log("ID");
+        /**
+        * Identifier
+        */
+        Parser.prototype.parseIdentifier = function () {
             if (this.currentToken.getKind() == "Identifier") {
                 var currentValue = this.currentToken.getValue();
                 this.matchCharacter(currentValue);
             }
         };
-        Parser.prototype.parseCharList = function () {
+        /**
+        * Character List
+        */
+        Parser.prototype.parseCharacterList = function () {
         };
+        /**
+        * Type
+        */
         Parser.prototype.parseType = function () {
             if (this.currentToken.getValue() == "int") {
                 this.matchCharacter("int");
@@ -177,25 +241,52 @@ var JOEC;
                 this.matchCharacter("boolean");
             }
         };
-        Parser.prototype.parseChar = function () {
+        /**
+        * Character
+        */
+        Parser.prototype.parseCharacter = function () {
         };
+        /**
+        * Digit
+        */
         Parser.prototype.parseDigit = function () {
-            if (this.currentToken.getKind() == "digit") {
+            if (this.currentToken.getKind() == "Digit") {
                 var currentValue = this.currentToken.getValue();
                 this.matchCharacter(currentValue);
             }
         };
-        Parser.prototype.parseBoolOp = function () {
+        /**
+        * Boolean Operator
+        */
+        Parser.prototype.parseBooleanOperator = function () {
+            if (this.currentToken.getValue() == "=") {
+                // =
+                this.matchCharacter("=");
+                // =
+                this.matchCharacter("=");
+            }
+            else {
+                // !
+                this.matchCharacter("!");
+                // =
+                this.matchCharacter("=");
+            }
         };
-        Parser.prototype.parseBoolVal = function () {
-            console.log("OUTSIDE");
+        /**
+        * Boolean Value
+        */
+        Parser.prototype.parseBooleanValue = function () {
             if (this.currentToken.getKind() == "BoolVal") {
-                console.log("inside");
                 var currentValue = this.currentToken.getValue();
                 this.matchCharacter(currentValue);
             }
         };
-        Parser.prototype.parseIntOp = function () {
+        /**
+        * Integer Operator
+        */
+        Parser.prototype.parseIntegerOperator = function () {
+            // +
+            this.matchCharacter("+");
         };
         return Parser;
     })();
