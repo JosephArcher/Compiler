@@ -9,104 +9,121 @@ module JOEC {
 
 	export class Main {
 
+		/**
+		* Start Compiler
+		* 
+		* Used to start the compiler, called when the compile button is pressed
+		*/
 		public static startCompiler() {
 
-			// Mark the compiler as running
-			_isRunning = true;
+			// Initalize verbose mode
+			_verboseMode = <HTMLInputElement>document.getElementById("vCheck");
 
 			// Init the Alphabet
 			Utils.initAlphabet();
 
-			console.log(_alphabet);
-			
-			// Disable the Compile Button to prevent spam
+			// Mark the compiler as running
+			_isRunning = true;
+
+			// Disable the Compile Button
 			var compileButton = <HTMLButtonElement>document.getElementById("compileButton");
 			compileButton.disabled = true;
 
-			// Enable the Stop Button to allow user to stop the current compilation
+			// Enable Stop Button to allow user to stop the current compilation
 			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
 			stopButton.disabled = false;
 
-			Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
-			Utils.createNewUpdateMessage("Starting Lexical Analysis!");
+			Utils.createNewUpdateMessage("Starting Compilation!\n");
 
 			// Get the source code
 			var sourceCode = Utils.getSourceCode();
 
 			// Check to see if any source code exists
-			if(sourceCode.length < 1){
+			if(sourceCode.length < 1) { // If no code exists
+
+				// Tell the user and stop 
 				Utils.createNewErrorMessage("No Source Code Found !")
 				this.stopCompiler();
 				return;
 			}
+
 			// Create a new Lexical Analzer
 			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
-			// Start to generate tokens
+			// Generate the tokens
 			LA.generateTokens();
 
-			// Check for errors
+			// Check for any lexical errors
 			if(LA.hasErrors) {
 
+				// Tell the user
 				Utils.createNewErrorMessage("Compilation Failed :( ");
 
-				// X Mark
+				// Mark the lex UI with a error mark
 				var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
 				lexremoveUI.style.visibility = "visible";
 
+				// Stop the comiler
 				this.stopCompiler();
 
 				return;
 			}
+
 			// Check to see if the $(EOF) is the last token is the array and if not correct the error and emit a warning
 			var lastToken:JOEC.Token = LA.tokenArray[LA.tokenArray.length - 1];
 
 			if (lastToken.getValue() != "$") {
 
 				Utils.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
-				LA.tokenArray.push(new Token("EOF", -1, "$"));
+				LA.tokenArray.push(new Token("EOF", 0, "$"));
 			}
 
 			// Finish off the lexer and update the UI for the User
 			Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
 
-			// Check Mark
+			// Update the UI and mark the lexer phase as complete
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
 			lexCheckUI.style.visibility = "visible";
 
-			// X Mark
+			// Update the UI remove the error mark 
 			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
 			lexremoveUI.style.visibility = "hidden";
 
 			// Create a new Parser
-			Utils.createNewUpdateMessage("Creating Parser");
 			var Par = new Parser();
+
+			Utils.createNewUpdateMessage("Creating Parser");
 
 			// Start her up
 			Par.startParse(LA.tokenArray);
 
-			// Check for errors
+			// Check for any parse errors
 			if(Par.hasErrors) {
 
+				// Tell the user
 				Utils.createNewErrorMessage("Compilation Failed :( ");
 
-				// X Mark
+				// Update the parse UI with a error mark
 				var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
 				parseremoveUI.style.visibility = "visible";
 
+				// Stop the comiler
 				this.stopCompiler();
- 
 				return;
-
 			}
-			// Finish off the Parser and update the UI for the User
+
+			// Update the User
 			Utils.createNewUpdateMessage("Parser Completed");
+
+			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";
 		}
 
 		/**
-		* Stops the current compilation
+		* Stop Comiler
+		*
+		* Used to stop the compiler
 		*/
 		public static stopCompiler() {
 

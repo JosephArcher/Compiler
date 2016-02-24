@@ -1,33 +1,70 @@
+/*
+	TEST PROGRAMS 	
+
+	Lex Test Programs
+
+ Test Program 1 (Keywords)
+
+{
+	print
+	while
+	if
+	int
+	string
+	boolean
+	false
+	true
+}$
+
+Test Program 2 (Symbol)
+
+{
+	{
+	}
+	(
+	)
+	$
+	"
+	=
+	!
+	+
+}$
+
+
+Test Program 3 (IDs)
+
+{
+	abcd
+	efgh
+	ijkl
+	mnop
+	qrst
+	uvwx
+	yz
+}$
+
+Test Program 4 (Incorrect Character)
+{
+	hello >
+
+}$
+
+Test Program 5 (Basic print program)
+
+{
+	int a
+	a = 1
+	print(a)	
+}$
+
+*/
+
 function testProgram1() {
 	console.log("Test Program 1 Called");
 	var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
 	sourceCodeHTML.value = "{" +
-		"\n  int a" +
-		"\n a = 1" +
-		"\n print(a)" +
-		"\n }$";
-}
-function testProgram2() {
-	console.log("Test Program 2 Called");
-	var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
-	sourceCodeHTML.value = "{" +
-		"\n \t int b" +
-		"\n \t b = 1" +
-		"\n \t print(b)";
-}
-function testProgram3() {
-	console.log("Test Program 3 Called");
-	var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
-	sourceCodeHTML.value = "{" +
-		"\n \t int c" +
-		"\n \t c = 1" +
-		"\n \t print(c)";
-}
-function testProgram4() {
-	console.log("Test Program 4 Called");
-	var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
-	sourceCodeHTML.value = "{" +
-		"\n \t int d" +
-		"\n \t d = 1" +
-		"\n \t print(d)";
+		"  int a" +
+		" a = 1" +
+		" print(a)" +
+		" }$";
 }

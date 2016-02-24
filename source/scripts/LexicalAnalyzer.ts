@@ -235,7 +235,7 @@ module JOEC {
 			var insideString: number = 0;
 			var nextTablePosition;
 			var holder = "";
-			
+			Utils.createNewUpdateMessage("Starting Lexical Analysis!");
 			// Loop over the source code
 			for (var i = 0; i < this.sourceCode.length; i++) {
 
@@ -290,13 +290,11 @@ module JOEC {
 
 			}
 
-			// Check to see if verbose mdde is enabled
-
 			//If verbose mode
-			// if(_isVerbose.checked){
-			// 	console.log("VERBOSE MODE BB");
-			// 	Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
-			// }
+			if (_verboseMode.checked) {
+			 	console.log("VERBOSE MODE BB");
+			 	Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
+			 }
 		}
 		public createTransitionTable() {
 

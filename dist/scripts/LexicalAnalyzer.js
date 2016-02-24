@@ -210,6 +210,7 @@ var JOEC;
             var insideString = 0;
             var nextTablePosition;
             var holder = "";
+            JOEC.Utils.createNewUpdateMessage("Starting Lexical Analysis!");
             // Loop over the source code
             for (var i = 0; i < this.sourceCode.length; i++) {
                 // Check to see if the next character is a line number and if so then increase the counter and get next character
@@ -251,12 +252,11 @@ var JOEC;
                     this.writeOutCharacter(this.currentCharacters);
                 }
             }
-            // Check to see if verbose mdde is enabled
             //If verbose mode
-            // if(_isVerbose.checked){
-            // 	console.log("VERBOSE MODE BB");
-            // 	Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
-            // }
+            if (_verboseMode.checked) {
+                console.log("VERBOSE MODE BB");
+                JOEC.Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
+            }
         };
         LexicalAnalyzer.prototype.createTransitionTable = function () {
             _transitionTable = [

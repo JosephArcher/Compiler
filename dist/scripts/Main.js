@@ -9,38 +9,46 @@ var JOEC;
     var Main = (function () {
         function Main() {
         }
+        /**
+        * Start Compiler
+        *
+        * Used to start the compiler, called when the compile button is pressed
+        */
         Main.startCompiler = function () {
-            // Mark the compiler as running
-            _isRunning = true;
+            // Initalize verbose mode
+            _verboseMode = document.getElementById("vCheck");
             // Init the Alphabet
             JOEC.Utils.initAlphabet();
-            console.log(_alphabet);
-            // Disable the Compile Button to prevent spam
+            // Mark the compiler as running
+            _isRunning = true;
+            // Disable the Compile Button
             var compileButton = document.getElementById("compileButton");
             compileButton.disabled = true;
-            // Enable the Stop Button to allow user to stop the current compilation
+            // Enable Stop Button to allow user to stop the current compilation
             var stopButton = document.getElementById("stopButton");
             stopButton.disabled = false;
-            JOEC.Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
-            JOEC.Utils.createNewUpdateMessage("Starting Lexical Analysis!");
+            JOEC.Utils.createNewUpdateMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
             // Check to see if any source code exists
             if (sourceCode.length < 1) {
+                // Tell the user and stop 
                 JOEC.Utils.createNewErrorMessage("No Source Code Found !");
                 this.stopCompiler();
                 return;
             }
             // Create a new Lexical Analzer
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
-            // Start to generate tokens
+            // Generate the tokens
             LA.generateTokens();
-            // Check for errors
+            // Check for any lexical errors
             if (LA.hasErrors) {
+                // Tell the user
                 JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
-                // X Mark
+                // Mark the lex UI with a error mark
                 var lexremoveUI = document.getElementById("lexError");
                 lexremoveUI.style.visibility = "visible";
+                // Stop the comiler
                 this.stopCompiler();
                 return;
             }
@@ -48,37 +56,42 @@ var JOEC;
             var lastToken = LA.tokenArray[LA.tokenArray.length - 1];
             if (lastToken.getValue() != "$") {
                 JOEC.Utils.createNewWarningMessage("Missing the EOF symbol $ ... Fixing it now boss");
-                LA.tokenArray.push(new JOEC.Token("EOF", -1, "$"));
+                LA.tokenArray.push(new JOEC.Token("EOF", 0, "$"));
             }
             // Finish off the lexer and update the UI for the User
             JOEC.Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
-            // Check Mark
+            // Update the UI and mark the lexer phase as complete
             var lexCheckUI = document.getElementById("lexCheck");
             lexCheckUI.style.visibility = "visible";
-            // X Mark
+            // Update the UI remove the error mark 
             var lexremoveUI = document.getElementById("lexError");
             lexremoveUI.style.visibility = "hidden";
             // Create a new Parser
-            JOEC.Utils.createNewUpdateMessage("Creating Parser");
             var Par = new JOEC.Parser();
+            JOEC.Utils.createNewUpdateMessage("Creating Parser");
             // Start her up
             Par.startParse(LA.tokenArray);
-            // Check for errors
+            // Check for any parse errors
             if (Par.hasErrors) {
+                // Tell the user
                 JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
-                // X Mark
+                // Update the parse UI with a error mark
                 var parseremoveUI = document.getElementById("parseError");
                 parseremoveUI.style.visibility = "visible";
+                // Stop the comiler
                 this.stopCompiler();
                 return;
             }
-            // Finish off the Parser and update the UI for the User
+            // Update the User
             JOEC.Utils.createNewUpdateMessage("Parser Completed");
+            // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";
         };
         /**
-        * Stops the current compilation
+        * Stop Comiler
+        *
+        * Used to stop the compiler
         */
         Main.stopCompiler = function () {
             // Mark the compiler as off
