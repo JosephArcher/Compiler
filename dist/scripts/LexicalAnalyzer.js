@@ -147,14 +147,14 @@ var JOEC;
                 // Invalid Keyword Fix
                 case 42:
                     console.log("Invalid Keyword Fix");
-                    console.log(this.currentCharacters);
                     // Loop over the current characters and make an identifier out of each
                     for (var i = 0; i < this.currentCharacters.length; i++) {
+                        console.log(this.currentCharacters.charCodeAt(i));
                         // Check to see if this is the last time and if so write out the current string
                         if (i == this.currentCharacters.length - 1) {
                             console.log("THIS SHIT NEEDS TO GO BACK! " + this.currentCharacters.charAt(this.currentCharacters.length - 1));
                             // ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
-                            this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode; // 
+                            this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
                         }
                         else {
                             // Check to see if the character is a space
@@ -212,10 +212,10 @@ var JOEC;
             var holder = "";
             // Loop over the source code
             for (var i = 0; i < this.sourceCode.length; i++) {
-                //this.currentPos = this.currentPos + 1;
                 // Check to see if the next character is a line number and if so then increase the counter and get next character
                 if (this.sourceCode.charCodeAt(i) == 10) {
-                    this.lineNumber++;
+                    console.log("Adding to the new line");
+                    ++this.lineNumber;
                 }
                 else {
                     // Get the next character value
@@ -251,6 +251,12 @@ var JOEC;
                     this.writeOutCharacter(this.currentCharacters);
                 }
             }
+            // Check to see if verbose mdde is enabled
+            //If verbose mode
+            // if(_isVerbose.checked){
+            // 	console.log("VERBOSE MODE BB");
+            // 	Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
+            // }
         };
         LexicalAnalyzer.prototype.createTransitionTable = function () {
             _transitionTable = [
@@ -286,7 +292,7 @@ var JOEC;
                 /* 27 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 28, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 28 */ [42, 42, 42, 42, 42, 42, 11, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],
                 /* 29 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                /* 30 */ [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 31],
+                /* 30 */ [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 30, 44, 31],
                 /* 31 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 32 */ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 /* 33 */ [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 34, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42],

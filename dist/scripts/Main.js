@@ -23,6 +23,14 @@ var JOEC;
             stopButton.disabled = false;
             JOEC.Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
             JOEC.Utils.createNewUpdateMessage("Starting Lexical Analysis!");
+            // Get the source code
+            var sourceCode = JOEC.Utils.getSourceCode();
+            // Check to see if any source code exists
+            if (sourceCode.length < 1) {
+                JOEC.Utils.createNewErrorMessage("No Source Code Found !");
+                this.stopCompiler();
+                return;
+            }
             // Create a new Lexical Analzer
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Start to generate tokens

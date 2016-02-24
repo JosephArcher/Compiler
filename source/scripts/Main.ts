@@ -30,6 +30,15 @@ module JOEC {
 			Utils.createNewUpdateMessage("Starting Compilation! \n \n ");
 			Utils.createNewUpdateMessage("Starting Lexical Analysis!");
 
+			// Get the source code
+			var sourceCode = Utils.getSourceCode();
+
+			// Check to see if any source code exists
+			if(sourceCode.length < 1){
+				Utils.createNewErrorMessage("No Source Code Found !")
+				this.stopCompiler();
+				return;
+			}
 			// Create a new Lexical Analzer
 			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
