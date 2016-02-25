@@ -27,12 +27,15 @@ var JOEC;
             JOEC.Utils.initAlphabet();
             // Mark the compiler as running
             _isRunning = true;
-            // Disable the Compile Button
-            var compileButton = document.getElementById("compileButton");
-            compileButton.disabled = true;
-            // Enable Stop Button to allow user to stop the current compilation
-            var stopButton = document.getElementById("stopButton");
-            stopButton.disabled = false;
+            // Reset the Check and X Marks on the UI
+            var lexremoveUI = document.getElementById("lexError");
+            lexremoveUI.style.visibility = "hidden";
+            var parseremoveUI = document.getElementById("parseError");
+            parseremoveUI.style.visibility = "hidden";
+            var lexcheckUI = document.getElementById("lexCheck");
+            lexremoveUI.style.visibility = "hidden";
+            var parserCheckUI = document.getElementById("parseCheck");
+            parserCheckUI.style.visibility = "hidden";
             JOEC.Utils.createNewMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
@@ -116,9 +119,6 @@ var JOEC;
             // Enable the Compile Button to allow user to run another compilation
             var compileButton = document.getElementById("compileButton");
             compileButton.disabled = false;
-            // Disable the stop button because no program is being compiled anymore
-            var stopButton = document.getElementById("stopButton");
-            stopButton.disabled = true;
         };
         return Main;
     })();

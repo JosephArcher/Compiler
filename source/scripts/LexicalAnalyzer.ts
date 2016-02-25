@@ -140,7 +140,6 @@ module JOEC {
 					break;
 				// Tabs
 				case 51:
-					console.log("Hopefully this fixes tabs");
 					break;
 				// Invalid Keyword Fix
 				case 42:
@@ -150,7 +149,6 @@ module JOEC {
 
 						// Check to see if this is the last time 
 						if (i == this.currentCharacters.length - 1) {
-							console.log("putting back");
 
 							// ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
 							this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
@@ -233,8 +231,6 @@ module JOEC {
 
 				this.currentCharacters = this.currentCharacters + nextCharacter;
 
-				console.log("Next Character: " + nextCharacter + this.sourceCode.charCodeAt(i) );
-
 				// Get the table position of the character
 				nextTablePosition = Utils.getCharacterPosition(nextCharacter);
 
@@ -260,11 +256,9 @@ module JOEC {
 					break;
 				}
 				else {
-					console.log("else if firing");
 					currentState = nextState;
 				}
 			  
-
 			  // Check to see if this is the last time and if so write out the current string
 			  if(i == this.sourceCode.length - 1){
 				this.writeOutCharacter(this.currentCharacters);

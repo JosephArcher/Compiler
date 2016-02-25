@@ -32,13 +32,18 @@ module JOEC {
 			// Mark the compiler as running
 			_isRunning = true;
 
-			// Disable the Compile Button
-			var compileButton = <HTMLButtonElement>document.getElementById("compileButton");
-			compileButton.disabled = true;
+			// Reset the Check and X Marks on the UI
+			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
+			lexremoveUI.style.visibility = "hidden";
 
-			// Enable Stop Button to allow user to stop the current compilation
-			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
-			stopButton.disabled = false;
+			var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
+			parseremoveUI.style.visibility = "hidden";
+
+			var lexcheckUI = <HTMLSpanElement>document.getElementById("lexCheck");
+			lexremoveUI.style.visibility = "hidden";
+
+			var parserCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
+			parserCheckUI.style.visibility = "hidden";
 
 			Utils.createNewMessage("Starting Compilation!\n");
 
@@ -152,10 +157,6 @@ module JOEC {
 			// Enable the Compile Button to allow user to run another compilation
 			var compileButton = <HTMLButtonElement>document.getElementById("compileButton");
 			compileButton.disabled = false;
-
-			// Disable the stop button because no program is being compiled anymore
-			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
-			stopButton.disabled = true;
 		}
 		
 	}

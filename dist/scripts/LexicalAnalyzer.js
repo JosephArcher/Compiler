@@ -132,7 +132,6 @@ var JOEC;
                     break;
                 // Tabs
                 case 51:
-                    console.log("Hopefully this fixes tabs");
                     break;
                 // Invalid Keyword Fix
                 case 42:
@@ -140,7 +139,6 @@ var JOEC;
                     for (var i = 0; i < this.currentCharacters.length; i++) {
                         // Check to see if this is the last time 
                         if (i == this.currentCharacters.length - 1) {
-                            console.log("putting back");
                             // ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
                             this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
                         }
@@ -212,7 +210,6 @@ var JOEC;
                 // Get the next character value
                 nextCharacter = this.sourceCode.charAt(i);
                 this.currentCharacters = this.currentCharacters + nextCharacter;
-                console.log("Next Character: " + nextCharacter + this.sourceCode.charCodeAt(i));
                 // Get the table position of the character
                 nextTablePosition = JOEC.Utils.getCharacterPosition(nextCharacter);
                 // Check to see if there is an error
@@ -233,7 +230,6 @@ var JOEC;
                     break;
                 }
                 else {
-                    console.log("else if firing");
                     currentState = nextState;
                 }
                 // Check to see if this is the last time and if so write out the current string
