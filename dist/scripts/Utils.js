@@ -58,7 +58,9 @@ var JOEC;
             _alphabet["+"] = { pos: 42 };
             _alphabet[" "] = { pos: 43 };
             _alphabet["="] = { pos: 44 };
-            _alphabet["\""] = { pos: 45 };
+            _alphabet["\""] = { pos: 45 }; // Quote
+            _alphabet["\n"] = { pos: 46 }; // New Line
+            _alphabet["\t"] = { pos: 47 }; // Tab
         };
         /*
         * getCharacterPosition
