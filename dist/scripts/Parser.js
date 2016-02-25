@@ -48,37 +48,43 @@ var JOEC;
                 this.currentToken = this.tokenQueue.dequeue();
             }
             else {
-                JOEC.Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
-                this.hasErrors = true;
+                if (!this.hasErrors) {
+                    JOEC.Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
+                    this.hasErrors = true;
+                }
             }
         };
         /**
         * Program
         */
         Parser.prototype.parseProgram = function () {
-            JOEC.Utils.createNewMessage("Parsing Program " + this.numberOfPrograms++);
+            JOEC.Utils.createNewMessage("Parsing Program " + this.numberOfPrograms);
             // Get the first character
             this.currentToken = this.tokenQueue.dequeue();
             // Block
             this.parseBlock();
             // Dollar Sign
             this.matchCharacter('$');
-            // Check to see if more tokens still exist
-            if (this.tokenQueue.getSize() > 0) {
-                console.log("Another Program could still be in possible");
-                // If they do call the parse program another time
-                this.runAnotherProgram();
+            if (!this.hasErrors) {
+                JOEC.Utils.createNewMessage("Program " + this.numberOfPrograms + " successfully parsed");
+                // Check to see if more tokens still exist
+                if (this.tokenQueue.getSize() > 0) {
+                    // If they do call the parse program another time
+                    this.runAnotherProgram();
+                }
             }
         };
         Parser.prototype.runAnotherProgram = function () {
-            JOEC.Utils.createNewMessage("\nParsing Program " + this.numberOfPrograms++);
+            // Increment the number of Programs counter
+            this.numberOfPrograms++;
+            JOEC.Utils.createNewMessage("\nParsing Program " + this.numberOfPrograms);
             // Block
             this.parseBlock();
             // Dollar Sign
             this.matchCharacter('$');
+            JOEC.Utils.createNewMessage("Program " + this.numberOfPrograms + " successfully parsed");
             // Check to see if more tokens still exist
             if (this.tokenQueue.getSize() > 0) {
-                console.log("Another Program could still be in possible");
                 // If they do call the parse program another time
                 this.runAnotherProgram();
             }

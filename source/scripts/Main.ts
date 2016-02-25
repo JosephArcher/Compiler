@@ -62,13 +62,14 @@ module JOEC {
 
 			// Check to see if verbose mode is enabled
 			if(_verboseMode.checked){
-
+				Utils.createNewMessage("\nToken List \n============ ");
 				var nextToken: JOEC.Token; 
 				// Loop over the token array and print out the tokens and line numbers
 				for(var i = 0; i < LA.tokenArray.length; i++){
 					nextToken = LA.tokenArray[i];
-					Utils.createNewMessage(nextToken.getKind() + nextToken.getValue() + nextToken.getLineNumber());
+					Utils.createNewMessage("< Value: " +  nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
 				}
+				Utils.createNewMessage("============");
 			}
 
 			// Check for any lexical errors
@@ -97,7 +98,7 @@ module JOEC {
 			}
 
 			// Finish off the lexer and update the UI for the User
-			Utils.createNewMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+			Utils.createNewMessage("\nLex Completed... " + LA.tokenArray.length + " token(s) were found \n");
 
 			// Update the UI and mark the lexer phase as complete
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
@@ -110,7 +111,7 @@ module JOEC {
 			// Create a new Parser
 			var Par = new Parser();
 
-			Utils.createNewMessage("Creating Parser");
+			Utils.createNewMessage("Starting Parse! \n");
 
 			// Start her up
 			Par.startParse(LA.tokenArray);
@@ -131,7 +132,7 @@ module JOEC {
 			}
 
 			// Update the User
-			Utils.createNewMessage("Parser Completed");
+			Utils.createNewMessage("\nParser Completed");
 
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");

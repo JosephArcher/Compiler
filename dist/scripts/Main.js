@@ -49,12 +49,14 @@ var JOEC;
             LA.generateTokens();
             // Check to see if verbose mode is enabled
             if (_verboseMode.checked) {
+                JOEC.Utils.createNewMessage("\nToken List \n============ ");
                 var nextToken;
                 // Loop over the token array and print out the tokens and line numbers
                 for (var i = 0; i < LA.tokenArray.length; i++) {
                     nextToken = LA.tokenArray[i];
-                    JOEC.Utils.createNewMessage(nextToken.getKind() + nextToken.getValue() + nextToken.getLineNumber());
+                    JOEC.Utils.createNewMessage("< Value: " + nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
                 }
+                JOEC.Utils.createNewMessage("============");
             }
             // Check for any lexical errors
             if (LA.hasErrors) {
@@ -74,7 +76,7 @@ var JOEC;
                 LA.tokenArray.push(new JOEC.Token("EOF", 0, "$"));
             }
             // Finish off the lexer and update the UI for the User
-            JOEC.Utils.createNewMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+            JOEC.Utils.createNewMessage("\nLex Completed... " + LA.tokenArray.length + " token(s) were found \n");
             // Update the UI and mark the lexer phase as complete
             var lexCheckUI = document.getElementById("lexCheck");
             lexCheckUI.style.visibility = "visible";
@@ -83,7 +85,7 @@ var JOEC;
             lexremoveUI.style.visibility = "hidden";
             // Create a new Parser
             var Par = new JOEC.Parser();
-            JOEC.Utils.createNewMessage("Creating Parser");
+            JOEC.Utils.createNewMessage("Starting Parse! \n");
             // Start her up
             Par.startParse(LA.tokenArray);
             // Check for any parse errors
@@ -98,7 +100,7 @@ var JOEC;
                 return;
             }
             // Update the User
-            JOEC.Utils.createNewMessage("Parser Completed");
+            JOEC.Utils.createNewMessage("\nParser Completed");
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";
