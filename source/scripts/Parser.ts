@@ -14,6 +14,7 @@ module JOEC {
 		public currentToken: JOEC.Token;     // The current token 
 		public hasErrors: boolean = false;   // Determines if the parser has any errors
 		public tokenQueue = new Queue();     // Holds the tokens passed in from the lexer
+		public numberOfPrograms: number = 0; // The number of programs that have been parsed
 
 		// Constructor
 		constructor() {}
@@ -66,6 +67,8 @@ module JOEC {
 		*/
 		public parseProgram () {
 
+			Utils.createNewMessage("Parsing Program " + this.numberOfPrograms++);
+
 			// Get the first character
 			this.currentToken= <JOEC.Token> this.tokenQueue.dequeue();
 
@@ -77,9 +80,27 @@ module JOEC {
 
 			// Check to see if more tokens still exist
 			if(this.tokenQueue.getSize() > 0){
+				
 				console.log("Another Program could still be in possible");
 				// If they do call the parse program another time
-				this.parseProgram();
+				this.runAnotherProgram();
+			}	
+		}
+		public runAnotherProgram(){
+		
+			Utils.createNewMessage("\nParsing Program " + this.numberOfPrograms++);
+
+			// Block
+			this.parseBlock();
+
+			// Dollar Sign
+			this.matchCharacter('$');
+
+			// Check to see if more tokens still exist
+			if (this.tokenQueue.getSize() > 0) {
+				console.log("Another Program could still be in possible");
+				// If they do call the parse program another time
+				this.runAnotherProgram();
 			}	
 		}
 		/**

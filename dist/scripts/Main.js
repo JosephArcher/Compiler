@@ -47,6 +47,15 @@ var JOEC;
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Generate the tokens
             LA.generateTokens();
+            // Check to see if verbose mode is enabled
+            if (_verboseMode.checked) {
+                var nextToken;
+                // Loop over the token array and print out the tokens and line numbers
+                for (var i = 0; i < LA.tokenArray.length; i++) {
+                    nextToken = LA.tokenArray[i];
+                    JOEC.Utils.createNewMessage(nextToken.getKind() + nextToken.getValue() + nextToken.getLineNumber());
+                }
+            }
             // Check for any lexical errors
             if (LA.hasErrors) {
                 // Tell the user

@@ -60,6 +60,17 @@ module JOEC {
 			// Generate the tokens
 			LA.generateTokens();
 
+			// Check to see if verbose mode is enabled
+			if(_verboseMode.checked){
+
+				var nextToken: JOEC.Token; 
+				// Loop over the token array and print out the tokens and line numbers
+				for(var i = 0; i < LA.tokenArray.length; i++){
+					nextToken = LA.tokenArray[i];
+					Utils.createNewMessage(nextToken.getKind() + nextToken.getValue() + nextToken.getLineNumber());
+				}
+			}
+
 			// Check for any lexical errors
 			if(LA.hasErrors) {
 

@@ -13,6 +13,7 @@ var JOEC;
         function Parser() {
             this.hasErrors = false; // Determines if the parser has any errors
             this.tokenQueue = new JOEC.Queue(); // Holds the tokens passed in from the lexer
+            this.numberOfPrograms = 0; // The number of programs that have been parsed
         }
         /**
         * startParse
@@ -55,6 +56,7 @@ var JOEC;
         * Program
         */
         Parser.prototype.parseProgram = function () {
+            JOEC.Utils.createNewMessage("Parsing Program " + this.numberOfPrograms++);
             // Get the first character
             this.currentToken = this.tokenQueue.dequeue();
             // Block
@@ -65,7 +67,20 @@ var JOEC;
             if (this.tokenQueue.getSize() > 0) {
                 console.log("Another Program could still be in possible");
                 // If they do call the parse program another time
-                this.parseProgram();
+                this.runAnotherProgram();
+            }
+        };
+        Parser.prototype.runAnotherProgram = function () {
+            JOEC.Utils.createNewMessage("\nParsing Program " + this.numberOfPrograms++);
+            // Block
+            this.parseBlock();
+            // Dollar Sign
+            this.matchCharacter('$');
+            // Check to see if more tokens still exist
+            if (this.tokenQueue.getSize() > 0) {
+                console.log("Another Program could still be in possible");
+                // If they do call the parse program another time
+                this.runAnotherProgram();
             }
         };
         /**

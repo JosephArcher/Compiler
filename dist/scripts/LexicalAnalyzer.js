@@ -65,95 +65,66 @@ var JOEC;
                 // EOF (Dollar Sign)
                 case 1:
                     this.tokenArray.push(new JOEC.Token("EOF", this.lineNumber, "$"));
-                    JOEC.Utils.createNewMessage("< $ | line " + this.lineNumber + ">");
                     break;
                 // {
                 case 2:
                     this.tokenArray.push(new JOEC.Token("Left_Bracket", this.lineNumber, "{"));
-                    JOEC.Utils.createNewMessage("< { | line " + this.lineNumber + ">");
                     break;
                 case 3:
                     // }
                     this.tokenArray.push(new JOEC.Token("Right_Backet", this.lineNumber, "}"));
-                    JOEC.Utils.createNewMessage("< } | line " + this.lineNumber + ">");
                     break;
                 // (
                 case 4:
-                    console.log("( Found");
                     this.tokenArray.push(new JOEC.Token("Left_Para", this.lineNumber, "("));
-                    JOEC.Utils.createNewMessage("< ( | line " + this.lineNumber + ">");
                     break;
                 // )
                 case 5:
-                    console.log(") Found");
                     this.tokenArray.push(new JOEC.Token("Right_Para", this.lineNumber, ")"));
-                    JOEC.Utils.createNewMessage("< ) | line " + this.lineNumber + ">");
                     break;
                 // !
                 case 6:
-                    console.log("! Found");
                     this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, "!"));
-                    JOEC.Utils.createNewMessage("< ! | line " + this.lineNumber + ">");
                     break;
                 // +
                 case 7:
-                    console.log("+ Found");
                     this.tokenArray.push(new JOEC.Token("Plus_Sign", this.lineNumber, "+"));
-                    JOEC.Utils.createNewMessage("< + | line " + this.lineNumber + ">");
                     break;
                 // =
                 case 8:
-                    console.log("= Found");
                     this.tokenArray.push(new JOEC.Token("Equal_Sign", this.lineNumber, "="));
-                    JOEC.Utils.createNewMessage("< = | line " + this.lineNumber + ">");
                     break;
                 // Type
                 case 11:
-                    console.log("Type Found");
                     this.tokenArray.push(new JOEC.Token("Type", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("< " + this.currentCharacters.trim() + "| line " + this.lineNumber);
                     break;
                 // Print
                 case 16:
-                    console.log("print keyword Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, "print"));
-                    JOEC.Utils.createNewMessage("< print | line " + this.lineNumber);
                     break;
                 // Digit
                 case 17:
-                    console.log("Digit Found");
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("<" + this.currentCharacters.trim() + "| line " + this.lineNumber);
                     break;
                 // String
                 case 31:
-                    console.log("String Found");
                     this.tokenArray.push(new JOEC.Token("String", this.lineNumber, this.currentCharacters));
-                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Identifier
                 case 32:
-                    console.log("ID Found");
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Boolean value ( true | false )
                 case 36:
-                    console.log("BoolVal Found");
                     this.tokenArray.push(new JOEC.Token("BoolVal", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("<" + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // if
                 case 41:
-                    console.log("If Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // while
                 case 48:
-                    console.log("while Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Invalid Keyword Fix
                 case 42:
@@ -170,16 +141,13 @@ var JOEC;
                             }
                             else if (this.isSymbol(this.currentCharacters.charAt(i))) {
                                 this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i).trim() + "| line " + this.lineNumber);
                             }
                             else if (this.isDigit(this.currentCharacters.charAt(i))) {
                                 console.log("DIGIT BROKE? 1");
                                 this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
                             }
                             else {
                                 this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
                             }
                         }
                     }
@@ -207,15 +175,12 @@ var JOEC;
                 }
                 else if (this.isSymbol(this.currentCharacters.charAt(i))) {
                     this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
                 else if (this.isDigit(this.currentCharacters.charAt(i))) {
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
                 else {
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewMessage("ID " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
             }
         };
@@ -274,11 +239,6 @@ var JOEC;
                 if (i == this.sourceCode.length - 1) {
                     this.writeOutCharacter(this.currentCharacters);
                 }
-            }
-            //If verbose mode
-            if (_verboseMode.checked) {
-                console.log("VERBOSE MODE BB");
-                JOEC.Utils.createNewMessage("VERBOSE MODE ENABLED");
             }
         };
         /*

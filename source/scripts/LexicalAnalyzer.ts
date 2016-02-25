@@ -3,7 +3,6 @@
 ///<reference path="Token.ts"/>
 
 module JOEC {
-
 	/*
 	* Lexical Analyzer
 	*/
@@ -14,7 +13,7 @@ module JOEC {
 		public hasErrors: boolean = false;  // Determines if the lexer has any errors
 		private lineNumber: number = 1;     // The current line number
 		private currentCharacters = "";     // The current characters that are being looked at
-		
+
 		constructor(_SourceCode: string) {
 
 			// Source Code
@@ -75,95 +74,66 @@ module JOEC {
 				// EOF (Dollar Sign)
 				case 1:
 					this.tokenArray.push(new Token("EOF", this.lineNumber, "$"));
-					Utils.createNewMessage("< $ | line " + this.lineNumber + ">");
 					break;
 				// {
 				case 2:
 					this.tokenArray.push(new Token("Left_Bracket", this.lineNumber, "{"));
-					Utils.createNewMessage("< { | line " + this.lineNumber + ">");
 					break;
 				case 3:
 				// }
 					this.tokenArray.push(new Token("Right_Backet", this.lineNumber, "}"));
-					Utils.createNewMessage("< } | line " + this.lineNumber + ">");
 					break;
 				// (
 				case 4:
-					console.log("( Found");
 					this.tokenArray.push(new Token("Left_Para", this.lineNumber, "("));
-					Utils.createNewMessage("< ( | line " + this.lineNumber + ">");
 					break;
 				// )
 				case 5:
-					console.log(") Found");
 					this.tokenArray.push(new Token("Right_Para", this.lineNumber,")"));
-					Utils.createNewMessage("< ) | line " + this.lineNumber + ">");
 					break;
 				// !
 				case 6:
-					console.log("! Found");
 					this.tokenArray.push(new Token("Symbol", this.lineNumber ,"!"));
-					Utils.createNewMessage("< ! | line " + this.lineNumber + ">");
 					break;
 				// +
 				case 7:
-					console.log("+ Found");
 					this.tokenArray.push(new Token("Plus_Sign", this.lineNumber, "+"));
-					Utils.createNewMessage("< + | line " + this.lineNumber + ">");
 					break;
 				// =
 				case 8:
-					console.log("= Found");
 					this.tokenArray.push(new Token("Equal_Sign",this.lineNumber, "="));
-					Utils.createNewMessage("< = | line " + this.lineNumber + ">");
 					break;
 				// Type
 				case 11:
-					console.log("Type Found");
 					this.tokenArray.push(new Token("Type",this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewMessage("< " + this.currentCharacters.trim() + "| line " + this.lineNumber);
 					break;
 				// Print
 				case 16:
-					console.log("print keyword Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, "print"));
-					Utils.createNewMessage("< print | line " + this.lineNumber);
 					break;
 				// Digit
 				case 17:
-					console.log("Digit Found");
 					this.tokenArray.push(new Token("Digit", this.lineNumber,this.currentCharacters.trim() ));
-					Utils.createNewMessage("<" + this.currentCharacters.trim() + "| line " + this.lineNumber);
 					break;
 				// String
 				case 31:
-					console.log("String Found");
 					this.tokenArray.push(new Token("String", this.lineNumber, this.currentCharacters));
-					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Identifier
 				case 32:
-					console.log("ID Found");
 					this.tokenArray.push(new Token("Identifier", this.lineNumber,this.currentCharacters.trim()));
-					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Boolean value ( true | false )
 				case 36:
-					console.log("BoolVal Found");
 					this.tokenArray.push(new Token("BoolVal", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewMessage("<" + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// if
 				case 41:
-					console.log("If Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// while
 				case 48:
-					console.log("while Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Invalid Keyword Fix
 				case 42:
@@ -184,16 +154,13 @@ module JOEC {
 							else if (this.isSymbol(this.currentCharacters.charAt(i))) {
 
 								this.tokenArray.push(new Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewMessage("< " + this.currentCharacters.charAt(i).trim() + "| line " + this.lineNumber);
 							}
 							else if (this.isDigit(this.currentCharacters.charAt(i))) {
 								console.log("DIGIT BROKE? 1");
 								this.tokenArray.push(new Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
 							}
 							else {
 								this.tokenArray.push(new Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
 							}
 						}
 					}
@@ -225,19 +192,14 @@ module JOEC {
 				else if (this.isSymbol(this.currentCharacters.charAt(i))) {
 
 					this.tokenArray.push(new Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
 				else if (this.isDigit(this.currentCharacters.charAt(i))) {
 
 					this.tokenArray.push(new Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
 				else {
 					this.tokenArray.push(new Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewMessage("ID " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
-
-			
 			}
 		}
 	   /*
@@ -308,13 +270,7 @@ module JOEC {
 				this.writeOutCharacter(this.currentCharacters);
 			  }
 
-			}
-
-			//If verbose mode
-			if (_verboseMode.checked) {
-			 	console.log("VERBOSE MODE BB");
-			 	Utils.createNewMessage("VERBOSE MODE ENABLED");
-			 }
+			}			
 		}
 	   /*
 		* createTransitionTable
