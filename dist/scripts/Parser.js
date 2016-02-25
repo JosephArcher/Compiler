@@ -3,24 +3,28 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
-/**
-* Parser
-*/
 var JOEC;
 (function (JOEC) {
+    /*
+    * Parser
+    */
     var Parser = (function () {
         // Constructor
         function Parser() {
-            // False if no error | True if any error
-            this.hasErrors = false;
-            // Holds the Tokens
-            this.tokenQueue = new JOEC.Queue();
+            this.hasErrors = false; // Determines if the parser has any errors
+            this.tokenQueue = new JOEC.Queue(); // Holds the tokens passed in from the lexer
         }
         /**
-        *	Called to start the parser
+        * startParse
+        *
+        * Called to start the parser
+        *
+        * Params
+        * 	tokenArray - the array of tokens created in the lexer
         */
         Parser.prototype.startParse = function (tokenArray) {
             var len = tokenArray.length;
+            // Loop over the array and add the tokens to queue for ease of use
             for (var i = 0; i < len; i++) {
                 this.tokenQueue.enqueue(tokenArray[i]);
             }
@@ -28,15 +32,21 @@ var JOEC;
             this.parseProgram();
         };
         /**
-        * Used to match the current token and then get the
+        * matchCharacter
+        *
+        * Used to match what token you are expecting to get
+        * with what the current token is
+        *
+        * Params
+        * 	toMatch - the character you are expecting to encounter
         */
         Parser.prototype.matchCharacter = function (toMatch) {
+            // Check to see if they match
             if (this.currentToken.getValue() == toMatch) {
                 console.log("A match was found for " + toMatch);
                 this.currentToken = this.tokenQueue.dequeue();
             }
             else {
-                console.log("Error no match was found");
                 JOEC.Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
                 this.hasErrors = true;
             }
@@ -51,6 +61,12 @@ var JOEC;
             this.parseBlock();
             // Dollar Sign
             this.matchCharacter('$');
+            // Check to see if more tokens still exist
+            if (this.tokenQueue.getSize() > 0) {
+                console.log("Another Program could still be in possible");
+                // If they do call the parse program another time
+                this.parseProgram();
+            }
         };
         /**
         * Block
@@ -161,7 +177,6 @@ var JOEC;
         * Expression
         */
         Parser.prototype.parseExpression = function () {
-            console.log("Expression");
             // INT
             if (this.currentToken.getKind() == "Digit") {
                 this.parseIntegerExpression();
@@ -170,7 +185,6 @@ var JOEC;
                 this.parseStringExpression();
             }
             else if (this.currentToken.getKind() == "BoolVal" || this.currentToken.getValue() == "(") {
-                console.log("BOOLEAN");
                 this.parseBooleanExpression();
             }
             else if (this.currentToken.getKind() == "Identifier") {
@@ -195,10 +209,6 @@ var JOEC;
         Parser.prototype.parseStringExpression = function () {
             var currentToken = this.currentToken.getValue();
             this.matchCharacter(currentToken);
-            //this.matchCharacter("\"");
-            // while (CurrentCharacter)
-            //this.parseCharacterList();
-            //this.matchCharacter("\"");
         };
         /**
         * Boolean Expression

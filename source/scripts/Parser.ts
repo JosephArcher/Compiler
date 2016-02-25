@@ -4,31 +4,33 @@
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
 
-/**
-* Parser 
-*/
-module JOEC {
 
+module JOEC {
+	/*
+	* Parser 
+	*/
 	export class Parser {	
 		
-		public currentToken: JOEC.Token;
-
-		// False if no error | True if any error
-		public hasErrors: boolean = false;
-
-		// Holds the Tokens
-		public tokenQueue = new Queue();
+		public currentToken: JOEC.Token;     // The current token 
+		public hasErrors: boolean = false;   // Determines if the parser has any errors
+		public tokenQueue = new Queue();     // Holds the tokens passed in from the lexer
 
 		// Constructor
 		constructor() {}
 
 		/**
-		*	Called to start the parser
+		* startParse
+		*
+		* Called to start the parser
+		*
+		* Params
+		* 	tokenArray - the array of tokens created in the lexer
 		*/
 		public startParse(tokenArray) {
 
 			var len = tokenArray.length;
 
+			// Loop over the array and add the tokens to queue for ease of use
 			for (var i = 0; i < len; i++){
 				this.tokenQueue.enqueue(tokenArray[i]);
 			}
@@ -38,17 +40,23 @@ module JOEC {
 
 		}
 		/**
-		* Used to match the current token and then get the 
+		* matchCharacter
+		*
+		* Used to match what token you are expecting to get
+		* with what the current token is
+		*
+		* Params
+		* 	toMatch - the character you are expecting to encounter
 		*/
 		public matchCharacter(toMatch: string) {
 
+			// Check to see if they match
 			if(this.currentToken.getValue() == toMatch){
 
 				console.log("A match was found for " + toMatch);
 				this.currentToken = this.tokenQueue.dequeue();
 			}
 			else{
-				console.log("Error no match was found");
 				Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
 				this.hasErrors = true;
 			}
@@ -66,6 +74,13 @@ module JOEC {
 
 			// Dollar Sign
 			this.matchCharacter('$');
+
+			// Check to see if more tokens still exist
+			if(this.tokenQueue.getSize() > 0){
+				console.log("Another Program could still be in possible");
+				// If they do call the parse program another time
+				this.parseProgram();
+			}	
 		}
 		/**
 		* Block
@@ -207,7 +222,7 @@ module JOEC {
 		*/
 		public parseExpression(){
 
-			console.log("Expression");
+
 			// INT
 			if(this.currentToken.getKind() == "Digit"){
 				this.parseIntegerExpression();
@@ -218,7 +233,6 @@ module JOEC {
 			}
 			// BOOLEAN
 			else if(this.currentToken.getKind() == "BoolVal" || this.currentToken.getValue() == "(" ){
-				console.log("BOOLEAN");
 				this.parseBooleanExpression();
 			}
 			// ID
@@ -245,17 +259,9 @@ module JOEC {
 		* String Expression
 		*/
 		public parseStringExpression(){
-
-
+			
 			var currentToken = this.currentToken.getValue();
 			this.matchCharacter(currentToken);
-
-			//this.matchCharacter("\"");
-
-			// while (CurrentCharacter)
-			//this.parseCharacterList();
-
-			//this.matchCharacter("\"");
 		}
 		/**
 		* Boolean Expression

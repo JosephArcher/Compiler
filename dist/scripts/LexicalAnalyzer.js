@@ -3,23 +3,21 @@
 ///<reference path="Token.ts"/>
 var JOEC;
 (function (JOEC) {
+    /*
+    * Lexical Analyzer
+    */
     var LexicalAnalyzer = (function () {
         function LexicalAnalyzer(_SourceCode) {
             this.sourceCode = ""; // The source code to be compiled
             this.tokenArray = []; // Holds in order all of the tokens that have been created
-            this.hasErrors = false;
+            this.hasErrors = false; // Determines if the lexer has any errors
             this.lineNumber = 1; // The current line number
-            this.currentCharacters = "";
-            this.currentPos = 0; // The current pos
-            this.lookAheadPos = 0;
-            this.lookAheadStates = [];
+            this.currentCharacters = ""; // The current characters that are being looked at
             // Source Code
             this.sourceCode = _SourceCode;
             // Create the transition table
             this.createTransitionTable();
         }
-        LexicalAnalyzer.prototype.isAlpha = function (chara) {
-        };
         LexicalAnalyzer.prototype.isSymbol = function (chara) {
             if (chara == "$" || chara == "{" || chara == "}" || chara == "(" || chara == ")" || chara == "\"" || chara == "=" || chara == "!" || chara == "+") {
                 return true;
@@ -36,6 +34,14 @@ var JOEC;
                 return false;
             }
         };
+        /*
+         * checkForErrorState
+         * Looks at a given number that represents a location in the transition
+         * table matrix and determines if it is an error state
+         *
+         * Params
+         *	State - the state to check
+         */
         LexicalAnalyzer.prototype.checkForErrorState = function (state) {
             switch (state) {
                 case 44:
@@ -46,113 +52,115 @@ var JOEC;
             }
             return true;
         };
+        /*
+         * checkForAcceptState
+         * Looks at a given number that represents a location in the transition
+         * table matrix and determines if it is an accept state
+         *
+         * Params
+         *	State - the state to check
+         */
         LexicalAnalyzer.prototype.checkForAcceptState = function (state) {
             switch (state) {
-                // END OF FILE
+                // EOF (Dollar Sign)
                 case 1:
-                    console.log("$ Found");
                     this.tokenArray.push(new JOEC.Token("EOF", this.lineNumber, "$"));
-                    JOEC.Utils.createNewUpdateMessage("$ Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< $ | line " + this.lineNumber + ">");
                     break;
                 // {
                 case 2:
-                    console.log("{ Found");
                     this.tokenArray.push(new JOEC.Token("Left_Bracket", this.lineNumber, "{"));
-                    JOEC.Utils.createNewUpdateMessage("{ Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< { | line " + this.lineNumber + ">");
                     break;
                 case 3:
                     // }
-                    console.log("} Found");
                     this.tokenArray.push(new JOEC.Token("Right_Backet", this.lineNumber, "}"));
-                    JOEC.Utils.createNewUpdateMessage("} Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< } | line " + this.lineNumber + ">");
                     break;
                 // (
                 case 4:
                     console.log("( Found");
                     this.tokenArray.push(new JOEC.Token("Left_Para", this.lineNumber, "("));
-                    JOEC.Utils.createNewUpdateMessage("( Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< ( | line " + this.lineNumber + ">");
                     break;
                 // )
                 case 5:
                     console.log(") Found");
                     this.tokenArray.push(new JOEC.Token("Right_Para", this.lineNumber, ")"));
-                    JOEC.Utils.createNewUpdateMessage(") Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< ) | line " + this.lineNumber + ">");
                     break;
                 // !
                 case 6:
                     console.log("! Found");
                     this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, "!"));
-                    JOEC.Utils.createNewUpdateMessage("! Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< ! | line " + this.lineNumber + ">");
                     break;
                 // +
                 case 7:
                     console.log("+ Found");
                     this.tokenArray.push(new JOEC.Token("Plus_Sign", this.lineNumber, "+"));
-                    JOEC.Utils.createNewUpdateMessage("+ Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< + | line " + this.lineNumber + ">");
                     break;
                 // =
                 case 8:
                     console.log("= Found");
                     this.tokenArray.push(new JOEC.Token("Equal_Sign", this.lineNumber, "="));
-                    JOEC.Utils.createNewUpdateMessage("= Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< = | line " + this.lineNumber + ">");
                     break;
                 // Type
                 case 11:
                     console.log("Type Found");
                     this.tokenArray.push(new JOEC.Token("Type", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("Type Token " + this.currentCharacters.trim() + " Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< " + this.currentCharacters.trim() + "| line " + this.lineNumber);
                     break;
                 // Print
                 case 16:
                     console.log("print keyword Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, "print"));
-                    JOEC.Utils.createNewUpdateMessage("print Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< print | line " + this.lineNumber);
                     break;
                 // Digit
                 case 17:
                     console.log("Digit Found");
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("Digit" + this.currentCharacters.trim() + "Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("<" + this.currentCharacters.trim() + "| line " + this.lineNumber);
                     break;
                 // String
                 case 31:
                     console.log("String Found");
                     this.tokenArray.push(new JOEC.Token("String", this.lineNumber, this.currentCharacters));
-                    JOEC.Utils.createNewUpdateMessage("String  " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Identifier
                 case 32:
                     console.log("ID Found");
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("ID  " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Boolean value ( true | false )
                 case 36:
                     console.log("BoolVal Found");
                     this.tokenArray.push(new JOEC.Token("BoolVal", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("BoolVal " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("<" + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // if
                 case 41:
                     console.log("If Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("if " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // while
                 case 48:
                     console.log("while Found");
                     this.tokenArray.push(new JOEC.Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-                    JOEC.Utils.createNewUpdateMessage("Keyword " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
                     break;
                 // Invalid Keyword Fix
                 case 42:
-                    console.log("Invalid Keyword Fix");
                     // Loop over the current characters and make an identifier out of each
                     for (var i = 0; i < this.currentCharacters.length; i++) {
-                        console.log(this.currentCharacters.charCodeAt(i));
                         // Check to see if this is the last time and if so write out the current string
                         if (i == this.currentCharacters.length - 1) {
-                            console.log("THIS SHIT NEEDS TO GO BACK! " + this.currentCharacters.charAt(this.currentCharacters.length - 1));
                             // ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
                             this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
                         }
@@ -162,16 +170,16 @@ var JOEC;
                             }
                             else if (this.isSymbol(this.currentCharacters.charAt(i))) {
                                 this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i).trim() + "| line " + this.lineNumber);
                             }
                             else if (this.isDigit(this.currentCharacters.charAt(i))) {
                                 console.log("DIGIT BROKE? 1");
                                 this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
                             }
                             else {
                                 this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                                JOEC.Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                                JOEC.Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
                             }
                         }
                     }
@@ -181,8 +189,17 @@ var JOEC;
             }
             return true;
         };
+        /*
+        * writeOutCharacter
+        *
+        * Used to handle what happens if the lexer
+        * still has current characters and is trying to
+        * end the phase
+        *
+        * Params
+        *	toWrite - the string of leftover charcters
+        */
         LexicalAnalyzer.prototype.writeOutCharacter = function (toWrite) {
-            console.log("write out leftover Fix");
             // Loop over the current characters and make an identifier out of each and place and last character read back into the source
             for (var i = 0; i < this.currentCharacters.length; i++) {
                 // Check to see if the character is a space
@@ -190,18 +207,24 @@ var JOEC;
                 }
                 else if (this.isSymbol(this.currentCharacters.charAt(i))) {
                     this.tokenArray.push(new JOEC.Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
                 else if (this.isDigit(this.currentCharacters.charAt(i))) {
                     this.tokenArray.push(new JOEC.Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
                 else {
                     this.tokenArray.push(new JOEC.Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-                    JOEC.Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+                    JOEC.Utils.createNewMessage("ID " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
                 }
             }
         };
+        /*
+         * generateTokens
+         *
+         * Used to generate an array of tokens from the source code
+         * provided in the HTML TextArea
+         */
         LexicalAnalyzer.prototype.generateTokens = function () {
             // Create variables
             var currentState = 0; // The current state
@@ -210,7 +233,7 @@ var JOEC;
             var insideString = 0;
             var nextTablePosition;
             var holder = "";
-            JOEC.Utils.createNewUpdateMessage("Starting Lexical Analysis!");
+            JOEC.Utils.createNewMessage("Starting Lexical Analysis!");
             // Loop over the source code
             for (var i = 0; i < this.sourceCode.length; i++) {
                 // Check to see if the next character is a line number and if so then increase the counter and get next character
@@ -255,9 +278,14 @@ var JOEC;
             //If verbose mode
             if (_verboseMode.checked) {
                 console.log("VERBOSE MODE BB");
-                JOEC.Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
+                JOEC.Utils.createNewMessage("VERBOSE MODE ENABLED");
             }
         };
+        /*
+         * createTransitionTable
+         *
+         * Used to create the matrix transition table
+         */
         LexicalAnalyzer.prototype.createTransitionTable = function () {
             _transitionTable = [
                 // 00 * 01 * 02 * 03 * 04 * 05 * 06 * 07 * 08 * 09 * 10 * 11 * 12 * 13 * 14 * 15 * 16 * 17 * 18 * 19 * 20 * 21 * 22 * 23 * 24 * 25 * 26 * 27 * 28 * 29 * 30 * 31 * 32 * 33 * 34 * 35 * 36 * 37 * 38 * 39 * 40 * 41 * 42 * 43 * 44 * 45	

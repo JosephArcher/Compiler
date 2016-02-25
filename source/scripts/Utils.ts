@@ -2,11 +2,15 @@
 
 module JOEC {
 
+	/*
+	* Utitily functions that are useful but have no real place (at least I could not find one I liked...)
+	*/
 	export class Utils {
 
 		/**
-		* Creates a mapping on each character that can be used in the language to its pos in the transition table
+		* initAlphabet
 		*
+		* Creates a mapping on each character that can be used in the language to its position in the transition table
 		*/
 		public static initAlphabet() {
 			_alphabet["a"] = { pos: 0  };
@@ -55,37 +59,68 @@ module JOEC {
 			_alphabet[" "] = { pos: 43 };
 			_alphabet["="] = { pos: 44 };
 			_alphabet["\""] = { pos: 45 };
-
-			console.log(_alphabet[" "]);
 		}
+		/*
+		* getCharacterPosition
+		*
+		* Params 
+		*    character - a character in the alphabet  
+		* Returns
+		*  	 the given character's position in the matrix
+		*/
 		public static getCharacterPosition(character: string): number {
 
 			if(_alphabet[character]){
 
 				var joe = _alphabet[character].pos;
 				return joe;
-
 			}
 			console.log("Unknown character found");
 			return null;
 		}
 		/**	
-		* Get the Source Code
+		* getSourceCode
+		* 
+		* Used to get the source code from the HTML TextArea
 		*/
 		public static getSourceCode(): string {
 
 			var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
 			return sourceCodeHTML.value;
 		}
+		/**	
+		* createNewErrorMessage
+		* 
+		* Displays a given message as an error in the user console
+		*
+		* Params
+		*	msg - the message to output to the user console
+		*/
 		public static createNewErrorMessage(msg) {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
-			consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
+			consoleHTML.innerHTML = consoleHTML.value + "\nERROR :  " + msg;
 		}
+		/**	
+		* createNewWarningMessage
+		* 
+		* Displays a given message as a warning in the user console
+		*
+		* Params
+		*	msg - the message to output to the user console
+		*/
 		public static createNewWarningMessage(msg) {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
-			consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
+			consoleHTML.innerHTML = consoleHTML.value + "\nWarning :  " + msg;
 		}
-		public static createNewUpdateMessage(msg) {
+		/**	
+		* createNewMessage
+		* 
+		* Displays a given message in the user console
+		*
+		* Params
+		*	msg - the message to output to the user console
+		*/
+		public static createNewMessage(msg) {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
 			consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
 		}

@@ -6,55 +6,55 @@
  Test Program 1 (Keywords)
 
 {
-	print
-	while
-	if
-	int
-	string
-	boolean
-	false
-	true
+print
+while
+if
+int
+string
+boolean
+false
+true
 }$
 
 Test Program 2 (Symbol)
 
 {
-	{
-	}
-	(
-	)
-	$
-	"
-	=
-	!
-	+
+{
+}
+(
+)
+$
+"
+=
+!
++
 }$
 
 
 Test Program 3 (IDs)
 
 {
-	abcd
-	efgh
-	ijkl
-	mnop
-	qrst
-	uvwx
-	yz
+abcd
+efgh
+ijkl
+mnop
+qrst
+uvwx
+yz
 }$
 
 Test Program 4 (Incorrect Character)
 {
-	hello >
+hello >
 
 }$
 
 Test Program 5 (Basic print program)
 
 {
-	int a
-	a = 1
-	print(a)	
+int a
+a = 1
+print(a)	
 }$
 
 */

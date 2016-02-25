@@ -7,6 +7,13 @@
 
 module JOEC {
 
+	/*
+	*  Main
+	*  
+	*  Contains the overall logic of the comiler and calls all of the nessesary steps in order
+	*  to compile
+	*/
+
 	export class Main {
 
 		/**
@@ -33,7 +40,7 @@ module JOEC {
 			var stopButton = <HTMLButtonElement>document.getElementById("stopButton");
 			stopButton.disabled = false;
 
-			Utils.createNewUpdateMessage("Starting Compilation!\n");
+			Utils.createNewMessage("Starting Compilation!\n");
 
 			// Get the source code
 			var sourceCode = Utils.getSourceCode();
@@ -79,7 +86,7 @@ module JOEC {
 			}
 
 			// Finish off the lexer and update the UI for the User
-			Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+			Utils.createNewMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
 
 			// Update the UI and mark the lexer phase as complete
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
@@ -92,7 +99,7 @@ module JOEC {
 			// Create a new Parser
 			var Par = new Parser();
 
-			Utils.createNewUpdateMessage("Creating Parser");
+			Utils.createNewMessage("Creating Parser");
 
 			// Start her up
 			Par.startParse(LA.tokenArray);
@@ -113,7 +120,7 @@ module JOEC {
 			}
 
 			// Update the User
-			Utils.createNewUpdateMessage("Parser Completed");
+			Utils.createNewMessage("Parser Completed");
 
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");

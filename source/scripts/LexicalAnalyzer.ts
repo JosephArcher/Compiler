@@ -4,17 +4,17 @@
 
 module JOEC {
 
+	/*
+	* Lexical Analyzer
+	*/
 	export class LexicalAnalyzer {	
 
-		public sourceCode: string = ""; // The source code to be compiled
-		public tokenArray = []; // Holds in order all of the tokens that have been created
-		public hasErrors: boolean = false;
-		private lineNumber: number = 1; // The current line number
-		private currentCharacters = "";
-		private currentPos: number = 0; // The current pos
-		private lookAheadPos: number = 0;
-		public lookAheadStates = [];
-
+		public sourceCode: string = "";     // The source code to be compiled
+		public tokenArray = [];             // Holds in order all of the tokens that have been created
+		public hasErrors: boolean = false;  // Determines if the lexer has any errors
+		private lineNumber: number = 1;     // The current line number
+		private currentCharacters = "";     // The current characters that are being looked at
+		
 		constructor(_SourceCode: string) {
 
 			// Source Code
@@ -22,9 +22,6 @@ module JOEC {
 
 			// Create the transition table
 			this.createTransitionTable();
-		}
-		public isAlpha(chara: string){
-
 		}
 		public isSymbol(chara: string){
 
@@ -45,6 +42,14 @@ module JOEC {
 			}
 
 		}
+	   /*
+		* checkForErrorState
+		* Looks at a given number that represents a location in the transition 
+		* table matrix and determines if it is an error state
+		*
+		* Params
+		*	State - the state to check
+		*/
 		public checkForErrorState(state: number): boolean {
 			switch (state) {
 
@@ -56,121 +61,120 @@ module JOEC {
 			}
 			return true;
 		}
+	   /*
+		* checkForAcceptState
+		* Looks at a given number that represents a location in the transition 
+		* table matrix and determines if it is an accept state
+		*
+		* Params
+		*	State - the state to check
+		*/
 		public checkForAcceptState(state: number): boolean {
 
 			switch (state) {
-				// END OF FILE
+				// EOF (Dollar Sign)
 				case 1:
-					console.log("$ Found");
 					this.tokenArray.push(new Token("EOF", this.lineNumber, "$"));
-					Utils.createNewUpdateMessage("$ Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< $ | line " + this.lineNumber + ">");
 					break;
 				// {
 				case 2:
-					console.log("{ Found");
 					this.tokenArray.push(new Token("Left_Bracket", this.lineNumber, "{"));
-					Utils.createNewUpdateMessage("{ Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< { | line " + this.lineNumber + ">");
 					break;
 				case 3:
 				// }
-					console.log("} Found");
 					this.tokenArray.push(new Token("Right_Backet", this.lineNumber, "}"));
-					Utils.createNewUpdateMessage("} Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< } | line " + this.lineNumber + ">");
 					break;
 				// (
 				case 4:
 					console.log("( Found");
 					this.tokenArray.push(new Token("Left_Para", this.lineNumber, "("));
-					Utils.createNewUpdateMessage("( Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< ( | line " + this.lineNumber + ">");
 					break;
 				// )
 				case 5:
 					console.log(") Found");
 					this.tokenArray.push(new Token("Right_Para", this.lineNumber,")"));
-					Utils.createNewUpdateMessage(") Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< ) | line " + this.lineNumber + ">");
 					break;
 				// !
 				case 6:
 					console.log("! Found");
 					this.tokenArray.push(new Token("Symbol", this.lineNumber ,"!"));
-					Utils.createNewUpdateMessage("! Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< ! | line " + this.lineNumber + ">");
 					break;
 				// +
 				case 7:
 					console.log("+ Found");
 					this.tokenArray.push(new Token("Plus_Sign", this.lineNumber, "+"));
-					Utils.createNewUpdateMessage("+ Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< + | line " + this.lineNumber + ">");
 					break;
 				// =
 				case 8:
 					console.log("= Found");
 					this.tokenArray.push(new Token("Equal_Sign",this.lineNumber, "="));
-					Utils.createNewUpdateMessage("= Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< = | line " + this.lineNumber + ">");
 					break;
 				// Type
 				case 11:
 					console.log("Type Found");
 					this.tokenArray.push(new Token("Type",this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewUpdateMessage("Type Token " + this.currentCharacters.trim() + " Found on line " + this.lineNumber);
+					Utils.createNewMessage("< " + this.currentCharacters.trim() + "| line " + this.lineNumber);
 					break;
 				// Print
 				case 16:
 					console.log("print keyword Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, "print"));
-					Utils.createNewUpdateMessage("print Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< print | line " + this.lineNumber);
 					break;
 				// Digit
 				case 17:
 					console.log("Digit Found");
 					this.tokenArray.push(new Token("Digit", this.lineNumber,this.currentCharacters.trim() ));
-					Utils.createNewUpdateMessage("Digit" + this.currentCharacters.trim() + "Found on line " + this.lineNumber);
+					Utils.createNewMessage("<" + this.currentCharacters.trim() + "| line " + this.lineNumber);
 					break;
 				// String
 				case 31:
 					console.log("String Found");
 					this.tokenArray.push(new Token("String", this.lineNumber, this.currentCharacters));
-					Utils.createNewUpdateMessage("String  " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Identifier
 				case 32:
 					console.log("ID Found");
 					this.tokenArray.push(new Token("Identifier", this.lineNumber,this.currentCharacters.trim()));
-					Utils.createNewUpdateMessage("ID  " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Boolean value ( true | false )
 				case 36:
 					console.log("BoolVal Found");
 					this.tokenArray.push(new Token("BoolVal", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewUpdateMessage("BoolVal " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("<" + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// if
 				case 41:
 					console.log("If Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewUpdateMessage("if " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// while
 				case 48:
 					console.log("while Found");
 					this.tokenArray.push(new Token("Keyword", this.lineNumber, this.currentCharacters.trim()));
-					Utils.createNewUpdateMessage("Keyword " + this.currentCharacters + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("< " + this.currentCharacters + "| line " + this.lineNumber);
 					break;
 				// Invalid Keyword Fix
 				case 42:
-					console.log("Invalid Keyword Fix");
+				
 					// Loop over the current characters and make an identifier out of each
 					for (var i = 0; i < this.currentCharacters.length ; i++){
 
-
-						console.log(this.currentCharacters.charCodeAt(i));
 						// Check to see if this is the last time and if so write out the current string
 						if (i == this.currentCharacters.length - 1) {
-
-							console.log("THIS SHIT NEEDS TO GO BACK! " + this.currentCharacters.charAt(this.currentCharacters.length - 1));
-
 							// ALAN IF YOU EVER SEE THIS ... ThiS line of code might have saved me... also hello!
 							this.sourceCode = this.currentCharacters.charAt(this.currentCharacters.length - 1) + this.sourceCode;
-							
 						}
 						else{
 							// Check to see if the character is a space
@@ -180,16 +184,16 @@ module JOEC {
 							else if (this.isSymbol(this.currentCharacters.charAt(i))) {
 
 								this.tokenArray.push(new Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+								Utils.createNewMessage("< " + this.currentCharacters.charAt(i).trim() + "| line " + this.lineNumber);
 							}
 							else if (this.isDigit(this.currentCharacters.charAt(i))) {
 								console.log("DIGIT BROKE? 1");
 								this.tokenArray.push(new Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+								Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
 							}
 							else {
 								this.tokenArray.push(new Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-								Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+								Utils.createNewMessage("< " + this.currentCharacters.charAt(i) + "| line " + this.lineNumber);
 							}
 						}
 					}
@@ -199,11 +203,21 @@ module JOEC {
 			}
 			return true;
 		}
+		/*
+		* writeOutCharacter
+		*
+		* Used to handle what happens if the lexer 
+		* still has current characters and is trying to
+		* end the phase
+		*
+		* Params
+		*	toWrite - the string of leftover charcters
+		*/
 		public writeOutCharacter(toWrite: string) {
-			console.log("write out leftover Fix");
 		
 			// Loop over the current characters and make an identifier out of each and place and last character read back into the source
 			for (var i = 0; i < this.currentCharacters.length; i++) {
+
 				// Check to see if the character is a space
 				if (this.currentCharacters.charAt(i) == " ") {
 					// Do nothing
@@ -211,21 +225,27 @@ module JOEC {
 				else if (this.isSymbol(this.currentCharacters.charAt(i))) {
 
 					this.tokenArray.push(new Token("Symbol", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewUpdateMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("Symbol " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
 				else if (this.isDigit(this.currentCharacters.charAt(i))) {
 
 					this.tokenArray.push(new Token("Digit", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewUpdateMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("Digit " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
 				else {
 					this.tokenArray.push(new Token("Identifier", this.lineNumber, this.currentCharacters.charAt(i).trim()));
-					Utils.createNewUpdateMessage("ID " + this.currentCharacters.charAt(i) + " Token Found on line " + this.lineNumber);
+					Utils.createNewMessage("ID " + this.currentCharacters.charAt(i).trim() + " Token Found on line " + this.lineNumber);
 				}
 
 			
 			}
 		}
+	   /*
+		* generateTokens
+		*
+		* Used to generate an array of tokens from the source code
+		* provided in the HTML TextArea
+		*/
 		public generateTokens() {
 
 			// Create variables
@@ -235,7 +255,7 @@ module JOEC {
 			var insideString: number = 0;
 			var nextTablePosition;
 			var holder = "";
-			Utils.createNewUpdateMessage("Starting Lexical Analysis!");
+			Utils.createNewMessage("Starting Lexical Analysis!");
 			// Loop over the source code
 			for (var i = 0; i < this.sourceCode.length; i++) {
 
@@ -293,9 +313,14 @@ module JOEC {
 			//If verbose mode
 			if (_verboseMode.checked) {
 			 	console.log("VERBOSE MODE BB");
-			 	Utils.createNewUpdateMessage("VERBOSE MODE ENABLED");
+			 	Utils.createNewMessage("VERBOSE MODE ENABLED");
 			 }
 		}
+	   /*
+		* createTransitionTable
+		*
+		* Used to create the matrix transition table
+		*/
 		public createTransitionTable() {
 
 			_transitionTable = [ 

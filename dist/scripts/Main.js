@@ -6,6 +6,12 @@
 ///<reference path="Queue.ts"/>
 var JOEC;
 (function (JOEC) {
+    /*
+    *  Main
+    *
+    *  Contains the overall logic of the comiler and calls all of the nessesary steps in order
+    *  to compile
+    */
     var Main = (function () {
         function Main() {
         }
@@ -27,7 +33,7 @@ var JOEC;
             // Enable Stop Button to allow user to stop the current compilation
             var stopButton = document.getElementById("stopButton");
             stopButton.disabled = false;
-            JOEC.Utils.createNewUpdateMessage("Starting Compilation!\n");
+            JOEC.Utils.createNewMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
             // Check to see if any source code exists
@@ -59,7 +65,7 @@ var JOEC;
                 LA.tokenArray.push(new JOEC.Token("EOF", 0, "$"));
             }
             // Finish off the lexer and update the UI for the User
-            JOEC.Utils.createNewUpdateMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
+            JOEC.Utils.createNewMessage("\n \n Lex Completed... " + LA.tokenArray.length + " token(s) were found");
             // Update the UI and mark the lexer phase as complete
             var lexCheckUI = document.getElementById("lexCheck");
             lexCheckUI.style.visibility = "visible";
@@ -68,7 +74,7 @@ var JOEC;
             lexremoveUI.style.visibility = "hidden";
             // Create a new Parser
             var Par = new JOEC.Parser();
-            JOEC.Utils.createNewUpdateMessage("Creating Parser");
+            JOEC.Utils.createNewMessage("Creating Parser");
             // Start her up
             Par.startParse(LA.tokenArray);
             // Check for any parse errors
@@ -83,7 +89,7 @@ var JOEC;
                 return;
             }
             // Update the User
-            JOEC.Utils.createNewUpdateMessage("Parser Completed");
+            JOEC.Utils.createNewMessage("Parser Completed");
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";

@@ -3,6 +3,9 @@ module JOEC {
 
 	export class Token {
 
+		/*
+		* Token
+		*/
 
 		public kind: string;
 		public lineNumber: number;

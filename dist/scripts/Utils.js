@@ -1,12 +1,16 @@
 ///<reference path="Globals.ts"/>
 var JOEC;
 (function (JOEC) {
+    /*
+    * Utitily functions that are useful but have no real place (at least I could not find one I liked...)
+    */
     var Utils = (function () {
         function Utils() {
         }
         /**
-        * Creates a mapping on each character that can be used in the language to its pos in the transition table
+        * initAlphabet
         *
+        * Creates a mapping on each character that can be used in the language to its position in the transition table
         */
         Utils.initAlphabet = function () {
             _alphabet["a"] = { pos: 0 };
@@ -55,8 +59,15 @@ var JOEC;
             _alphabet[" "] = { pos: 43 };
             _alphabet["="] = { pos: 44 };
             _alphabet["\""] = { pos: 45 };
-            console.log(_alphabet[" "]);
         };
+        /*
+        * getCharacterPosition
+        *
+        * Params
+        *    character - a character in the alphabet
+        * Returns
+        *  	 the given character's position in the matrix
+        */
         Utils.getCharacterPosition = function (character) {
             if (_alphabet[character]) {
                 var joe = _alphabet[character].pos;
@@ -66,21 +77,47 @@ var JOEC;
             return null;
         };
         /**
-        * Get the Source Code
+        * getSourceCode
+        *
+        * Used to get the source code from the HTML TextArea
         */
         Utils.getSourceCode = function () {
             var sourceCodeHTML = document.getElementById("programInput");
             return sourceCodeHTML.value;
         };
+        /**
+        * createNewErrorMessage
+        *
+        * Displays a given message as an error in the user console
+        *
+        * Params
+        *	msg - the message to output to the user console
+        */
         Utils.createNewErrorMessage = function (msg) {
             var consoleHTML = document.getElementById("console");
-            consoleHTML.innerHTML = consoleHTML.value + "\n ERROR :  " + msg;
+            consoleHTML.innerHTML = consoleHTML.value + "\nERROR :  " + msg;
         };
+        /**
+        * createNewWarningMessage
+        *
+        * Displays a given message as a warning in the user console
+        *
+        * Params
+        *	msg - the message to output to the user console
+        */
         Utils.createNewWarningMessage = function (msg) {
             var consoleHTML = document.getElementById("console");
-            consoleHTML.innerHTML = consoleHTML.value + "\n Warning :  " + msg;
+            consoleHTML.innerHTML = consoleHTML.value + "\nWarning :  " + msg;
         };
-        Utils.createNewUpdateMessage = function (msg) {
+        /**
+        * createNewMessage
+        *
+        * Displays a given message in the user console
+        *
+        * Params
+        *	msg - the message to output to the user console
+        */
+        Utils.createNewMessage = function (msg) {
             var consoleHTML = document.getElementById("console");
             consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
         };
