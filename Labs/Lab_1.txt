@@ -97,7 +97,7 @@ Dragon Bible
 ------
 Q. A compiler that translate a high-level language into another high level language is called a source-to-source translator. What advantages are there to using C as a target language for a compiler.
 
-A. 
+A. C is more effecient and stuff
 
 1.6.1
 -----
@@ -114,20 +114,20 @@ Q. For the block-structured C code of Fig.1.13(a), indicate the values assigned 
    w = i + j; // W = 7 + 6 (13)
  }
 
- x = i + j; // X = 6 + 5 (11)
+ x = i + j; // X = 4 + 5 (9)
 
  { 
    int i = 8;
    y = i + j; // Y = 8 + 5 (13)
  }
 
- z = i + j; // z = 5 + 6 (11)
+ z = i + j; // z = 4 + 5 (9)
 
 A.
 
 W = 13
-X = 11
+X = 9
 Y = 13
-z = 11
+z = 9
 
 
