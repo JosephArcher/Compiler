@@ -7,7 +7,7 @@
  
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> <!-- Added FontAwSome -->
    <link rel="stylesheet" type="text/css" href="UI.css"> <!-- Some of my own CSS -->
-   <link href="simple-sidebar.css" rel="stylesheet">
+  
    <script src="http://d3js.org/d3.v2.js"></script>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -26,39 +26,13 @@
    </title>
 </head>
 <body>
-  <div id="wrapper">
-
-      <!-- Sidebar -->
-      <div id="sidebar-wrapper">
-        <div id="header1">
-
-          <ul class="nav nav-tabs" id="myTab">
-            <li class="active"><a data-target="#home" data-toggle="tab">Tokens</a></li>
-            <li><a data-target="#profile" data-toggle="tab">CST</a></li>
-            <li><a data-target="#messages" data-toggle="tab">AST</a></li>
-          </ul>
-
-          <div class="tab-content">
-           <div class="tab-pane active" id="home">
-            <ul id="tokenList" class="list-group">
-              
-            </ul>
-           </div>
-            <div class="tab-pane" id="profile">CST</div>
-            <div class="tab-pane" id="messages">AST</div>
-          </div>
-        </div>
-      </div>
-      <!-- /#sidebar-wrapper -->
-
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-             <div id="header">
+  <div id="header">
     <p> Joe's Compiler</p>
   </div>
-                  <div id="main">
-
+<div id="sidebar">
+ <h2>Lorem Ipsum Dolor</h2>
+</div>
+  <div id="main">
     <div id="programInputSection">
       <p>Program Input</p>
       <textarea id="programInput" 
@@ -85,13 +59,7 @@
             data-target="#myModal"
             class="btn btn-default">Load...</button>
 
-     <button id="menu-toggle"
-            type="button" 
-            style="width: 150px; margin-top: 15px;"
-           href="#menu-toggle"
-            class="btn btn-default">Show</button>
-
-            
+            <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
 
     <span id="verboseCheckbox">  <input id = "vCheck" checked  type="checkbox" aria-label="Verbose ?"> Verbose Mode </span>  
    </div>
@@ -101,23 +69,28 @@
                 placeholder="Output will appear here..."></textarea>
    </div>
   </div>
-    <div id="consoleSection">
+  <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Program Loader</h4>
+          </div>
+          <div class="modal-body">
+            <button type="button" class="btn btn-primary" onclick="testProgram1();">Program 1</button>
+            <button type="button" class="btn btn-primary" onclick="testProgram2();">Program 2</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Okay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div id="consoleSection">
     <p>Console</p>
      <textarea readonly id="console"></textarea>
 
   </div>
-            </div>
-        </div>
-        <!-- /#page-content-wrapper -->
-
-    </div>
-    <!-- /#wrapper -->
-     <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
 </body>
 </html>

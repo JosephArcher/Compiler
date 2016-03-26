@@ -4,8 +4,7 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Parser.ts"/>
 ///<reference path="Queue.ts"/>
-///<reference path="d3.d.ts"/>
-/// <reference path="jquery.d.ts" />
+///<reference path="d3.d.ts" />
 var JOEC;
 (function (JOEC) {
     /*
@@ -52,7 +51,6 @@ var JOEC;
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Generate the tokens
             LA.generateTokens();
-            var tokenListUI = document.getElementById("tokenList");
             // Check to see if verbose mode is enabled
             if (_verboseMode.checked) {
                 JOEC.Utils.createNewMessage("\nToken List \n============ ");
@@ -61,7 +59,6 @@ var JOEC;
                 for (var i = 0; i < LA.tokenArray.length; i++) {
                     nextToken = LA.tokenArray[i];
                     JOEC.Utils.createNewMessage("< Value: " + nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
-                    $("#tokenList").append('<li class="hostLogListItem" style="height:75px;"> <p class="" >' + nextToken.getValue() + '<span class="label logCounter">' + "hostCounter" + '</span> </p> <span class="logDateTime">' + "test" + ' </span > <span class="logSource" >' + "source" + '</span> </li>');
                 }
                 JOEC.Utils.createNewMessage("============");
             }
@@ -130,14 +127,8 @@ var JOEC;
         * Used to stop the compiler
         */
         Main.showVis = function () {
-            $('#main').animate({
-                'marginLeft': "-=30px" //moves left
-            });
-        };
-        Main.openSidepage = function () {
-            $('#mainpage').animate({
-                left: '350px'
-            }, 400, 'easeOutBack');
+            console.log("Show Vis");
+            d3.select("main").transition().style("background-color", "black");
         };
         return Main;
     })();

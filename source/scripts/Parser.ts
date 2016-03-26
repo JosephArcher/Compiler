@@ -3,7 +3,8 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
-
+///<reference path="Tree.ts"/>
+///<reference path="TreeNode.ts"/>
 
 module JOEC {
 	/*
@@ -74,6 +75,9 @@ module JOEC {
 
 			// Get the first character
 			this.currentToken= <JOEC.Token> this.tokenQueue.dequeue();
+
+			// Start to generate a concrete syntax tree
+
 
 			// Block
 			this.parseBlock();

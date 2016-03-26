@@ -4,6 +4,8 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Parser.ts"/>
 ///<reference path="Queue.ts"/>
+///<reference path="d3.d.ts"/>
+/// <reference path="jquery.d.ts" />
 
 module JOEC {
 
@@ -58,12 +60,12 @@ module JOEC {
 				this.stopCompiler();
 				return;
 			}
-
 			// Create a new Lexical Analzer
 			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
 			// Generate the tokens
 			LA.generateTokens();
+			var tokenListUI = <HTMLInputElement>document.getElementById("tokenList");
 
 			// Check to see if verbose mode is enabled
 			if(_verboseMode.checked){
@@ -73,6 +75,8 @@ module JOEC {
 				for(var i = 0; i < LA.tokenArray.length; i++){
 					nextToken = LA.tokenArray[i];
 					Utils.createNewMessage("< Value: " +  nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
+					$("#tokenList").append('<li class="hostLogListItem" style="height:75px;"> <p class="" >' + nextToken.getValue() + '<span class="label logCounter">' + "hostCounter" + '</span> </p> <span class="logDateTime">' + "test" + ' </span > <span class="logSource" >' + "source" + '</span> </li>');
+
 				}
 				Utils.createNewMessage("============");
 			}
@@ -158,6 +162,20 @@ module JOEC {
 			var compileButton = <HTMLButtonElement>document.getElementById("compileButton");
 			compileButton.disabled = false;
 		}
-		
+		/**
+		* Stop Comiler
+		*
+		* Used to stop the compiler
+		*/
+		public static showVis() {
+			$('#main').animate({
+				'marginLeft': "-=30px" //moves left
+			});
+		}
+		public static openSidepage() {
+		$('#mainpage').animate({
+			left: '350px'
+		}, 400, 'easeOutBack');
+	}
 	}
 }

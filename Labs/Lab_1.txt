@@ -114,20 +114,27 @@ Q. For the block-structured C code of Fig.1.13(a), indicate the values assigned 
    w = i + j; // W = 7 + 6 (13)
  }
 
- x = i + j; // X = 4 + 5 (9)
+ x = i + j; // X = 6 + 5 (11)
 
  { 
    int i = 8;
    y = i + j; // Y = 8 + 5 (13)
  }
 
- z = i + j; // z = 4 + 5 (9)
+ z = i + j; // z = 4 + 5 (11)
 
 A.
 
 W = 13
-X = 9
+X = 11
 Y = 13
-z = 9
+z = 11
+
+B.
+
+w = 9
+x = 7
+y = 13
+z = 11
 
 
