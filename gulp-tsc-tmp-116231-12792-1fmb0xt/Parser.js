@@ -3,7 +3,7 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
-///<reference path="Tree.ts"/>o
+///<reference path="Tree.ts"/>
 ///<reference path="TreeNode.ts"/>
 var JOEC;
 (function (JOEC) {
@@ -47,7 +47,6 @@ var JOEC;
             // Check to see if they match
             if (this.currentToken.getValue() == toMatch) {
                 console.log("A match was found for " + toMatch);
-                this.CST.addNode(this.currentToken.getValue(), "Leaf");
                 this.currentToken = this.tokenQueue.dequeue();
             }
             else {
@@ -65,10 +64,6 @@ var JOEC;
             // Get the first character
             this.currentToken = this.tokenQueue.dequeue();
             // Start to generate a concrete syntax tree
-            this.CST = new JOEC.Tree();
-            this.AST = new JOEC.Tree();
-            // Add the RootNode
-            this.CST.addNode("Program", "Branch");
             // Block
             this.parseBlock();
             // Dollar Sign
@@ -101,22 +96,17 @@ var JOEC;
         * Block
         */
         Parser.prototype.parseBlock = function () {
-            this.CST.addNode("Block", "Branch");
-            this.AST.addNode("Block", "Branch");
             // {
             this.matchCharacter('{');
             // Statement List
             this.parseStatementList();
             // }
             this.matchCharacter('}');
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Statement List
         */
         Parser.prototype.parseStatementList = function () {
-            this.CST.addNode("StatementList", "Branch");
             if (this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "Type" || this.currentToken.getValue() == "if") {
                 // Statement
                 this.parseStatement();
@@ -124,17 +114,14 @@ var JOEC;
                 this.parseStatementList();
             }
             else {
-                this.CST.endChildren();
                 // Do Nothing
                 return;
             }
-            this.CST.endChildren();
         };
         /**
         * Statement
         */
         Parser.prototype.parseStatement = function () {
-            this.CST.addNode("Statement", "Branch");
             // Print Statement
             if (this.currentToken.getValue() == "print") {
                 this.parsePrintStatement();
@@ -154,14 +141,11 @@ var JOEC;
             else if (this.currentToken.getValue() == "{") {
                 this.parseBlock();
             }
-            this.CST.endChildren();
         };
         /**
         * Print Statement
         */
         Parser.prototype.parsePrintStatement = function () {
-            this.CST.addNode("PrintStatement", "Branch");
-            this.AST.addNode("Print-Statement", "Branch");
             // Print
             this.matchCharacter("print");
             // Match (
@@ -170,72 +154,53 @@ var JOEC;
             this.parseExpression();
             // Match )
             this.matchCharacter(")");
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Assignment Statement
         */
         Parser.prototype.parseAssignmentStatement = function () {
-            this.CST.addNode("AssignmentStatement", "Branch");
-            this.AST.addNode("Assignment-Statement", "Branch");
             // Identifier
             this.parseIdentifier();
             // =
             this.matchCharacter("=");
             // Expression
             this.parseExpression();
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Variable Declaration Statement
         */
         Parser.prototype.parseVarDecl = function () {
-            this.CST.addNode("VarDecl", "Branch");
-            this.AST.addNode("Var-Decl", "Branch");
             // Type
             this.parseType();
             // Identifier
             this.parseIdentifier();
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * While Statement
         */
         Parser.prototype.parseWhileStatement = function () {
-            this.CST.addNode("WhileStatement", "Branch");
-            this.AST.addNode("While-Statement", "Branch");
             // While
             this.matchCharacter("while");
             // Boolean Expression
             this.parseBooleanExpression();
             // Block
             this.parseBlock();
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * If Statement
         */
         Parser.prototype.parseIfStatement = function () {
-            this.CST.addNode("IfStatement", "Branch");
-            this.AST.addNode("If-Statement", "Branch");
             // If
             this.matchCharacter("if");
             // Boolean Expression
             this.parseBooleanExpression();
             // Block
             this.parseBlock();
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Expression
         */
         Parser.prototype.parseExpression = function () {
-            this.CST.addNode("Expression", "Branch");
             // INT
             if (this.currentToken.getKind() == "Digit") {
                 this.parseIntegerExpression();
@@ -249,13 +214,11 @@ var JOEC;
             else if (this.currentToken.getKind() == "Identifier") {
                 this.parseIdentifier();
             }
-            this.CST.endChildren();
         };
         /**
         * Int Expression
         */
         Parser.prototype.parseIntegerExpression = function () {
-            this.CST.addNode("IntegerExpression", "Branch");
             // Parse Digit
             this.parseDigit();
             // Check to see what next
@@ -263,24 +226,18 @@ var JOEC;
                 this.parseIntegerOperator();
                 this.parseExpression();
             }
-            this.CST.endChildren();
         };
         /**
         * String Expression
         */
         Parser.prototype.parseStringExpression = function () {
-            this.CST.addNode("StringExpression", "Branch");
             var currentToken = this.currentToken.getValue();
-            this.AST.addNode(currentToken, "Branch");
             this.matchCharacter(currentToken);
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Boolean Expression
         */
         Parser.prototype.parseBooleanExpression = function () {
-            this.CST.addNode("BooleanStatement", "Branch");
             console.log("Boolean Express");
             if (this.currentToken.getValue() == "(") {
                 console.log("Para found");
@@ -293,20 +250,15 @@ var JOEC;
             else {
                 this.parseBooleanValue();
             }
-            this.CST.endChildren();
         };
         /**
         * Identifier
         */
         Parser.prototype.parseIdentifier = function () {
-            this.CST.addNode("Identifier", "Branch");
             if (this.currentToken.getKind() == "Identifier") {
                 var currentValue = this.currentToken.getValue();
-                this.AST.addNode(currentValue, "Branch");
                 this.matchCharacter(currentValue);
             }
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Character List
@@ -317,21 +269,15 @@ var JOEC;
         * Type
         */
         Parser.prototype.parseType = function () {
-            this.CST.addNode("Type", "Branch");
             if (this.currentToken.getValue() == "int") {
-                this.AST.addNode("Int", "Branch");
                 this.matchCharacter("int");
             }
             else if (this.currentToken.getValue() == "string") {
-                this.AST.addNode("String", "Branch");
                 this.matchCharacter("string");
             }
             else if (this.currentToken.getValue() == "boolean") {
-                this.AST.addNode("Boolean", "Branch");
                 this.matchCharacter("boolean");
             }
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Character
@@ -342,20 +288,15 @@ var JOEC;
         * Digit
         */
         Parser.prototype.parseDigit = function () {
-            this.CST.addNode("Digit", "Branch");
             if (this.currentToken.getKind() == "Digit") {
                 var currentValue = this.currentToken.getValue();
-                this.AST.addNode(currentValue, "Branch");
                 this.matchCharacter(currentValue);
             }
-            this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Boolean Operator
         */
         Parser.prototype.parseBooleanOperator = function () {
-            this.CST.addNode("BooleanOperator", "Branch");
             if (this.currentToken.getValue() == "=") {
                 // =
                 this.matchCharacter("=");
@@ -368,27 +309,22 @@ var JOEC;
                 // =
                 this.matchCharacter("=");
             }
-            this.CST.endChildren();
         };
         /**
         * Boolean Value
         */
         Parser.prototype.parseBooleanValue = function () {
-            this.CST.addNode("BooleanValue", "Branch");
             if (this.currentToken.getKind() == "BoolVal") {
                 var currentValue = this.currentToken.getValue();
                 this.matchCharacter(currentValue);
             }
-            this.CST.endChildren();
         };
         /**
         * Integer Operator
         */
         Parser.prototype.parseIntegerOperator = function () {
-            this.CST.addNode("IntegerOperator", "Branch");
             // +
             this.matchCharacter("+");
-            this.CST.endChildren();
         };
         return Parser;
     })();

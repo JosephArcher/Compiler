@@ -18,11 +18,15 @@ module JOEC {
 
 	export class Main {
 
+		public static testing() {
+		}
+
 		/**
 		* Start Compiler
 		* 
 		* Used to start the compiler, called when the compile button is pressed
 		*/
+	
 		public static startCompiler() {
 
 			// Initalize verbose mode
@@ -60,6 +64,7 @@ module JOEC {
 				this.stopCompiler();
 				return;
 			}
+			$("#testMe").append("<li><a onclick=\"JOEC.Main.testing()\"> Test</a></li>");
 			// Create a new Lexical Analzer
 			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
@@ -142,6 +147,10 @@ module JOEC {
 
 			// Update the User
 			Utils.createNewMessage("\nParser Completed");
+			console.log(Par.CST);
+			Utils.addNewCST(Par.CST.toString());
+			Utils.createNewMessage(Par.CST.toString());
+			Utils.addNewAST(Par.AST.toString());
 
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");

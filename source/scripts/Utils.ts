@@ -127,5 +127,13 @@ module JOEC {
 			var consoleHTML = <HTMLTextAreaElement>document.getElementById("console");
 			consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
 		}
+		public static addNewCST(CST: string){
+			var cstArea = document.getElementById("cstArea");
+			cstArea.innerHTML = CST;
+		}
+		public static addNewAST(AST: string) {
+			var astArea = document.getElementById("astArea");
+			astArea.innerHTML = AST;
+		}
 	}
 }

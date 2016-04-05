@@ -8,11 +8,9 @@
 var JOEC;
 (function (JOEC) {
     var TreeNode = (function () {
-        function TreeNode(theName) {
-            this.name = "";
-            this.parent = null;
+        function TreeNode() {
+            this.value = "";
             this.children = [];
-            this.name = theName;
         }
         TreeNode.prototype.addChildNode = function (node) {
             this.children.push(node);

@@ -10,12 +10,16 @@ module JOEC {
 
 	export class TreeNode {
 
-		public value = "";
-		public parentNode: TreeNode;
+		public name = ""; 
+		public parent: TreeNode = null;
 		public children = [];
 
-		public constructor(){
+		public constructor(theName){
+			this.name = theName;
+		}
 
+		public addChildNode(node:JOEC.TreeNode) {
+			this.children.push(node);
 		}
 
 	}

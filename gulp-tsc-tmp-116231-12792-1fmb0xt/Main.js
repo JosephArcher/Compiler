@@ -17,8 +17,6 @@ var JOEC;
     var Main = (function () {
         function Main() {
         }
-        Main.testing = function () {
-        };
         /**
         * Start Compiler
         *
@@ -31,6 +29,39 @@ var JOEC;
             JOEC.Utils.initAlphabet();
             // Mark the compiler as running
             _isRunning = true;
+            var width = 960, height = 2200;
+            var cluster = d3.layout.cluster()
+                .size([height, width - 160]);
+            var diagonal = d3.svg.diagonal()
+                .projection(function (d) { return [d.y, d.x]; });
+            var svg = d3.select("body").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(40,0)");
+            d3.json("/mbostock/raw/4063550/flare.json", function (error, root) {
+                if (error)
+                    throw error;
+                var nodes = cluster.nodes(root), links = cluster.links(nodes);
+                var link = svg.selectAll(".link")
+                    .data(links)
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", diagonal);
+                var node = svg.selectAll(".node")
+                    .data(nodes)
+                    .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+                node.append("circle")
+                    .attr("r", 4.5);
+                node.append("text")
+                    .attr("dx", function (d) { return d.children ? -8 : 8; })
+                    .attr("dy", 3)
+                    .style("text-anchor", function (d) { return d.children ? "end" : "start"; })
+                    .text(function (d) { return d.name; });
+            });
+            d3.select(self.frameElement).style("height", height + "px");
             // Reset the Check and X Marks on the UI
             var lexremoveUI = document.getElementById("lexError");
             lexremoveUI.style.visibility = "hidden";
@@ -50,7 +81,6 @@ var JOEC;
                 this.stopCompiler();
                 return;
             }
-            $("#testMe").append("<li><a onclick=\"JOEC.Main.testing()\"> Test</a></li>");
             // Create a new Lexical Analzer
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Generate the tokens
@@ -111,10 +141,6 @@ var JOEC;
             }
             // Update the User
             JOEC.Utils.createNewMessage("\nParser Completed");
-            console.log(Par.CST);
-            JOEC.Utils.addNewCST(Par.CST.toString());
-            JOEC.Utils.createNewMessage(Par.CST.toString());
-            JOEC.Utils.addNewAST(Par.AST.toString());
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";

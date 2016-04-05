@@ -3,7 +3,7 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
-///<reference path="Tree.ts"/>
+///<reference path="Tree.ts"/>o
 ///<reference path="TreeNode.ts"/>
 
 module JOEC {
@@ -16,6 +16,8 @@ module JOEC {
 		public hasErrors: boolean = false;   // Determines if the parser has any errors
 		public tokenQueue = new Queue();     // Holds the tokens passed in from the lexer
 		public numberOfPrograms: number = 0; // The number of programs that have been parsed
+		public CST: JOEC.Tree;               // Concrete Syntax Tree
+		public AST: JOEC.Tree;               // Abstract Syntax Tree
 
 		// Constructor
 		constructor() {}
@@ -56,6 +58,7 @@ module JOEC {
 				if (this.currentToken.getValue() == toMatch) {
 
 					console.log("A match was found for " + toMatch);
+					this.CST.addNode(this.currentToken.getValue(), "Leaf");
 					this.currentToken = this.tokenQueue.dequeue();
 				}
 				else {
@@ -77,7 +80,11 @@ module JOEC {
 			this.currentToken= <JOEC.Token> this.tokenQueue.dequeue();
 
 			// Start to generate a concrete syntax tree
+			this.CST = new JOEC.Tree();
+			this.AST = new JOEC.Tree();
 
+			// Add the RootNode
+			this.CST.addNode("Program", "Branch");
 
 			// Block
 			this.parseBlock();
@@ -90,6 +97,7 @@ module JOEC {
 				Utils.createNewMessage("Program " + this.numberOfPrograms + " successfully parsed");
 
 				// Check to see if more tokens still exist
+
 				if (this.tokenQueue.getSize() > 0) {
 				
 					// If they do call the parse program another time
@@ -124,6 +132,10 @@ module JOEC {
 		*/
 		public parseBlock() {
 
+
+			this.CST.addNode("Block", "Branch");
+			this.AST.addNode("Block", "Branch");
+
 			// {
 			this.matchCharacter('{');
 
@@ -132,11 +144,16 @@ module JOEC {
 
 			// }
 			this.matchCharacter('}');
+
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Statement List
 		*/
 		public parseStatementList() {
+
+			this.CST.addNode("StatementList", "Branch");
 
 			if(this.currentToken.getValue() == "print" || this.currentToken.getKind() == "Identifier" || this.currentToken.getValue() == "while" || this.currentToken.getValue() == "{" || this.currentToken.getKind() == "Type" || this.currentToken.getValue() == "if" ){
 
@@ -147,15 +164,18 @@ module JOEC {
 				this.parseStatementList();
 			}
 			else  {
-
+				this.CST.endChildren();
 				// Do Nothing
 				return;
 			}
+			this.CST.endChildren();
 		}
 		/**
 		* Statement
 		*/
 		public parseStatement() {
+
+			this.CST.addNode("Statement" , "Branch");
 
 			// Print Statement
 			if(this.currentToken.getValue() == "print"){
@@ -181,11 +201,16 @@ module JOEC {
 			else if(this.currentToken.getValue() == "{"){
 				this.parseBlock();
 			}
+
+			this.CST.endChildren();
 		}
 		/**
 		* Print Statement
 		*/
 		public parsePrintStatement(){
+
+			this.CST.addNode("PrintStatement", "Branch");
+			this.AST.addNode("Print-Statement", "Branch");
 
 			// Print
 			this.matchCharacter("print");
@@ -199,11 +224,16 @@ module JOEC {
 			// Match )
 			this.matchCharacter(")");
 
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Assignment Statement
 		*/
 		public parseAssignmentStatement(){
+
+			this.CST.addNode("AssignmentStatement", "Branch");
+			this.AST.addNode("Assignment-Statement", "Branch");
 
 			// Identifier
 			this.parseIdentifier();
@@ -213,22 +243,33 @@ module JOEC {
 
 			// Expression
 			this.parseExpression();
+
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Variable Declaration Statement
 		*/
 		public parseVarDecl() {
 
+			this.CST.addNode("VarDecl", "Branch");
+			this.AST.addNode("Var-Decl", "Branch");
 			// Type
 			this.parseType();
 
 			// Identifier
 			this.parseIdentifier();
+
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* While Statement
 		*/
 		public parseWhileStatement(){
+
+			this.CST.addNode("WhileStatement", "Branch");
+			this.AST.addNode("While-Statement", "Branch");
 
 			// While
 			this.matchCharacter("while")
@@ -239,11 +280,17 @@ module JOEC {
 			// Block
 			this.parseBlock();
 
+			this.CST.endChildren();
+			this.AST.endChildren();
+
 		}
 		/**
 		* If Statement
 		*/
 		public parseIfStatement(){
+
+			this.CST.addNode("IfStatement", "Branch");
+			this.AST.addNode("If-Statement", "Branch");
 
 			// If
 			this.matchCharacter("if");
@@ -253,12 +300,16 @@ module JOEC {
 
 			// Block
 			this.parseBlock();
+
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Expression
 		*/
 		public parseExpression(){
 
+			this.CST.addNode("Expression", "Branch");
 
 			// INT
 			if(this.currentToken.getKind() == "Digit"){
@@ -276,11 +327,15 @@ module JOEC {
 			else if (this.currentToken.getKind() == "Identifier") {
 				this.parseIdentifier();
 			}
+
+			this.CST.endChildren();
 		}
 		/**
 		* Int Expression
 		*/
 		public parseIntegerExpression(){
+
+			this.CST.addNode("IntegerExpression", "Branch");
 
 			// Parse Digit
 			this.parseDigit();
@@ -291,20 +346,29 @@ module JOEC {
 				this.parseExpression();
 			}
 
+			this.CST.endChildren();
+
 		}
 		/**
 		* String Expression
 		*/
 		public parseStringExpression(){
+
+			this.CST.addNode("StringExpression", "Branch");
 			
 			var currentToken = this.currentToken.getValue();
+			this.AST.addNode(currentToken, "Branch");
 			this.matchCharacter(currentToken);
+
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Boolean Expression
 		*/
 		public parseBooleanExpression(){
 
+			this.CST.addNode("BooleanStatement", "Branch");
 			console.log("Boolean Express");
 			if(this.currentToken.getValue() == "("){
 				console.log("Para found");
@@ -321,17 +385,21 @@ module JOEC {
 			else{
 				this.parseBooleanValue();
 			}
+			this.CST.endChildren();
 		}
 		/**
 		* Identifier
 		*/
 		public parseIdentifier() {
+			this.CST.addNode("Identifier", "Branch");
 
 			if (this.currentToken.getKind() == "Identifier") {
 				var currentValue = this.currentToken.getValue();
+				this.AST.addNode(currentValue , "Branch");
 				this.matchCharacter(currentValue);
 			}
-
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Character List
@@ -344,15 +412,22 @@ module JOEC {
 		* Type
 		*/
 		public parseType() {
+
+			this.CST.addNode("Type", "Branch");
 			if(this.currentToken.getValue() == "int"){
+				this.AST.addNode("Int", "Branch");
 				this.matchCharacter("int");
 			}
 			else if(this.currentToken.getValue() == "string"){
+				this.AST.addNode("String", "Branch");
 				this.matchCharacter("string");
 			}
 			else if(this.currentToken.getValue() == "boolean"){
+				this.AST.addNode("Boolean", "Branch");
 				this.matchCharacter("boolean");
 			}
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Character
@@ -365,15 +440,22 @@ module JOEC {
 		*/
 		public parseDigit(){
 
+			this.CST.addNode("Digit", "Branch");
 			if (this.currentToken.getKind() == "Digit") {
+
 				var currentValue = this.currentToken.getValue();
+				this.AST.addNode(currentValue, "Branch");
 				this.matchCharacter(currentValue);
 			}
+			this.CST.endChildren();
+			this.AST.endChildren();
 		}
 		/**
 		* Boolean Operator
 		*/
 		public parseBooleanOperator() {
+
+			this.CST.addNode("BooleanOperator", "Branch");
 
 			if(this.currentToken.getValue() == "=") {
 
@@ -392,12 +474,14 @@ module JOEC {
 				// =
 				this.matchCharacter("=");
 			}
-
+			this.CST.endChildren();
 		}
 		/**
 		* Boolean Value
 		*/
 		public parseBooleanValue() {
+
+			this.CST.addNode("BooleanValue", "Branch");
 			
 			if(this.currentToken.getKind() == "BoolVal"){
 				
@@ -405,14 +489,17 @@ module JOEC {
 
 				this.matchCharacter(currentValue);
 			}
+			this.CST.endChildren();
 		}
 		/**
 		* Integer Operator
 		*/
 		public parseIntegerOperator() {
-
+			this.CST.addNode("IntegerOperator" , "Branch")
 			// +
 			this.matchCharacter("+");
+			
+			this.CST.endChildren();
 		}
 	}
 }

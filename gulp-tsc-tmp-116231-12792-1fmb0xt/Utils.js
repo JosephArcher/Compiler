@@ -123,14 +123,6 @@ var JOEC;
             var consoleHTML = document.getElementById("console");
             consoleHTML.innerHTML = consoleHTML.value + "\n" + msg;
         };
-        Utils.addNewCST = function (CST) {
-            var cstArea = document.getElementById("cstArea");
-            cstArea.innerHTML = CST;
-        };
-        Utils.addNewAST = function (AST) {
-            var astArea = document.getElementById("astArea");
-            astArea.innerHTML = AST;
-        };
         return Utils;
     })();
     JOEC.Utils = Utils;
