@@ -52,6 +52,7 @@
 }
 
 #wrapper.toggled #sidebar-wrapper {
+    padding-left: 0px;
     width: 500px;
 }
 

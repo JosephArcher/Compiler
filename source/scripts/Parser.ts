@@ -553,15 +553,17 @@ module JOEC {
 			}
 		}
 		public evaluateStatementList(node:JOEC.TreeNode){
-			console.log("Statement LIST");
+			
 			// Check the number of children
 			if(node.children.length == 2){
 				this.evaluateStatement(node.children[0]);
 				this.evaluateStatementList(node.children[1]);
 			}
 		}
-		public evaluateStatement(theNode: JOEC.TreeNode){
+		public evaluateStatement(theNode: JOEC.TreeNode) {
+
 			var node = theNode.children[0];
+
 			if (node.name == "VarDecl") {
 				console.log("evaluating a statement");
 				this.AST.addNode("Variable Declaration", "Branch");
@@ -569,7 +571,8 @@ module JOEC {
 				this.AST.addNode(node.children[1].children[0].name, "Leaf");
 				this.AST.endChildren();
 			}
-			// Holy shit alan this was hard to figure out
+			
+			// Holy shit alan this was hard to figure out for no reason
 			else if(node.name == "Block"){
 				this.evaluateBlock(node);
 			}
@@ -603,7 +606,6 @@ module JOEC {
 
 				if (childNode.children.length == 1) {
 					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
-
 				}
 				else if (childNode.children.length == 3) {
 					this.AST.addNode("+", "Branch");
@@ -629,7 +631,6 @@ module JOEC {
 					var boolOp = childNode.children[2];
 					var secondExpression = childNode.children[3];
 
-					// Construct the boolOp
 					var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
 
 					// Construct the subtree
