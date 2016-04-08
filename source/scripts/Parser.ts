@@ -132,10 +132,8 @@ module JOEC {
 		*/
 		public parseBlock() {
 
-
 			this.CST.addNode("Block", "Branch");
 		
-
 			// {
 			this.matchCharacter('{');
 
@@ -626,6 +624,19 @@ module JOEC {
 				}
 				else if (childNode.children.length == 5){
 
+					// Find the important nodes
+					var firstExpression = childNode.children[1];
+					var boolOp = childNode.children[2];
+					var secondExpression = childNode.children[3];
+
+					// Construct the boolOp
+					var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
+
+					// Construct the subtree
+					this.AST.addNode(boolOpName, "Branch");
+					this.evaluateExpression(firstExpression);
+					this.evaluateExpression(secondExpression);
+					this.AST.endChildren();
 				}
 			}
 			// Identifier Expression
