@@ -81,7 +81,7 @@ module JOEC {
 
 			// Start to generate a concrete syntax tree
 			this.CST = new JOEC.Tree();
-			this.AST = new JOEC.Tree();
+			
 
 			// Add the RootNode
 			this.CST.addNode("Program", "Branch");
@@ -134,7 +134,7 @@ module JOEC {
 
 
 			this.CST.addNode("Block", "Branch");
-			this.AST.addNode("Block", "Branch");
+		
 
 			// {
 			this.matchCharacter('{');
@@ -146,7 +146,7 @@ module JOEC {
 			this.matchCharacter('}');
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* Statement List
@@ -210,7 +210,7 @@ module JOEC {
 		public parsePrintStatement(){
 
 			this.CST.addNode("PrintStatement", "Branch");
-			this.AST.addNode("Print-Statement", "Branch");
+			
 
 			// Print
 			this.matchCharacter("print");
@@ -225,7 +225,7 @@ module JOEC {
 			this.matchCharacter(")");
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* Assignment Statement
@@ -233,7 +233,7 @@ module JOEC {
 		public parseAssignmentStatement(){
 
 			this.CST.addNode("AssignmentStatement", "Branch");
-			this.AST.addNode("Assignment-Statement", "Branch");
+			
 
 			// Identifier
 			this.parseIdentifier();
@@ -245,7 +245,7 @@ module JOEC {
 			this.parseExpression();
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+		
 		}
 		/**
 		* Variable Declaration Statement
@@ -253,7 +253,7 @@ module JOEC {
 		public parseVarDecl() {
 
 			this.CST.addNode("VarDecl", "Branch");
-			this.AST.addNode("Var-Decl", "Branch");
+			
 			// Type
 			this.parseType();
 
@@ -261,7 +261,7 @@ module JOEC {
 			this.parseIdentifier();
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* While Statement
@@ -269,7 +269,7 @@ module JOEC {
 		public parseWhileStatement(){
 
 			this.CST.addNode("WhileStatement", "Branch");
-			this.AST.addNode("While-Statement", "Branch");
+			
 
 			// While
 			this.matchCharacter("while")
@@ -281,7 +281,7 @@ module JOEC {
 			this.parseBlock();
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+		
 
 		}
 		/**
@@ -290,7 +290,7 @@ module JOEC {
 		public parseIfStatement(){
 
 			this.CST.addNode("IfStatement", "Branch");
-			this.AST.addNode("If-Statement", "Branch");
+			
 
 			// If
 			this.matchCharacter("if");
@@ -302,7 +302,7 @@ module JOEC {
 			this.parseBlock();
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+		
 		}
 		/**
 		* Expression
@@ -327,7 +327,6 @@ module JOEC {
 			else if (this.currentToken.getKind() == "Identifier") {
 				this.parseIdentifier();
 			}
-
 			this.CST.endChildren();
 		}
 		/**
@@ -357,11 +356,11 @@ module JOEC {
 			this.CST.addNode("StringExpression", "Branch");
 			
 			var currentToken = this.currentToken.getValue();
-			this.AST.addNode(currentToken, "Branch");
+			
 			this.matchCharacter(currentToken);
 
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* Boolean Expression
@@ -395,11 +394,11 @@ module JOEC {
 
 			if (this.currentToken.getKind() == "Identifier") {
 				var currentValue = this.currentToken.getValue();
-				this.AST.addNode(currentValue , "Branch");
+				
 				this.matchCharacter(currentValue);
 			}
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* Character List
@@ -415,19 +414,19 @@ module JOEC {
 
 			this.CST.addNode("Type", "Branch");
 			if(this.currentToken.getValue() == "int"){
-				this.AST.addNode("Int", "Branch");
+				
 				this.matchCharacter("int");
 			}
 			else if(this.currentToken.getValue() == "string"){
-				this.AST.addNode("String", "Branch");
+				
 				this.matchCharacter("string");
 			}
 			else if(this.currentToken.getValue() == "boolean"){
-				this.AST.addNode("Boolean", "Branch");
+				
 				this.matchCharacter("boolean");
 			}
 			this.CST.endChildren();
-			this.AST.endChildren();
+		
 		}
 		/**
 		* Character
@@ -444,11 +443,11 @@ module JOEC {
 			if (this.currentToken.getKind() == "Digit") {
 
 				var currentValue = this.currentToken.getValue();
-				this.AST.addNode(currentValue, "Branch");
+				
 				this.matchCharacter(currentValue);
 			}
 			this.CST.endChildren();
-			this.AST.endChildren();
+			
 		}
 		/**
 		* Boolean Operator
@@ -501,5 +500,125 @@ module JOEC {
 			
 			this.CST.endChildren();
 		}
+		public traverseCST() {
+
+			// Make a new stack to use while iterating over the tree
+			var nodeStack = new JOEC.Stack();
+
+			// Make a new ast tree
+			this.AST = new JOEC.Tree();
+
+			// Add the root node to the stack to start the iteration
+			nodeStack.push(this.CST.rootNode);
+
+			// Mark the node as visited
+			this.CST.rootNode.visted = true;
+
+			// Loop till you iterate over every node in the tree
+			while (!nodeStack.isEmpty()) {
+				// Get the next node
+				var nextNode: JOEC.TreeNode = nodeStack.peek();
+				var childNode: JOEC.TreeNode = nextNode.getNextUnvistedChildNode();
+
+				// Check to see if any children exist
+				if (childNode != null) {
+
+					// Mark the node as visted
+					childNode.visted = true;
+
+					//console.log(childNode.name + " THE NAME");
+
+					// Check to see if this is a trigger node
+					this.checkNode(childNode);
+
+					// Add the node to the stack
+					nodeStack.push(childNode);
+				}
+				else {
+					// Pop the node off the stack
+					nodeStack.pop();
+				}
+			}
+			//console.log("AST \n " + this.AST.toString());
+		}
+		public checkNode(node: JOEC.TreeNode){
+
+			if (node.name == "Block") {
+				this.AST.addNode("Block", "Branch");
+				// Get the number of statements to be called before the block needs to close
+
+				//var len = node.children[1].children[0].children[0];
+				//this.checkNode(len);
+				
+				// for (var i = 1; i < len - 1; i++){
+				// 	this.checkNode(<JOEC.TreeNode> node.children[1].children[i].children[0]);
+				// }
+				this.AST.endChildren();
+			}
+			else if (node.name == "VarDecl") {
+				this.AST.addNode("Variable Declaration", "Branch");
+				this.AST.addNode(node.children[0].children[0].name, "Leaf");
+				this.AST.addNode(node.children[1].children[0].name, "Leaf");
+				this.AST.endChildren();
+			}
+			else if (node.name == "PrintStatement") {
+				this.AST.addNode("Print", "Branch");
+				this.evaluateExpression(node.children[2]);
+				this.AST.endChildren();
+			}
+			else if (node.name == "AssignmentStatement") {
+				this.AST.addNode("Assign", "Branch");
+				this.AST.addNode(node.children[0].children[0].name, "Leaf");
+				this.evaluateExpression(node.children[2]);
+				this.AST.endChildren();
+			}
+			else if (node.name == "IfStatement") {
+				this.AST.addNode("Variable Declaration", "Branch");
+				this.AST.addNode(node.children[0].children[0].name, "Leaf");
+				this.AST.addNode(node.children[1].children[0].name, "Leaf");
+				this.AST.endChildren();
+			}
+			
+		}
+		public evaluateExpression(node: JOEC.TreeNode) {
+
+			var childNode: JOEC.TreeNode = node.children[0];
+			
+			// Integer Expression
+			if (childNode.name == "IntegerExpression"){
+
+				if (childNode.children.length == 1) {
+					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+
+				}
+				else if (childNode.children.length == 3) {
+					this.AST.addNode("+", "Branch");
+					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+					this.evaluateExpression(childNode.children[2]);
+					this.AST.endChildren();
+				}
+			}
+			// String Expression
+			else if (childNode.name == "StringExpression") {
+				this.AST.addNode(childNode.children[0].name, "Leaf");
+				
+			}
+			// Boolean Expression
+			else if (childNode.name == "BooleanStatement") {
+				
+				if(childNode.children.length == 1){
+					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+				}
+				else if (childNode.children.length == 5){
+
+				}
+			}
+			// Identifier Expression
+			else if (childNode.name == "Identifier") {
+				this.AST.addNode(childNode.children[0].name, "Branch");
+				this.AST.endChildren();
+			}
+		}
+		
 	}
 }

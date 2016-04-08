@@ -1,4 +1,7 @@
 ///<reference path="Globals.ts"/>
+///<reference path="Tree.ts"/>
+///<reference path="TreeNode.ts"/>
+///<reference path="Stack.ts"/>
 var JOEC;
 (function (JOEC) {
     /*
@@ -130,6 +133,35 @@ var JOEC;
         Utils.addNewAST = function (AST) {
             var astArea = document.getElementById("astArea");
             astArea.innerHTML = AST;
+        };
+        Utils.traverseTree = function (rootNode) {
+            // Make a new stack to use while iterating over the tree
+            var nodeStack = new JOEC.Stack();
+            // Make a new (AST)
+            var AST = new JOEC.Tree();
+            // Add the root node to the stack to start the iteration
+            nodeStack.push(rootNode);
+            // Mark the node as visited
+            rootNode.visted = true;
+            // Loop till you iterate over every node in the tree
+            while (!nodeStack.isEmpty()) {
+                // Get the next node
+                var nextNode = nodeStack.peek();
+                var childNode = nextNode.getNextUnvistedChildNode();
+                // Check to see if any children exist
+                if (childNode != null) {
+                    childNode.visted = true;
+                    console.log(childNode.name + " THE NAME");
+                    if (childNode.name == "Block") {
+                        AST.addNode("Block", "Branch");
+                    }
+                    nodeStack.push(childNode);
+                }
+                else {
+                    nodeStack.pop();
+                }
+            }
+            console.log("AST \n " + AST.toString());
         };
         return Utils;
     })();

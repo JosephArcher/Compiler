@@ -150,8 +150,10 @@ module JOEC {
 			console.log(Par.CST);
 			Utils.addNewCST(Par.CST.toString());
 			Utils.createNewMessage(Par.CST.toString());
-			Utils.addNewAST(Par.AST.toString());
 
+			Par.traverseCST();
+			//Utils.addNewAST(Par.AST.toString());
+			console.log(Par.AST.toString());
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";

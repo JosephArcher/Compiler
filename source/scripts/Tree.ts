@@ -40,7 +40,7 @@ module JOEC {
         	}
     	}
     	public endChildren() {
-			console.log("current" + this.currentNode.parent);
+    		console.log("current" + this.currentNode.parent);
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.currentNode.parent !== null) && (this.currentNode.parent.name !== undefined)) {
 				this.currentNode = this.currentNode.parent;

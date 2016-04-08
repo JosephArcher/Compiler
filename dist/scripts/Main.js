@@ -114,7 +114,9 @@ var JOEC;
             console.log(Par.CST);
             JOEC.Utils.addNewCST(Par.CST.toString());
             JOEC.Utils.createNewMessage(Par.CST.toString());
-            JOEC.Utils.addNewAST(Par.AST.toString());
+            Par.traverseCST();
+            //Utils.addNewAST(Par.AST.toString());
+            console.log(Par.AST.toString());
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";

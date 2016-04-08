@@ -66,7 +66,6 @@ var JOEC;
             this.currentToken = this.tokenQueue.dequeue();
             // Start to generate a concrete syntax tree
             this.CST = new JOEC.Tree();
-            this.AST = new JOEC.Tree();
             // Add the RootNode
             this.CST.addNode("Program", "Branch");
             // Block
@@ -102,7 +101,6 @@ var JOEC;
         */
         Parser.prototype.parseBlock = function () {
             this.CST.addNode("Block", "Branch");
-            this.AST.addNode("Block", "Branch");
             // {
             this.matchCharacter('{');
             // Statement List
@@ -110,7 +108,6 @@ var JOEC;
             // }
             this.matchCharacter('}');
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Statement List
@@ -161,7 +158,6 @@ var JOEC;
         */
         Parser.prototype.parsePrintStatement = function () {
             this.CST.addNode("PrintStatement", "Branch");
-            this.AST.addNode("Print-Statement", "Branch");
             // Print
             this.matchCharacter("print");
             // Match (
@@ -171,14 +167,12 @@ var JOEC;
             // Match )
             this.matchCharacter(")");
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Assignment Statement
         */
         Parser.prototype.parseAssignmentStatement = function () {
             this.CST.addNode("AssignmentStatement", "Branch");
-            this.AST.addNode("Assignment-Statement", "Branch");
             // Identifier
             this.parseIdentifier();
             // =
@@ -186,27 +180,23 @@ var JOEC;
             // Expression
             this.parseExpression();
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Variable Declaration Statement
         */
         Parser.prototype.parseVarDecl = function () {
             this.CST.addNode("VarDecl", "Branch");
-            this.AST.addNode("Var-Decl", "Branch");
             // Type
             this.parseType();
             // Identifier
             this.parseIdentifier();
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * While Statement
         */
         Parser.prototype.parseWhileStatement = function () {
             this.CST.addNode("WhileStatement", "Branch");
-            this.AST.addNode("While-Statement", "Branch");
             // While
             this.matchCharacter("while");
             // Boolean Expression
@@ -214,14 +204,12 @@ var JOEC;
             // Block
             this.parseBlock();
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * If Statement
         */
         Parser.prototype.parseIfStatement = function () {
             this.CST.addNode("IfStatement", "Branch");
-            this.AST.addNode("If-Statement", "Branch");
             // If
             this.matchCharacter("if");
             // Boolean Expression
@@ -229,7 +217,6 @@ var JOEC;
             // Block
             this.parseBlock();
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Expression
@@ -271,10 +258,8 @@ var JOEC;
         Parser.prototype.parseStringExpression = function () {
             this.CST.addNode("StringExpression", "Branch");
             var currentToken = this.currentToken.getValue();
-            this.AST.addNode(currentToken, "Branch");
             this.matchCharacter(currentToken);
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Boolean Expression
@@ -302,11 +287,9 @@ var JOEC;
             this.CST.addNode("Identifier", "Branch");
             if (this.currentToken.getKind() == "Identifier") {
                 var currentValue = this.currentToken.getValue();
-                this.AST.addNode(currentValue, "Branch");
                 this.matchCharacter(currentValue);
             }
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Character List
@@ -319,19 +302,15 @@ var JOEC;
         Parser.prototype.parseType = function () {
             this.CST.addNode("Type", "Branch");
             if (this.currentToken.getValue() == "int") {
-                this.AST.addNode("Int", "Branch");
                 this.matchCharacter("int");
             }
             else if (this.currentToken.getValue() == "string") {
-                this.AST.addNode("String", "Branch");
                 this.matchCharacter("string");
             }
             else if (this.currentToken.getValue() == "boolean") {
-                this.AST.addNode("Boolean", "Branch");
                 this.matchCharacter("boolean");
             }
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Character
@@ -345,11 +324,9 @@ var JOEC;
             this.CST.addNode("Digit", "Branch");
             if (this.currentToken.getKind() == "Digit") {
                 var currentValue = this.currentToken.getValue();
-                this.AST.addNode(currentValue, "Branch");
                 this.matchCharacter(currentValue);
             }
             this.CST.endChildren();
-            this.AST.endChildren();
         };
         /**
         * Boolean Operator
@@ -389,6 +366,101 @@ var JOEC;
             // +
             this.matchCharacter("+");
             this.CST.endChildren();
+        };
+        Parser.prototype.traverseCST = function () {
+            // Make a new stack to use while iterating over the tree
+            var nodeStack = new JOEC.Stack();
+            // Make a new ast tree
+            this.AST = new JOEC.Tree();
+            // Add the root node to the stack to start the iteration
+            nodeStack.push(this.CST.rootNode);
+            // Mark the node as visited
+            this.CST.rootNode.visted = true;
+            // Loop till you iterate over every node in the tree
+            while (!nodeStack.isEmpty()) {
+                // Get the next node
+                var nextNode = nodeStack.peek();
+                var childNode = nextNode.getNextUnvistedChildNode();
+                // Check to see if any children exist
+                if (childNode != null) {
+                    // Mark the node as visted
+                    childNode.visted = true;
+                    //console.log(childNode.name + " THE NAME");
+                    // Check to see if this is a trigger node
+                    this.checkNode(childNode);
+                    // Add the node to the stack
+                    nodeStack.push(childNode);
+                }
+                else {
+                    // Pop the node off the stack
+                    nodeStack.pop();
+                }
+            }
+            //console.log("AST \n " + this.AST.toString());
+        };
+        Parser.prototype.checkNode = function (node) {
+            if (node.name == "Block") {
+                this.AST.addNode("Block", "Branch");
+                // Get the number of statements to be called before the block needs to close
+                //var len = node.children[1].children[0].children[0];
+                //this.checkNode(len);
+                // for (var i = 1; i < len - 1; i++){
+                // 	this.checkNode(<JOEC.TreeNode> node.children[1].children[i].children[0]);
+                // }
+                this.AST.endChildren();
+            }
+            else if (node.name == "VarDecl") {
+                this.AST.addNode("Variable Declaration", "Branch");
+                this.AST.addNode(node.children[0].children[0].name, "Leaf");
+                this.AST.addNode(node.children[1].children[0].name, "Leaf");
+                this.AST.endChildren();
+            }
+            else if (node.name == "PrintStatement") {
+                this.AST.addNode("Print", "Branch");
+                this.evaluateExpression(node.children[2]);
+                this.AST.endChildren();
+            }
+            else if (node.name == "AssignmentStatement") {
+                this.AST.addNode("Assign", "Branch");
+                this.AST.addNode(node.children[0].children[0].name, "Leaf");
+                this.evaluateExpression(node.children[2]);
+                this.AST.endChildren();
+            }
+            else if (node.name == "IfStatement") {
+                this.AST.addNode("Variable Declaration", "Branch");
+                this.AST.addNode(node.children[0].children[0].name, "Leaf");
+                this.AST.addNode(node.children[1].children[0].name, "Leaf");
+                this.AST.endChildren();
+            }
+        };
+        Parser.prototype.evaluateExpression = function (node) {
+            var childNode = node.children[0];
+            // Integer Expression
+            if (childNode.name == "IntegerExpression") {
+                if (childNode.children.length == 1) {
+                    this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+                }
+                else if (childNode.children.length == 3) {
+                    this.AST.addNode("+", "Branch");
+                    this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+                    this.evaluateExpression(childNode.children[2]);
+                    this.AST.endChildren();
+                }
+            }
+            else if (childNode.name == "StringExpression") {
+                this.AST.addNode(childNode.children[0].name, "Leaf");
+            }
+            else if (childNode.name == "BooleanStatement") {
+                if (childNode.children.length == 1) {
+                    this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+                }
+                else if (childNode.children.length == 5) {
+                }
+            }
+            else if (childNode.name == "Identifier") {
+                this.AST.addNode(childNode.children[0].name, "Branch");
+                this.AST.endChildren();
+            }
         };
         return Parser;
     })();

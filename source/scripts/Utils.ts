@@ -1,4 +1,7 @@
 ///<reference path="Globals.ts"/>
+///<reference path="Tree.ts"/>
+///<reference path="TreeNode.ts"/>
+///<reference path="Stack.ts"/>
 
 module JOEC {
 
@@ -135,5 +138,56 @@ module JOEC {
 			var astArea = document.getElementById("astArea");
 			astArea.innerHTML = AST;
 		}
+		public static traverseTree(rootNode: JOEC.TreeNode){
+
+			// Make a new stack to use while iterating over the tree
+			var nodeStack = new JOEC.Stack();
+
+			// Make a new (AST)
+			var AST = new JOEC.Tree();
+
+			// Add the root node to the stack to start the iteration
+			nodeStack.push(rootNode);
+
+			// Mark the node as visited
+			rootNode.visted = true;
+
+			// Loop till you iterate over every node in the tree
+			while(!nodeStack.isEmpty()) {
+				// Get the next node
+				var nextNode: JOEC.TreeNode = nodeStack.peek();
+				var childNode: JOEC.TreeNode = nextNode.getNextUnvistedChildNode();
+
+				// Check to see if any children exist
+				if(childNode != null) {
+					childNode.visted = true;
+					console.log(childNode.name + " THE NAME");
+					if (childNode.name == "Block") {
+						AST.addNode("Block", "Branch");
+					}
+					nodeStack.push(childNode);
+				}
+				else {
+					nodeStack.pop();
+				}
+			}
+			console.log("AST \n " + AST.toString());
+		}
+		/*
+		Block
+		PrintStmt
+		AssignStmt
+		VarDecl
+		WhileStmt
+		IfStmt
+		IntExpr
+		StringExpr
+		BooleanExpr
+		IDExpr
+		Digit
+		BoolOp
+		BoolVal
+		IntOp
+		*/
 	}
 }
