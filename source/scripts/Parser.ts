@@ -502,83 +502,99 @@ module JOEC {
 		}
 		public traverseCST() {
 
-			// Make a new stack to use while iterating over the tree
-			var nodeStack = new JOEC.Stack();
+			// // Make a new stack to use while iterating over the tree
+			// var nodeStack = new JOEC.Stack();
 
-			// Make a new ast tree
-			this.AST = new JOEC.Tree();
+			// // Make a new ast tree
+			// this.AST = new JOEC.Tree();
 
-			// Add the root node to the stack to start the iteration
-			nodeStack.push(this.CST.rootNode);
+			// // Add the root node to the stack to start the iteration
+			// nodeStack.push(this.CST.rootNode);
 
-			// Mark the node as visited
-			this.CST.rootNode.visted = true;
+			// // Mark the node as visited
+			// this.CST.rootNode.visted = true;
 
-			// Loop till you iterate over every node in the tree
-			while (!nodeStack.isEmpty()) {
-				// Get the next node
-				var nextNode: JOEC.TreeNode = nodeStack.peek();
-				var childNode: JOEC.TreeNode = nextNode.getNextUnvistedChildNode();
+			// // Loop till you iterate over every node in the tree
+			// while (!nodeStack.isEmpty()) {
+			// 	// Get the next node
+			// 	var nextNode: JOEC.TreeNode = nodeStack.peek();
+			// 	var childNode: JOEC.TreeNode = nextNode.getNextUnvistedChildNode();
 
-				// Check to see if any children exist
-				if (childNode != null) {
+			// 	// Check to see if any children exist
+			// 	if (childNode != null) {
 
-					// Mark the node as visted
-					childNode.visted = true;
+			// 		// Mark the node as visted
+			// 		childNode.visted = true;
 
-					//console.log(childNode.name + " THE NAME");
+			// 		// Check to see if this is a trigger node
+			// 		this.evaluateBlock(childNode);
 
-					// Check to see if this is a trigger node
-					this.checkNode(childNode);
-
-					// Add the node to the stack
-					nodeStack.push(childNode);
-				}
-				else {
-					// Pop the node off the stack
-					nodeStack.pop();
-				}
-			}
+			// 		// Add the node to the stack
+			// 		nodeStack.push(childNode);
+			// 	}
+			// 	else {
+			// 		// Pop the node off the stack
+			// 		nodeStack.pop();
+			// 	}
+			// }
 			//console.log("AST \n " + this.AST.toString());
+
+			this.AST = new JOEC.Tree();
+			this.evaluateBlock(this.CST.rootNode.children[0]);
 		}
-		public checkNode(node: JOEC.TreeNode){
+		public evaluateBlock(node: JOEC.TreeNode){
 
 			if (node.name == "Block") {
-				this.AST.addNode("Block", "Branch");
-				// Get the number of statements to be called before the block needs to close
 
-				//var len = node.children[1].children[0].children[0];
-				//this.checkNode(len);
-				
-				// for (var i = 1; i < len - 1; i++){
-				// 	this.checkNode(<JOEC.TreeNode> node.children[1].children[i].children[0]);
-				// }
+				this.AST.addNode("Block", "Branch");
+
+				// Get the list of statements that needs to be run before the block closes
+				var StatmentList = node.children[1];
+				this.evaluateStatementList(StatmentList);
 				this.AST.endChildren();
 			}
-			else if (node.name == "VarDecl") {
+		}
+		public evaluateStatementList(node:JOEC.TreeNode){
+			console.log("Statement LIST");
+			// Check the number of children
+			if(node.children.length == 2){
+				this.evaluateStatement(node.children[0]);
+				this.evaluateStatementList(node.children[1]);
+			}
+		}
+		public evaluateStatement(theNode: JOEC.TreeNode){
+			var node = theNode.children[0];
+			if (node.name == "VarDecl") {
+				console.log("evaluating a statement");
 				this.AST.addNode("Variable Declaration", "Branch");
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 				this.AST.addNode(node.children[1].children[0].name, "Leaf");
 				this.AST.endChildren();
 			}
+			// Holy shit alan this was hard to figure out
+			else if(node.name == "Block"){
+				this.evaluateBlock(node);
+			}
 			else if (node.name == "PrintStatement") {
+				console.log("evaluating a statement");
 				this.AST.addNode("Print", "Branch");
 				this.evaluateExpression(node.children[2]);
 				this.AST.endChildren();
 			}
 			else if (node.name == "AssignmentStatement") {
+				console.log("evaluating a statement");
 				this.AST.addNode("Assign", "Branch");
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 				this.evaluateExpression(node.children[2]);
 				this.AST.endChildren();
 			}
 			else if (node.name == "IfStatement") {
+				console.log("evaluating a statement");
 				this.AST.addNode("Variable Declaration", "Branch");
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 				this.AST.addNode(node.children[1].children[0].name, "Leaf");
 				this.AST.endChildren();
 			}
-			
 		}
 		public evaluateExpression(node: JOEC.TreeNode) {
 
@@ -601,7 +617,6 @@ module JOEC {
 			// String Expression
 			else if (childNode.name == "StringExpression") {
 				this.AST.addNode(childNode.children[0].name, "Leaf");
-				
 			}
 			// Boolean Expression
 			else if (childNode.name == "BooleanStatement") {
@@ -619,6 +634,5 @@ module JOEC {
 				this.AST.endChildren();
 			}
 		}
-		
 	}
 }
