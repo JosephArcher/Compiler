@@ -45,11 +45,11 @@ module JOEC {
 			var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
 			parseremoveUI.style.visibility = "hidden";
 
-			var lexcheckUI = <HTMLSpanElement>document.getElementById("lexCheck");
-			lexremoveUI.style.visibility = "hidden";
+			var SAremovekUI = <HTMLSpanElement>document.getElementById("SAError");
+			SAremovekUI.style.visibility = "hidden";
 
-			var parserCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
-			parserCheckUI.style.visibility = "hidden";
+			var codeGenRemoveUI = <HTMLSpanElement>document.getElementById("codeGenError");
+			codeGenRemoveUI.style.visibility = "hidden";
 
 			Utils.createNewMessage("Starting Compilation!\n");
 
@@ -147,16 +147,54 @@ module JOEC {
 
 			// Update the User
 			Utils.createNewMessage("\nParser Completed");
-			console.log(Par.CST);
+
+			// Output the CST
 			Utils.addNewCST(Par.CST.toString());
 			Utils.createNewMessage(Par.CST.toString());
+			console.log(Par.CST);
 
+			// Traverse the CST to create an AST
 			Par.traverseCST();
-			//Utils.addNewAST(Par.AST.toString());
+
+			// Output the AST
+			Utils.addNewAST(Par.AST.toString());
+			Utils.createNewMessage(Par.AST.toString());
 			console.log(Par.AST.toString());
+
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";
+
+			//***************************************************\\
+			//          Semantic Analysis Starting               \\
+			//***************************************************\\
+
+			 // Create a Semantic Analyzer
+			var SemanticAnalyzer = new JOEC.SemanticAnalyzer();
+			SemanticAnalyzer.analyze(Par.AST);
+
+			// Check for any errors in semantic analysis
+			if(SemanticAnalyzer.hasErrors) {
+
+				// Tell the user
+				Utils.createNewErrorMessage("Compilation Failed :( ");
+
+				// Update the parse UI with a error mark
+				var parseremoveUI = <HTMLSpanElement>document.getElementById("SAError");
+				parseremoveUI.style.visibility = "visible";
+
+				// Stop the comiler
+				this.stopCompiler();
+				return;
+			}
+
+			// Update the User
+			Utils.createNewMessage("\nSemantic Analysis Completed");
+
+			// Update the UI and mark the SA as complete
+			var SACheckUI = <HTMLSpanElement>document.getElementById("SACheck");
+			SACheckUI.style.visibility = "visible";
+
 		}
 
 		/**

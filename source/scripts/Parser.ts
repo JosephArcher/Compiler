@@ -41,7 +41,6 @@ module JOEC {
 
 			// Parse Program
 			this.parseProgram();
-
 		}
 		/**
 		* matchCharacter
@@ -65,8 +64,7 @@ module JOEC {
 					if(!this.hasErrors){
 						Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
 						this.hasErrors = true;
-					}
-					
+					}	
 				}
 		}
 		/**
@@ -82,7 +80,6 @@ module JOEC {
 			// Start to generate a concrete syntax tree
 			this.CST = new JOEC.Tree();
 			
-
 			// Add the RootNode
 			this.CST.addNode("Program", "Branch");
 
@@ -144,7 +141,6 @@ module JOEC {
 			this.matchCharacter('}');
 
 			this.CST.endChildren();
-			
 		}
 		/**
 		* Statement List
@@ -209,7 +205,6 @@ module JOEC {
 
 			this.CST.addNode("PrintStatement", "Branch");
 			
-
 			// Print
 			this.matchCharacter("print");
 
@@ -223,7 +218,6 @@ module JOEC {
 			this.matchCharacter(")");
 
 			this.CST.endChildren();
-			
 		}
 		/**
 		* Assignment Statement
@@ -232,7 +226,6 @@ module JOEC {
 
 			this.CST.addNode("AssignmentStatement", "Branch");
 			
-
 			// Identifier
 			this.parseIdentifier();
 
@@ -243,7 +236,6 @@ module JOEC {
 			this.parseExpression();
 
 			this.CST.endChildren();
-		
 		}
 		/**
 		* Variable Declaration Statement
@@ -259,7 +251,6 @@ module JOEC {
 			this.parseIdentifier();
 
 			this.CST.endChildren();
-			
 		}
 		/**
 		* While Statement
@@ -268,7 +259,6 @@ module JOEC {
 
 			this.CST.addNode("WhileStatement", "Branch");
 			
-
 			// While
 			this.matchCharacter("while")
 
@@ -279,8 +269,6 @@ module JOEC {
 			this.parseBlock();
 
 			this.CST.endChildren();
-		
-
 		}
 		/**
 		* If Statement
@@ -289,7 +277,6 @@ module JOEC {
 
 			this.CST.addNode("IfStatement", "Branch");
 			
-
 			// If
 			this.matchCharacter("if");
 
@@ -300,7 +287,6 @@ module JOEC {
 			this.parseBlock();
 
 			this.CST.endChildren();
-		
 		}
 		/**
 		* Expression
@@ -344,7 +330,6 @@ module JOEC {
 			}
 
 			this.CST.endChildren();
-
 		}
 		/**
 		* String Expression
@@ -358,7 +343,6 @@ module JOEC {
 			this.matchCharacter(currentToken);
 
 			this.CST.endChildren();
-			
 		}
 		/**
 		* Boolean Expression
@@ -396,7 +380,6 @@ module JOEC {
 				this.matchCharacter(currentValue);
 			}
 			this.CST.endChildren();
-			
 		}
 		/**
 		* Character List
@@ -424,7 +407,6 @@ module JOEC {
 				this.matchCharacter("boolean");
 			}
 			this.CST.endChildren();
-		
 		}
 		/**
 		* Character
@@ -445,7 +427,6 @@ module JOEC {
 				this.matchCharacter(currentValue);
 			}
 			this.CST.endChildren();
-			
 		}
 		/**
 		* Boolean Operator
@@ -461,7 +442,6 @@ module JOEC {
 
 				// =
 				this.matchCharacter("=");
-
 			}
 			else { 
 
@@ -630,7 +610,6 @@ module JOEC {
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode){
 
-			console.log("BOOOOOOOLEAN");
 			if (node.children.length == 1) {
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 			}
@@ -649,7 +628,6 @@ module JOEC {
 				this.evaluateExpression(secondExpression);
 				this.AST.endChildren();
 			}
-
 		}
 	}
 }

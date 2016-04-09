@@ -12,18 +12,27 @@ module JOEC {
 
 		public scopeLevel: number = 0;
 		public scopeStuff = {};
+		public parent: JOEC.ScopeNode = null;
 		public children = [];
 
-		public constructor(theName) { }
+		public constructor() { }
 
 		public addChildNode(node: JOEC.TreeNode) {
 			this.children.push(node);
 		}
 		public addNewVariable(variableName: string) {
-			console.log("TESt");
-			console.log(this.scopeStuff);
+			
+			
 			this.scopeStuff[variableName] = {name: variableName, value: null};
-			console.log(this.scopeStuff);
+		
+		}
+		public updateVariable(variableName: string, variableValue: string) {
+
+			var theVariable = this.scopeStuff[variableName];
+
+			if(theVariable != null){
+				this.scopeStuff[variableName] = { name: variableName, value: variableValue };
+			}
 		}
 	}
 }

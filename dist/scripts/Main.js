@@ -36,10 +36,10 @@ var JOEC;
             lexremoveUI.style.visibility = "hidden";
             var parseremoveUI = document.getElementById("parseError");
             parseremoveUI.style.visibility = "hidden";
-            var lexcheckUI = document.getElementById("lexCheck");
-            lexremoveUI.style.visibility = "hidden";
-            var parserCheckUI = document.getElementById("parseCheck");
-            parserCheckUI.style.visibility = "hidden";
+            var SAremovekUI = document.getElementById("SAError");
+            SAremovekUI.style.visibility = "hidden";
+            var codeGenRemoveUI = document.getElementById("codeGenError");
+            codeGenRemoveUI.style.visibility = "hidden";
             JOEC.Utils.createNewMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
@@ -111,15 +111,41 @@ var JOEC;
             }
             // Update the User
             JOEC.Utils.createNewMessage("\nParser Completed");
-            console.log(Par.CST);
+            // Output the CST
             JOEC.Utils.addNewCST(Par.CST.toString());
             JOEC.Utils.createNewMessage(Par.CST.toString());
+            console.log(Par.CST);
+            // Traverse the CST to create an AST
             Par.traverseCST();
-            //Utils.addNewAST(Par.AST.toString());
+            // Output the AST
+            JOEC.Utils.addNewAST(Par.AST.toString());
+            JOEC.Utils.createNewMessage(Par.AST.toString());
             console.log(Par.AST.toString());
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";
+            //***************************************************\\
+            //          Semantic Analysis Starting               \\
+            //***************************************************\\
+            // Create a Semantic Analyzer
+            var SemanticAnalyzer = new JOEC.SemanticAnalyzer();
+            SemanticAnalyzer.analyze(Par.AST);
+            // Check for any errors in semantic analysis
+            if (SemanticAnalyzer.hasErrors) {
+                // Tell the user
+                JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
+                // Update the parse UI with a error mark
+                var parseremoveUI = document.getElementById("SAError");
+                parseremoveUI.style.visibility = "visible";
+                // Stop the comiler
+                this.stopCompiler();
+                return;
+            }
+            // Update the User
+            JOEC.Utils.createNewMessage("\nSemantic Analysis Completed");
+            // Update the UI and mark the SA as complete
+            var SACheckUI = document.getElementById("SACheck");
+            SACheckUI.style.visibility = "visible";
         };
         /**
         * Stop Comiler

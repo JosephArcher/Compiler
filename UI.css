@@ -123,11 +123,25 @@
 	margin-left: 10px;
 	visibility: hidden;
 }
+#SACheck {
+	margin-left: 10px;
+	visibility: hidden;
+}
+#codeGenCheck {
+	margin-left: 10px;
+	visibility: hidden;
+}
 #lexError {
 	visibility: hidden;
 }
 #parseError {
 		visibility: hidden;
+}
+#SAError {
+	visibility: hidden;
+}
+#codeGenError {
+	visibility: hidden;
 }
 #verboseCheckbox {
 	float: left;

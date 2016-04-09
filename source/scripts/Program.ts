@@ -7,7 +7,6 @@ module JOEC {
 		/*
 		* Program
 		*/
-
 		public id: number;
 		public sourceCode: string;
 		public tokenList = [];

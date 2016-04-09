@@ -476,7 +476,6 @@ var JOEC;
             }
         };
         Parser.prototype.evaluateBooleanExpression = function (node) {
-            console.log("BOOOOOOOLEAN");
             if (node.children.length == 1) {
                 this.AST.addNode(node.children[0].children[0].name, "Leaf");
             }

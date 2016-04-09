@@ -24,6 +24,8 @@
    <script type="text/javascript" src="dist/scripts/Tree.js"></script>
    <script type="text/javascript" src="dist/scripts/TreeNode.js"></script>
    <script type="text/javascript" src="dist/scripts/ScopeNode.js"></script>
+   <script type="text/javascript" src="dist/scripts/SymbolTable.js"></script>
+   <script type="text/javascript" src="dist/scripts/SemanticAnalyzer.js"></script>
    <title>
      Joe's Compiler
    </title>
@@ -92,8 +94,8 @@
       <div id="statusBar">
         <p> Lex   <span id="lexCheck"  class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
         <p> Parse <span id="parseCheck" class="glyphicon glyphicon-ok right "></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
-        <p> Sem. Analysis   <span id="lexCheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right"  hidden="hidden">  </span> </p>
-        <p> Code Gen <span id="parseCheck" class="glyphicon glyphicon-ok right"></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
+        <p> Sem. Analysis   <span id="SACheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="SAError" class="glyphicon glyphicon-remove right"  hidden="hidden">  </span> </p>
+        <p> Code Gen <span id="codeGenCheck" class="glyphicon glyphicon-ok right"></span> <span id="codeGenError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
    </div>
    
     <button id="compileButton"
