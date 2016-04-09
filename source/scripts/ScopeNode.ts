@@ -22,7 +22,7 @@ module JOEC {
 		public addNewVariable(variableName: string) {
 			console.log("TESt");
 			console.log(this.scopeStuff);
-			this.scopeStuff[variableName] = {};
+			this.scopeStuff[variableName] = {name: variableName, value: null};
 			console.log(this.scopeStuff);
 		}
 	}

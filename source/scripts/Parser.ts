@@ -565,35 +565,35 @@ module JOEC {
 			var node = theNode.children[0];
 
 			if (node.name == "VarDecl") {
-				console.log("evaluating a statement");
 				this.AST.addNode("Variable Declaration", "Branch");
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 				this.AST.addNode(node.children[1].children[0].name, "Leaf");
 				this.AST.endChildren();
 			}
-			
-			// Holy shit alan this was hard to figure out for no reason
 			else if(node.name == "Block"){
 				this.evaluateBlock(node);
 			}
 			else if (node.name == "PrintStatement") {
-				console.log("evaluating a statement");
 				this.AST.addNode("Print", "Branch");
 				this.evaluateExpression(node.children[2]);
 				this.AST.endChildren();
 			}
 			else if (node.name == "AssignmentStatement") {
-				console.log("evaluating a statement");
 				this.AST.addNode("Assign", "Branch");
 				this.AST.addNode(node.children[0].children[0].name, "Leaf");
 				this.evaluateExpression(node.children[2]);
 				this.AST.endChildren();
 			}
 			else if (node.name == "IfStatement") {
-				console.log("evaluating a statement");
-				this.AST.addNode("Variable Declaration", "Branch");
-				this.AST.addNode(node.children[0].children[0].name, "Leaf");
-				this.AST.addNode(node.children[1].children[0].name, "Leaf");
+				this.AST.addNode("If", "Branch");
+				this.evaluateBooleanExpression(node.children[1]);
+				this.evaluateBlock(node.children[2])
+				this.AST.endChildren();
+			}
+			else if (node.name == "WhileStatement") {
+				this.AST.addNode("While", "Branch");
+				this.evaluateBooleanExpression(node.children[1]);
+				this.evaluateBlock(node.children[2])
 				this.AST.endChildren();
 			}
 		}
@@ -620,31 +620,36 @@ module JOEC {
 			}
 			// Boolean Expression
 			else if (childNode.name == "BooleanStatement") {
-				
-				if(childNode.children.length == 1){
-					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
-				}
-				else if (childNode.children.length == 5){
-
-					// Find the important nodes
-					var firstExpression = childNode.children[1];
-					var boolOp = childNode.children[2];
-					var secondExpression = childNode.children[3];
-
-					var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
-
-					// Construct the subtree
-					this.AST.addNode(boolOpName, "Branch");
-					this.evaluateExpression(firstExpression);
-					this.evaluateExpression(secondExpression);
-					this.AST.endChildren();
-				}
+				this.evaluateBooleanExpression(childNode);
 			}
 			// Identifier Expression
 			else if (childNode.name == "Identifier") {
 				this.AST.addNode(childNode.children[0].name, "Branch");
 				this.AST.endChildren();
 			}
+		}
+		public evaluateBooleanExpression(node: JOEC.TreeNode){
+
+			console.log("BOOOOOOOLEAN");
+			if (node.children.length == 1) {
+				this.AST.addNode(node.children[0].children[0].name, "Leaf");
+			}
+			else if (node.children.length == 5) {
+
+				// Find the important nodes
+				var firstExpression = node.children[1];
+				var boolOp = node.children[2];
+				var secondExpression = node.children[3];
+
+				var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
+
+				// Construct the subtree
+				this.AST.addNode(boolOpName, "Branch");
+				this.evaluateExpression(firstExpression);
+				this.evaluateExpression(secondExpression);
+				this.AST.endChildren();
+			}
+
 		}
 	}
 }

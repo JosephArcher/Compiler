@@ -19,7 +19,7 @@ var JOEC;
         ScopeNode.prototype.addNewVariable = function (variableName) {
             console.log("TESt");
             console.log(this.scopeStuff);
-            this.scopeStuff[variableName] = {};
+            this.scopeStuff[variableName] = { name: variableName, value: null };
             console.log(this.scopeStuff);
         };
         return ScopeNode;

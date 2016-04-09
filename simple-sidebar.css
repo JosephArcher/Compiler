@@ -1,29 +1,10 @@
-
-
 /*!
  * Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
  * Code licensed under the Apache License v2.0.
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
-
+/* SMALL MODIFICATIONS WHERE MADE BY MYSELF (JOE ARCHER)
 /* Toggle Styles */
-.node circle {
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-.node {
-  font: 10px sans-serif;
-}
-
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-
 #wrapper {
     padding-left: 0;
     -webkit-transition: all 1s ease;
