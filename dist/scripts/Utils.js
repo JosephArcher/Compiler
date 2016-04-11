@@ -134,10 +134,6 @@ var JOEC;
             var astArea = document.getElementById("astArea");
             astArea.innerHTML = AST;
         };
-        Utils.prototype.handleNextNode = function (node) {
-            if (node.name == 'Block') {
-            }
-        };
         return Utils;
     })();
     JOEC.Utils = Utils;

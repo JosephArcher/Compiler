@@ -3,21 +3,22 @@
 ///<reference path="Token.ts"/>
 ///<reference path="Main.ts"/>
 ///<reference path="queue.ts"/>
-///<reference path="Tree.ts"/>o
+///<reference path="Tree.ts"/>
 ///<reference path="TreeNode.ts"/>
-
+///<reference path="SymbolTable.ts"/>
 module JOEC {
 	/*
 	* Parser 
 	*/
 	export class Parser {	
 		
-		public currentToken: JOEC.Token;     // The current token 
-		public hasErrors: boolean = false;   // Determines if the parser has any errors
-		public tokenQueue = new Queue();     // Holds the tokens passed in from the lexer
-		public numberOfPrograms: number = 0; // The number of programs that have been parsed
-		public CST: JOEC.Tree;               // Concrete Syntax Tree
-		public AST: JOEC.Tree;               // Abstract Syntax Tree
+		public currentToken: JOEC.Token;      // The current token 
+		public hasErrors: boolean = false;    // Determines if the parser has any errors
+		public tokenQueue = new Queue();      // Holds the tokens passed in from the lexer
+		public numberOfPrograms: number = 0;  // The number of programs that have been parsed
+		public CST: JOEC.Tree;                // Concrete Syntax Tree
+		public AST: JOEC.Tree;                // Abstract Syntax Tree
+		public SymbolTable: JOEC.SymbolTable; // Symbol Table
 
 		// Constructor
 		constructor() {}
@@ -57,7 +58,7 @@ module JOEC {
 				if (this.currentToken.getValue() == toMatch) {
 
 					console.log("A match was found for " + toMatch);
-					this.CST.addNode(this.currentToken.getValue(), "Leaf");
+					this.CST.addNode(this.currentToken.getValue(), "Leaf" , this.currentToken.getLineNumber());
 					this.currentToken = this.tokenQueue.dequeue();
 				}
 				else {
@@ -480,43 +481,6 @@ module JOEC {
 		}
 		public traverseCST() {
 
-			// // Make a new stack to use while iterating over the tree
-			// var nodeStack = new JOEC.Stack();
-
-			// // Make a new ast tree
-			// this.AST = new JOEC.Tree();
-
-			// // Add the root node to the stack to start the iteration
-			// nodeStack.push(this.CST.rootNode);
-
-			// // Mark the node as visited
-			// this.CST.rootNode.visted = true;
-
-			// // Loop till you iterate over every node in the tree
-			// while (!nodeStack.isEmpty()) {
-			// 	// Get the next node
-			// 	var nextNode: JOEC.TreeNode = nodeStack.peek();
-			// 	var childNode: JOEC.TreeNode = nextNode.getNextUnvistedChildNode();
-
-			// 	// Check to see if any children exist
-			// 	if (childNode != null) {
-
-			// 		// Mark the node as visted
-			// 		childNode.visted = true;
-
-			// 		// Check to see if this is a trigger node
-			// 		this.evaluateBlock(childNode);
-
-			// 		// Add the node to the stack
-			// 		nodeStack.push(childNode);
-			// 	}
-			// 	else {
-			// 		// Pop the node off the stack
-			// 		nodeStack.pop();
-			// 	}
-			// }
-			//console.log("AST \n " + this.AST.toString());
-
 			this.AST = new JOEC.Tree();
 			this.evaluateBlock(this.CST.rootNode.children[0]);
 		}
@@ -525,6 +489,8 @@ module JOEC {
 			if (node.name == "Block") {
 
 				this.AST.addNode("Block", "Branch");
+
+				// Add a new scope to the symbol table
 
 				// Get the list of statements that needs to be run before the block closes
 				var StatmentList = node.children[1];

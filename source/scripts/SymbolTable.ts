@@ -34,15 +34,43 @@ module JOEC {
 			// Update the current scope
 			this.currentScope = node;
 		}
-		public addNewVariable(variableName: string){
-
-			if(!this.currentScope == null){
-				this.currentScope.addNewVariable(variableName);
+		public endScope() {
+			// ... by moving "up" to our parent node (if possible).
+			if ((this.currentScope.parent !== null) && (this.currentScope.parent.scopeLevel !== undefined)) {
+				this.currentScope = this.currentScope.parent;
 			}
-
+			else {
+				// TODO: Some sort of error logging.
+				// This really should not happen, but it will, of course.
+			}
 		}
-		public assignVariable(variableValue: string){
-			
+		public declareVariable(variableName: string , variableType: string){
+			this.currentScope.addNewVariable(variableName, variableType);
+		}
+		public assignVariable(variableName:string, variableValue: string){
+
+			if(this.lookupVariable(variableName) != null){
+				var test = this.lookupVariable(variableName);
+				test.value = variableValue;
+			}
+		}
+		public lookupVariable(variableName: string) {
+
+			// Check the current scope
+			if(this.currentScope.lookupVariable(variableName) != null){
+				return this.currentScope.lookupVariable(variableName);
+			}
+			else {
+				// Check to see if the
+				while (this.currentScope.parent != null) {
+					this.currentScope = this.currentScope.parent;
+					// Check the current scope
+					if (this.currentScope.lookupVariable(variableName) != null) {
+						return this.currentScope.lookupVariable(variableName);
+					}
+				}
+			}
+			return null;
 		}
 	}
 }

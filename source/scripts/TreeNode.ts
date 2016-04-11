@@ -15,9 +15,11 @@ module JOEC {
 		public parent: TreeNode = null;
 		public children = [];
 		public visted: boolean = false;
+		public lineNumber: number = 0;
 
-		public constructor(theName){
+		public constructor(theName , lineNumber?){
 			this.name = theName;
+			this.lineNumber = lineNumber;
 		}
 	
 

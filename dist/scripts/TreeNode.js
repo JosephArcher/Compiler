@@ -8,13 +8,15 @@
 var JOEC;
 (function (JOEC) {
     var TreeNode = (function () {
-        function TreeNode(theName) {
+        function TreeNode(theName, lineNumber) {
             this.name = "";
             this.value = "";
             this.parent = null;
             this.children = [];
             this.visted = false;
+            this.lineNumber = 0;
             this.name = theName;
+            this.lineNumber = lineNumber;
         }
         TreeNode.prototype.addChildNode = function (node) {
             this.children.push(node);

@@ -171,7 +171,10 @@ module JOEC {
 
 			 // Create a Semantic Analyzer
 			var SemanticAnalyzer = new JOEC.SemanticAnalyzer();
-			SemanticAnalyzer.analyze(Par.AST);
+
+			SemanticAnalyzer.generateSymbolTable(Par.CST);
+			
+			
 
 			// Check for any errors in semantic analysis
 			if(SemanticAnalyzer.hasErrors) {
@@ -187,6 +190,10 @@ module JOEC {
 				this.stopCompiler();
 				return;
 			}
+
+			SemanticAnalyzer.checkForUnusedIndentifiers();
+
+
 
 			// Update the User
 			Utils.createNewMessage("\nSemantic Analysis Completed");

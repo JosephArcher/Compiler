@@ -129,7 +129,7 @@ var JOEC;
             //***************************************************\\
             // Create a Semantic Analyzer
             var SemanticAnalyzer = new JOEC.SemanticAnalyzer();
-            SemanticAnalyzer.analyze(Par.AST);
+            SemanticAnalyzer.generateSymbolTable(Par.CST);
             // Check for any errors in semantic analysis
             if (SemanticAnalyzer.hasErrors) {
                 // Tell the user
@@ -141,6 +141,7 @@ var JOEC;
                 this.stopCompiler();
                 return;
             }
+            SemanticAnalyzer.checkForUnusedIndentifiers();
             // Update the User
             JOEC.Utils.createNewMessage("\nSemantic Analysis Completed");
             // Update the UI and mark the SA as complete

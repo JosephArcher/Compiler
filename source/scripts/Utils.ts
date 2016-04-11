@@ -138,27 +138,5 @@ module JOEC {
 			var astArea = document.getElementById("astArea");
 			astArea.innerHTML = AST;
 		}
-
-		public handleNextNode(node: JOEC.TreeNode) {
-			if(node.name == 'Block'){
-				
-			}
-		}
-		/*
-		Block
-		PrintStmt
-		AssignStmt
-		VarDecl
-		WhileStmt
-		IfStmt
-		IntExpr
-		StringExpr
-		BooleanExpr
-		IDExpr
-		Digit
-		BoolOp
-		BoolVal
-		IntOp
-		*/
 	}
 }

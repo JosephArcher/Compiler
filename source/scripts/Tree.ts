@@ -16,9 +16,9 @@ module JOEC {
 		public constructor() {}
 
 		// Add a node: kind in {branch, leaf}.
-   		public addNode(name, kind) {
+   		public addNode(name, kind , lineNumber?) {
 
-			var node = new JOEC.TreeNode(name);
+			var node = new JOEC.TreeNode(name, lineNumber);
         	
        	 	// Check to see if it needs to be the root node.
         	if ((this.rootNode == null) || (!this.rootNode)) {

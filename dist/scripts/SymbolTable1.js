@@ -37,30 +37,13 @@ var JOEC;
             }
         };
         SymbolTable.prototype.declareVariable = function (variableName, variableType) {
-            this.currentScope.addNewVariable(variableName, variableType);
-        };
-        SymbolTable.prototype.assignVariable = function (variableName, variableValue) {
-            if (this.lookupVariable(variableName) != null) {
-                var test = this.lookupVariable(variableName);
-                test.value = variableValue;
+            if (!this.currentScope == null) {
+                this.currentScope.addNewVariable(variableName, variableType);
             }
+        };
+        SymbolTable.prototype.assignVariable = function (variableValue) {
         };
         SymbolTable.prototype.lookupVariable = function (variableName) {
-            // Check the current scope
-            if (this.currentScope.lookupVariable(variableName) != null) {
-                return this.currentScope.lookupVariable(variableName);
-            }
-            else {
-                // Check to see if the
-                while (this.currentScope.parent != null) {
-                    this.currentScope = this.currentScope.parent;
-                    // Check the current scope
-                    if (this.currentScope.lookupVariable(variableName) != null) {
-                        return this.currentScope.lookupVariable(variableName);
-                    }
-                }
-            }
-            return null;
         };
         return SymbolTable;
     })();
