@@ -60,11 +60,8 @@ var JOEC;
                     this.currentScope = this.currentScope.parent;
                     // Check the current scope
                     if (this.currentScope.lookupVariable(variableName) != null) {
-                        // Save the output 
-                        var answer = this.currentScope.lookupVariable(variableName);
-                        // reset the scope
                         this.currentScope = testing;
-                        return answer;
+                        return this.currentScope.lookupVariable(variableName);
                     }
                 }
                 return null;

@@ -11,18 +11,19 @@ module JOEC {
 	export class TreeNode {
 
 		public name = "";
-		public value = ""; 
+		public value = "";
+		public type = "";
+		public lineNumber: number = 0;
 		public parent: TreeNode = null;
 		public children = [];
 		public visted: boolean = false;
-		public lineNumber: number = 0;
-
-		public constructor(theName , lineNumber?){
-			this.name = theName;
-			this.lineNumber = lineNumber;
-		}
 	
 
+		public constructor(theName , type, lineNumber?){
+			this.name = theName;
+			this.type = type;
+			this.lineNumber = lineNumber;
+		}
 		public addChildNode(node:JOEC.TreeNode) {
 			this.children.push(node);
 		}

@@ -134,41 +134,6 @@ var JOEC;
             var astArea = document.getElementById("astArea");
             astArea.innerHTML = AST;
         };
-        /**
-         * resetCompilerStatusBar
-         *
-         * Used to hide all of the compiler ui check and x marks
-         *
-         */
-        Utils.resetCompilerStatusBar = function () {
-            // Reset the Check and X Marks on the UI
-            var lexremoveUI = document.getElementById("lexError");
-            lexremoveUI.style.visibility = "hidden";
-            var lexCheckUI = document.getElementById("lexCheck");
-            lexCheckUI.style.visibility = "hidden";
-            var parseremoveUI = document.getElementById("parseError");
-            parseremoveUI.style.visibility = "hidden";
-            var parseCheckUI = document.getElementById("parseCheck");
-            parseCheckUI.style.visibility = "hidden";
-            var SAremovekUI = document.getElementById("SAError");
-            SAremovekUI.style.visibility = "hidden";
-            var SACheckUI = document.getElementById("SACheck");
-            SACheckUI.style.visibility = "hidden";
-            var codeGenRemoveUI = document.getElementById("codeGenError");
-            codeGenRemoveUI.style.visibility = "hidden";
-            var codeGenCheckUI = document.getElementById("codeGenCheck");
-            codeGenCheckUI.style.visibility = "hidden";
-        };
-        Utils.showVis = function () {
-            $('#main').animate({
-                'marginLeft': "-=30px" //moves left
-            });
-        };
-        Utils.openSidepage = function () {
-            $('#mainpage').animate({
-                left: '350px'
-            }, 400, 'easeOutBack');
-        };
         return Utils;
     })();
     JOEC.Utils = Utils;

@@ -17,25 +17,26 @@ module JOEC {
 		public children = [];
 		public visted: boolean = false;
 
-		public addChildNode(node: JOEC.TreeNode) {
+		public addChildNode(node: JOEC.ScopeNode) {
 			this.children.push(node);
 		}
 		public addNewVariable(variableName: string , variableType) {
 			console.log("adding new variable");
 			this.scopeStuff[variableName] = new JOEC.Variable(variableName , variableType);
 		}
-		public updateVariable(variableName: string, variableValue: string) {
+		// public updateVariable(variableName: string, variableValue: string) {
 
-			var theVariable:JOEC.Variable = this.scopeStuff[variableName];
+		// 	var theVariable:JOEC.Variable = this.scopeStuff[variableName];
 
-			if(theVariable != null){
-				theVariable.value = variableValue;
-			}
-		}
+		// 	if(theVariable != null){
+		// 		theVariable.value = variableValue;
+		// 	}
+		// }
 		public lookupVariable(variableName: string){
 
 			if(this.scopeStuff[variableName]){
-				return this.scopeStuff[variableName];
+				var joe = this.scopeStuff[variableName];
+				return joe;
 			}
 			else{
 				return null;

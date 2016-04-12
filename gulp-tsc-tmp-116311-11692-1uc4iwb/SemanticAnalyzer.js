@@ -1,33 +1,20 @@
 ///<reference path="Tree.ts"/>
 ///<reference path="SymbolTable.ts"/>
-///<reference path="TypeChecker.ts"/>
 var JOEC;
 (function (JOEC) {
     /*
     * Semantic Analyzer
     */
     var SemanticAnalyzer = (function () {
-        function SemanticAnalyzer(CST, AST) {
-            this.hasErrors = false; // Error Status
-            this.CST = CST;
-            this.AST = AST;
+        function SemanticAnalyzer() {
+            this.hasErrors = false;
             this.SymbolTable = new JOEC.SymbolTable();
         }
-        SemanticAnalyzer.prototype.scopeCheck = function () {
-            this.generateSymbolTable();
-        };
-        SemanticAnalyzer.prototype.typeCheck = function () {
-            // Create a type checker
-            var typeChecker = new JOEC.TypeChecker(this.AST, this.SymbolTable);
-            typeChecker.typeCheckAST();
-            if (typeChecker.hasErrors) {
-                this.hasErrors = true;
-            }
-        };
-        SemanticAnalyzer.prototype.generateSymbolTable = function () {
+        SemanticAnalyzer.prototype.generateSymbolTable = function (CST) {
+            this.CST = CST;
             this.evaluateBlock(this.CST.rootNode.children[0]);
         };
-        SemanticAnalyzer.prototype.checkForUnusedIdentifiers = function () {
+        SemanticAnalyzer.prototype.checkForUnusedIndentifiers = function () {
             // Make a new stack to use while iterating over the tree
             var nodeStack = new JOEC.Stack();
             // Add the root node to the stack to start the iteration
@@ -67,12 +54,24 @@ var JOEC;
                 console.log(nextVariable);
             }
         };
+        SemanticAnalyzer.prototype.getType = function (value) {
+            if (value == "IntegerExpression") {
+                return "int";
+            }
+            else if (value == "StringExpression") {
+                return "string";
+            }
+            else if (value == "BooleanStatement")
+                return "boolean";
+        };
         SemanticAnalyzer.prototype.evaluateBlock = function (node) {
             // Add a new scope to the symbol table
             this.SymbolTable.addNewScope();
+            console.log("Starting new scope");
             // Get the list of statements that needs to be run before the block closes
             var StatmentList = node.children[1];
             this.evaluateStatementList(StatmentList);
+            console.log("Ending scope");
             // End a scope
             this.SymbolTable.endScope();
         };
@@ -97,19 +96,38 @@ var JOEC;
                 this.evaluateExpression(node.children[2]);
             }
             else if (node.name == "AssignmentStatement") {
+                // // If the ID exists
+                // if (this.SymbolTable.lookupVariable(node.children[0].children[0].name) != null) {	
+                // 	this.evaluateExpression(node.children[2]);
+                // }
+                // else {
+                // 	Utils.createNewErrorMessage("Error undeclared identifier");
+                // 	this.hasErrors = true;
+                // }
                 //First lookup the variable to see if one is in scope
                 var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-                console.log(this.SymbolTable);
-                // If a variable exists
+                console.log(variable + " testing");
+                //Check to see if the variable exists
                 if (variable != null) {
-                    // Evaluate the expression
-                    var results = this.evaluateExpression(node.children[2]);
-                    // Assign the variable
-                    this.SymbolTable.assignVariable(node.children[0].children[0].name, "results");
+                    // Get the type
+                    var type = this.getType(node.children[2].children[0].name);
+                    // Check to see if the types match
+                    if (variable.type == type) {
+                        // Get the results of the evaluation
+                        var results = this.evaluateExpression(node.children[2]);
+                        // Assign the variable
+                        this.SymbolTable.assignVariable(node.children[0].children[0].name, results);
+                    }
+                    else {
+                        console.log(node.children[2].children[0].children[0]);
+                        // Type Mismatch
+                        JOEC.Utils.createNewErrorMessage("ERROR: Type Mismatch");
+                        this.hasErrors = true;
+                    }
                 }
                 else {
                     // Undeclared Identifier
-                    JOEC.Utils.createNewErrorMessage("Undeclared identifier [ " + node.children[0].children[0].name + " ] on line " + node.children[0].children[0].lineNumber);
+                    JOEC.Utils.createNewErrorMessage("Error undeclared identifier");
                     this.hasErrors = true;
                 }
             }
@@ -127,31 +145,36 @@ var JOEC;
             // Integer Expression
             if (childNode.name == "IntegerExpression") {
                 if (childNode.children.length == 1) {
+                    return childNode.children[0].children[0].name;
                 }
                 else if (childNode.children.length == 3) {
+                    // this.AST.addNode("+", "Branch");
+                    // this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
                     this.evaluateExpression(childNode.children[2]);
                 }
             }
             else if (childNode.name == "StringExpression") {
-                return childNode.children[0];
+                return childNode.children[0].name;
             }
             else if (childNode.name == "BooleanStatement") {
                 this.evaluateBooleanExpression(childNode);
             }
             else if (childNode.name == "Identifier") {
                 if (this.SymbolTable.lookupVariable(childNode.children[0].name) != null) {
-                    return childNode.children[0];
+                    //console.log(childNode.children[0].name);
+                    return childNode.children[0].name;
                 }
                 else {
+                    console.log("HOLY SHITSDFSDFSDFSDFSDFSDFSFSDF");
                     // Undeclared Identifier
-                    JOEC.Utils.createNewErrorMessage("Undeclared identifier [ " + childNode.children[0].name + " ] on line " + childNode.children[0].lineNumber);
+                    JOEC.Utils.createNewErrorMessage("Undeclared identifier on line " + childNode.children[0].lineNumber);
                     this.hasErrors = true;
                 }
             }
         };
         SemanticAnalyzer.prototype.evaluateBooleanExpression = function (node) {
             if (node.children.length == 1) {
-                return node.children[0].children[0];
+                return node.children[0].children[0].name;
             }
             else if (node.children.length == 5) {
                 // Find the important nodes

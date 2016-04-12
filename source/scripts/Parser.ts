@@ -58,14 +58,14 @@ module JOEC {
 				if (this.currentToken.getValue() == toMatch) {
 
 					console.log("A match was found for " + toMatch);
-					this.CST.addNode(this.currentToken.getValue(), "Leaf" , this.currentToken.getLineNumber());
+					this.CST.addNode(this.currentToken.getValue(), "Leaf", this.currentToken.getKind(), this.currentToken.getLineNumber());
 					this.currentToken = this.tokenQueue.dequeue();
 				}
 				else {
-					if(!this.hasErrors){
+					
 						Utils.createNewErrorMessage("Expecting " + toMatch + " but found  \' " + this.currentToken.getValue() + " \' on line " + this.currentToken.getLineNumber());
 						this.hasErrors = true;
-					}	
+						
 				}
 		}
 		/**
@@ -196,7 +196,7 @@ module JOEC {
 			else if(this.currentToken.getValue() == "{"){
 				this.parseBlock();
 			}
-
+			
 			this.CST.endChildren();
 		}
 		/**
@@ -311,6 +311,10 @@ module JOEC {
 			// ID
 			else if (this.currentToken.getKind() == "Identifier") {
 				this.parseIdentifier();
+			}
+			else {
+
+				this.matchCharacter("Expression");
 			}
 			this.CST.endChildren();
 		}
@@ -551,18 +555,18 @@ module JOEC {
 			if (childNode.name == "IntegerExpression"){
 
 				if (childNode.children.length == 1) {
-					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+					this.AST.addNode(childNode.children[0].children[0].name, "Leaf", childNode.children[0].children[0].type);
 				}
 				else if (childNode.children.length == 3) {
 					this.AST.addNode("+", "Branch");
-					this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+					this.AST.addNode(childNode.children[0].children[0].name, "Leaf" , childNode.children[0].children[0].type);
 					this.evaluateExpression(childNode.children[2]);
 					this.AST.endChildren();
 				}
 			}
 			// String Expression
 			else if (childNode.name == "StringExpression") {
-				this.AST.addNode(childNode.children[0].name, "Leaf");
+				this.AST.addNode(childNode.children[0].name, "Leaf", childNode.children[0].type);
 			}
 			// Boolean Expression
 			else if (childNode.name == "BooleanStatement") {
@@ -573,6 +577,7 @@ module JOEC {
 				this.AST.addNode(childNode.children[0].name, "Branch");
 				this.AST.endChildren();
 			}
+
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode){
 

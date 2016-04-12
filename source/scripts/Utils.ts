@@ -138,5 +138,48 @@ module JOEC {
 			var astArea = document.getElementById("astArea");
 			astArea.innerHTML = AST;
 		}
+		/**
+		 * resetCompilerStatusBar
+		 *
+		 * Used to hide all of the compiler ui check and x marks 
+		 *
+		 */
+		public static resetCompilerStatusBar() {
+
+			// Reset the Check and X Marks on the UI
+			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
+			lexremoveUI.style.visibility = "hidden";
+
+			var lexCheckUI = <HTMLSpanElement>document.getElementById("lexCheck");
+			lexCheckUI.style.visibility = "hidden";
+
+			var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
+			parseremoveUI.style.visibility = "hidden";
+
+			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
+			parseCheckUI.style.visibility = "hidden";
+
+			var SAremovekUI = <HTMLSpanElement>document.getElementById("SAError");
+			SAremovekUI.style.visibility = "hidden";
+
+			var SACheckUI = <HTMLSpanElement>document.getElementById("SACheck");
+			SACheckUI.style.visibility = "hidden";
+
+			var codeGenRemoveUI = <HTMLSpanElement>document.getElementById("codeGenError");
+			codeGenRemoveUI.style.visibility = "hidden";
+
+			var codeGenCheckUI = <HTMLSpanElement>document.getElementById("codeGenCheck");
+			codeGenCheckUI.style.visibility = "hidden";
+		}
+		public static showVis() {
+			$('#main').animate({
+				'marginLeft': "-=30px" //moves left
+			});
+		}
+		public static openSidepage() {
+		$('#mainpage').animate({
+			left: '350px'
+		}, 400, 'easeOutBack');
+	}
 	}
 }

@@ -1,24 +1,40 @@
 ///<reference path="Tree.ts"/>
 ///<reference path="SymbolTable.ts"/>
+///<reference path="TypeChecker.ts"/>
 
 module JOEC {
-
+	/*
+	* Semantic Analyzer 
+	*/
 	export class SemanticAnalyzer {
 
-		public hasErrors: boolean = false;
-		public CST: JOEC.Tree;                // Tree
+		public hasErrors: boolean = false;    // Error Status
+		public CST: JOEC.Tree;                // CST Tree
+		public AST: JOEC.Tree;                // AST Tree
 		public SymbolTable: JOEC.SymbolTable; // Symbol Table
 
-		public constructor() {
+		public constructor(CST: JOEC.Tree , AST: JOEC.Tree) {
+			this.CST = CST;
+			this.AST = AST;
 			this.SymbolTable = new SymbolTable();
 		}
+		public scopeCheck() {
+			this.generateSymbolTable();
+		}
+		public typeCheck() {
+			// Create a type checker
+			var typeChecker: JOEC.TypeChecker = new TypeChecker(this.AST , this.SymbolTable);
 
-		public generateSymbolTable(CST: JOEC.Tree) {
+			typeChecker.typeCheckAST();
 
-			this.CST = CST;
+			if(typeChecker.hasErrors){
+				this.hasErrors = true;
+			}
+		}
+		public generateSymbolTable() {
 			this.evaluateBlock(this.CST.rootNode.children[0]);
 		}
-		public checkForUnusedIndentifiers() {
+		public checkForUnusedIdentifiers() {
 
 			// Make a new stack to use while iterating over the tree
 			var nodeStack = new JOEC.Stack();
@@ -69,26 +85,15 @@ module JOEC {
 				console.log(nextVariable);
 			}
 		}
-		public getType(value: string){
-
-			if (value == "IntegerExpression") {
-				return "int";
-			}
-			else if (value == "StringExpression") {
-				return "string";
-			}
-			else if (value == "BooleanStatement")
-				return "boolean";
-		}
 		public evaluateBlock(node: JOEC.TreeNode) {
 
 			// Add a new scope to the symbol table
 			this.SymbolTable.addNewScope();
-
+			
 			// Get the list of statements that needs to be run before the block closes
 			var StatmentList = node.children[1];
 			this.evaluateStatementList(StatmentList);
-			
+				
 			// End a scope
 			this.SymbolTable.endScope();
 		}
@@ -106,7 +111,6 @@ module JOEC {
 
 			// Variable Declaration
 			if (node.name == "VarDecl") {
-				
 				// Declare a new variable
 				this.SymbolTable.declareVariable(node.children[1].children[0].name, node.children[0].children[0].name);
 			}
@@ -121,34 +125,21 @@ module JOEC {
 			// Assignment Statement
 			else if (node.name == "AssignmentStatement") {
 
-				// First lookup the variable to see if one is in scope
+				//First lookup the variable to see if one is in scope
 				var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-
-				// Check to see if the variable exists
+				console.log(this.SymbolTable);
+				// If a variable exists
 				if(variable != null) {
 
-					// Get the type
-					var type = this.getType(node.children[2].children[0].name);
-					
-					// Check to see if the types match
-					if(variable.type == type){
+					// Evaluate the expression
+					var results = this.evaluateExpression(node.children[2]);
 
-						// Get the results of the evaluation
-						var results = this.evaluateExpression(node.children[2]);
-
-						// Assign the variable
-						this.SymbolTable.assignVariable(node.children[0].children[0].name, results);
-					}
-					else {
-						console.log(node.children[2].children[0].children[0]);
-						// Type Mismatch
-						Utils.createNewErrorMessage("ERROR: Type Mismatch");
-						this.hasErrors = true;
-					}
+					// Assign the variable
+					this.SymbolTable.assignVariable(node.children[0].children[0].name, "results");
 				}
 				else {
 					// Undeclared Identifier
-					Utils.createNewErrorMessage("Error undeclared identifier");
+					Utils.createNewErrorMessage("Undeclared identifier [ " + node.children[0].children[0].name + " ] on line " + node.children[0].children[0].lineNumber);
 					this.hasErrors = true;
 				}
 			}
@@ -169,22 +160,18 @@ module JOEC {
 
 			// Integer Expression
 			if (childNode.name == "IntegerExpression") {
-
-				if (childNode.children.length == 1) {
-					return childNode.children[0].children[0].name;
-					// this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
+				
+			
+				if (childNode.children.length == 1)  {
+					
 				}
 				else if (childNode.children.length == 3) {
-					// this.AST.addNode("+", "Branch");
-					// this.AST.addNode(childNode.children[0].children[0].name, "Leaf");
 					this.evaluateExpression(childNode.children[2]);
-					// this.AST.endChildren();
 				}
 			}
 			// String Expression
 			else if (childNode.name == "StringExpression") {
-				return childNode.children[0].name;
-				// this.AST.addNode(childNode.children[0].name, "Leaf");
+				return childNode.children[0];
 			}
 			// Boolean Expression
 			else if (childNode.name == "BooleanStatement") {
@@ -192,19 +179,21 @@ module JOEC {
 			}
 			// Identifier Expression
 			else if (childNode.name == "Identifier") {
+
 				if (this.SymbolTable.lookupVariable(childNode.children[0].name) != null) {
-					return childNode.children[0].name;
+					return childNode.children[0];
 				}
-				// this.AST.addNode(childNode.children[0].name, "Branch");
-				// this.AST.endChildren();
+				else {
+					// Undeclared Identifier
+					Utils.createNewErrorMessage("Undeclared identifier [ " + childNode.children[0].name + " ] on line " + childNode.children[0].lineNumber);
+					this.hasErrors = true;
+				}
 			}
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode) {
 
 			if (node.children.length == 1) {
-
-				return node.children[0].children[0].name;
-				// this.AST.addNode(node.children[0].children[0].name, "Leaf");
+				return node.children[0].children[0];
 			}
 			else if (node.children.length == 5) {
 
@@ -215,11 +204,9 @@ module JOEC {
 
 				var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
 
-				// Construct the subtree
-				// this.AST.addNode(boolOpName, "Branch");
 				this.evaluateExpression(firstExpression);
 				this.evaluateExpression(secondExpression);
-				// this.AST.endChildren();
+				
 			}
 		}
 	}

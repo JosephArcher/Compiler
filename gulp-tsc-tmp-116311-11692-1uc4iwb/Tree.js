@@ -13,8 +13,8 @@ var JOEC;
             this.currentNode = null; // Current Node
         }
         // Add a node: kind in {branch, leaf}.
-        Tree.prototype.addNode = function (name, kind, type, lineNumber) {
-            var node = new JOEC.TreeNode(name, type, lineNumber);
+        Tree.prototype.addNode = function (name, kind, lineNumber) {
+            var node = new JOEC.TreeNode(name, lineNumber);
             // Check to see if it needs to be the root node.
             if ((this.rootNode == null) || (!this.rootNode)) {
                 // We are the root node.
@@ -57,12 +57,12 @@ var JOEC;
                 // If there are no children (i.e., leaf nodes)...
                 if (!node.children || node.children.length === 0) {
                     // ... note the leaf node.
-                    traversalResult += "[" + node.name + "]";
+                    traversalResult += "[" + node.scopeStuff + "]";
                     traversalResult += "\n";
                 }
                 else {
                     // There are children, so note these interior/branch nodes and ...
-                    traversalResult += "<" + node.name + "> \n";
+                    traversalResult += "<" + node.scopeStuff + "> \n";
                     // .. recursively expand them.
                     for (var i = 0; i < node.children.length; i++) {
                         expand(node.children[i], depth + 1);

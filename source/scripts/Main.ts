@@ -6,6 +6,7 @@
 ///<reference path="Queue.ts"/>
 ///<reference path="d3.d.ts"/>
 /// <reference path="jquery.d.ts" />
+/// <reference path="TypeChecker.ts" />
 
 module JOEC {
 
@@ -38,18 +39,8 @@ module JOEC {
 			// Mark the compiler as running
 			_isRunning = true;
 
-			// Reset the Check and X Marks on the UI
-			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
-			lexremoveUI.style.visibility = "hidden";
-
-			var parseremoveUI = <HTMLSpanElement>document.getElementById("parseError");
-			parseremoveUI.style.visibility = "hidden";
-
-			var SAremovekUI = <HTMLSpanElement>document.getElementById("SAError");
-			SAremovekUI.style.visibility = "hidden";
-
-			var codeGenRemoveUI = <HTMLSpanElement>document.getElementById("codeGenError");
-			codeGenRemoveUI.style.visibility = "hidden";
+			// Clear up the UI
+			Utils.resetCompilerStatusBar();
 
 			Utils.createNewMessage("Starting Compilation!\n");
 
@@ -65,6 +56,11 @@ module JOEC {
 				return;
 			}
 			$("#testMe").append("<li><a onclick=\"JOEC.Main.testing()\"> Test</a></li>");
+
+			//***************************************************\\
+			//                 Lexical  Analysis                 \\
+			//***************************************************\\
+
 			// Create a new Lexical Analzer
 			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
 
@@ -118,9 +114,9 @@ module JOEC {
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
 			lexCheckUI.style.visibility = "visible";
 
-			// Update the UI remove the error mark 
-			var lexremoveUI = <HTMLSpanElement>document.getElementById("lexError");
-			lexremoveUI.style.visibility = "hidden";
+			//***************************************************\\
+			//                      Parser                       \\
+			//***************************************************\\
 
 			// Create a new Parser
 			var Par = new Parser();
@@ -142,6 +138,7 @@ module JOEC {
 
 				// Stop the comiler
 				this.stopCompiler();
+
 				return;
 			}
 
@@ -151,7 +148,6 @@ module JOEC {
 			// Output the CST
 			Utils.addNewCST(Par.CST.toString());
 			Utils.createNewMessage(Par.CST.toString());
-			console.log(Par.CST);
 
 			// Traverse the CST to create an AST
 			Par.traverseCST();
@@ -159,41 +155,42 @@ module JOEC {
 			// Output the AST
 			Utils.addNewAST(Par.AST.toString());
 			Utils.createNewMessage(Par.AST.toString());
-			console.log(Par.AST.toString());
-
+			
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";
 
 			//***************************************************\\
-			//          Semantic Analysis Starting               \\
+			//                 Semantic Analysis                 \\
 			//***************************************************\\
 
 			 // Create a Semantic Analyzer
-			var SemanticAnalyzer = new JOEC.SemanticAnalyzer();
+			var SemanticAnalyzer = new JOEC.SemanticAnalyzer(Par.CST , Par.AST);
 
-			SemanticAnalyzer.generateSymbolTable(Par.CST);
-			
-			
+			// Run a check for scope and build the symbol table
+			SemanticAnalyzer.scopeCheck();
 
-			// Check for any errors in semantic analysis
+			// Run a check for type
+			SemanticAnalyzer.typeCheck();
+
+			// If either the scope or type check fail
 			if(SemanticAnalyzer.hasErrors) {
 
 				// Tell the user
 				Utils.createNewErrorMessage("Compilation Failed :( ");
 
-				// Update the parse UI with a error mark
-				var parseremoveUI = <HTMLSpanElement>document.getElementById("SAError");
-				parseremoveUI.style.visibility = "visible";
+				// Update the Semantic Analysis UI with a error mark
+				var SAErrorUI = <HTMLSpanElement>document.getElementById("SAError");
+				SAErrorUI.style.visibility = "visible";
 
 				// Stop the comiler
 				this.stopCompiler();
+
 				return;
 			}
 
-			SemanticAnalyzer.checkForUnusedIndentifiers();
-
-
+			// Check the symbol table for unused Identifiers
+			SemanticAnalyzer.checkForUnusedIdentifiers();
 
 			// Update the User
 			Utils.createNewMessage("\nSemantic Analysis Completed");
@@ -201,7 +198,6 @@ module JOEC {
 			// Update the UI and mark the SA as complete
 			var SACheckUI = <HTMLSpanElement>document.getElementById("SACheck");
 			SACheckUI.style.visibility = "visible";
-
 		}
 
 		/**
@@ -218,20 +214,5 @@ module JOEC {
 			var compileButton = <HTMLButtonElement>document.getElementById("compileButton");
 			compileButton.disabled = false;
 		}
-		/**
-		* Stop Comiler
-		*
-		* Used to stop the compiler
-		*/
-		public static showVis() {
-			$('#main').animate({
-				'marginLeft': "-=30px" //moves left
-			});
-		}
-		public static openSidepage() {
-		$('#mainpage').animate({
-			left: '350px'
-		}, 400, 'easeOutBack');
-	}
 	}
 }

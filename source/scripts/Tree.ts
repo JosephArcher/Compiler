@@ -16,9 +16,9 @@ module JOEC {
 		public constructor() {}
 
 		// Add a node: kind in {branch, leaf}.
-   		public addNode(name, kind , lineNumber?) {
+   		public addNode(name, kind , type?, lineNumber?) {
 
-			var node = new JOEC.TreeNode(name, lineNumber);
+			var node = new JOEC.TreeNode(name, type, lineNumber);
         	
        	 	// Check to see if it needs to be the root node.
         	if ((this.rootNode == null) || (!this.rootNode)) {
@@ -46,6 +46,7 @@ module JOEC {
 				this.currentNode = this.currentNode.parent;
 			}
 			else {
+				console.log("TRYING TO END CHILDREN BUT CANT");
 				// TODO: Some sort of error logging.
 				// This really should not happen, but it will, of course.
 			}
