@@ -43,21 +43,57 @@ module JOEC {
 
 			// Get the source code
 			var sourceCode = Utils.getSourceCode();
+			console.log(sourceCode);
 
 			// Check to see if any source code exists
-			if(sourceCode.length < 1) { // If no code exists
+			if (sourceCode.length < 1) { // If no code exists
 
 				// Tell the user and stop 
 				Utils.createNewErrorMessage("No Source Code Found !")
 				this.stopCompiler();
 				return;
 			}
+
+			// Break Up the Source Code into Programs based on the number of dollar sign's
+
+			// Arrays to hold the program strings
+			var tempPrograms = [];
+			var programs = [];
+
+			// Program Object
+			var program: JOEC.Program;
+			// Split the programs into an array
+			tempPrograms = sourceCode.split("$");
+
+
+			// Loop over the programs adding a dollar sign to the end of each one
+			for (var i = 0; i < tempPrograms.length - 1; i++) {
+				// Get the next program from the array
+				var nextProgram: string = tempPrograms[i];
+				// Append a dollar sign to the end cause the split is taking them away for some reason
+				nextProgram = nextProgram + "$";
+				program = new JOEC.Program(i, nextProgram);
+				// Compile the next 	program
+				this.compileProgram(program);
+			}
+
+
+		}
+		public static compileProgram(program :JOEC.Program) {
+
+			// Clear/Reset the Interface and Sidebar
+			Utils.resetCompilerStatusBar();
+			Utils.resetUISideBar();
+
+			// Tell the user what program is being compiled
+			Utils.createNewMessage("\nStarting to compile program number " + program.id + "\n");
+
 			//***************************************************\\
 			//                 Lexical  Analysis                 \\
 			//***************************************************\\
 
 			// Create a new Lexical Analzer
-			var LA = new LexicalAnalyzer(Utils.getSourceCode());
+			var LA = new LexicalAnalyzer(program.sourceCode);
 
 			// Generate the tokens
 			LA.generateTokens();

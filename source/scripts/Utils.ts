@@ -91,7 +91,7 @@ module JOEC {
 		*/
 		public static getSourceCode(): string {
 
-			var sourceCodeHTML = <HTMLInputElement>document.getElementById("programInput");
+			var sourceCodeHTML = <HTMLTextAreaElement>document.getElementById("programInput");
 			return sourceCodeHTML.value;
 		}
 		/**	

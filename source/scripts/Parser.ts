@@ -73,7 +73,7 @@ module JOEC {
 		*/
 		public parseProgram () {
 
-			Utils.createNewMessage("Parsing Program " + this.numberOfPrograms);
+			Utils.createNewMessage("Parsing Program ");
 
 			// Get the first character
 			this.currentToken= <JOEC.Token> this.tokenQueue.dequeue();
@@ -90,18 +90,18 @@ module JOEC {
 			// Dollar Sign
 			this.matchCharacter('$');
 
-			if(!this.hasErrors) {
+			// if(!this.hasErrors) {
 
-				Utils.createNewMessage("Program " + this.numberOfPrograms + " successfully parsed");
+			// 	Utils.createNewMessage("Program successfully parsed");
 
-				// Check to see if more tokens still exist
+			// 	// Check to see if more tokens still exist
 
-				if (this.tokenQueue.getSize() > 0) {
+			// 	if (this.tokenQueue.getSize() > 0) {
 				
-					// If they do call the parse program another time
-					this.runAnotherProgram();
-				}	
-			}
+			// 		// If they do call the parse program another time
+			// 		this.runAnotherProgram();
+			// 	}	
+			// }
 		}
 		public runAnotherProgram(){
 			

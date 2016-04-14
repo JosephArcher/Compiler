@@ -60,7 +60,7 @@ var JOEC;
         * Program
         */
         Parser.prototype.parseProgram = function () {
-            JOEC.Utils.createNewMessage("Parsing Program " + this.numberOfPrograms);
+            JOEC.Utils.createNewMessage("Parsing Program ");
             // Get the first character
             this.currentToken = this.tokenQueue.dequeue();
             // Start to generate a concrete syntax tree
@@ -71,14 +71,14 @@ var JOEC;
             this.parseBlock();
             // Dollar Sign
             this.matchCharacter('$');
-            if (!this.hasErrors) {
-                JOEC.Utils.createNewMessage("Program " + this.numberOfPrograms + " successfully parsed");
-                // Check to see if more tokens still exist
-                if (this.tokenQueue.getSize() > 0) {
-                    // If they do call the parse program another time
-                    this.runAnotherProgram();
-                }
-            }
+            // if(!this.hasErrors) {
+            // 	Utils.createNewMessage("Program successfully parsed");
+            // 	// Check to see if more tokens still exist
+            // 	if (this.tokenQueue.getSize() > 0) {
+            // 		// If they do call the parse program another time
+            // 		this.runAnotherProgram();
+            // 	}	
+            // }
         };
         Parser.prototype.runAnotherProgram = function () {
             // Increment the number of Programs counter

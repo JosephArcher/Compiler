@@ -36,6 +36,7 @@ var JOEC;
             JOEC.Utils.createNewMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
+            console.log(sourceCode);
             // Check to see if any source code exists
             if (sourceCode.length < 1) {
                 // Tell the user and stop 
@@ -43,11 +44,36 @@ var JOEC;
                 this.stopCompiler();
                 return;
             }
+            // Break Up the Source Code into Programs based on the number of dollar sign's
+            // Arrays to hold the program strings
+            var tempPrograms = [];
+            var programs = [];
+            // Program Object
+            var program;
+            // Split the programs into an array
+            tempPrograms = sourceCode.split("$");
+            // Loop over the programs adding a dollar sign to the end of each one
+            for (var i = 0; i < tempPrograms.length - 1; i++) {
+                // Get the next program from the array
+                var nextProgram = tempPrograms[i];
+                // Append a dollar sign to the end cause the split is taking them away for some reason
+                nextProgram = nextProgram + "$";
+                program = new JOEC.Program(i, nextProgram);
+                // Compile the next 	program
+                this.compileProgram(program);
+            }
+        };
+        Main.compileProgram = function (program) {
+            // Clear/Reset the Interface and Sidebar
+            JOEC.Utils.resetCompilerStatusBar();
+            JOEC.Utils.resetUISideBar();
+            // Tell the user what program is being compiled
+            JOEC.Utils.createNewMessage("\nStarting to compile program number " + program.id + "\n");
             //***************************************************\\
             //                 Lexical  Analysis                 \\
             //***************************************************\\
             // Create a new Lexical Analzer
-            var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
+            var LA = new JOEC.LexicalAnalyzer(program.sourceCode);
             // Generate the tokens
             LA.generateTokens();
             // Check to see if verbose mode is enabled

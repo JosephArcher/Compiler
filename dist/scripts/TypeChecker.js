@@ -49,7 +49,23 @@ var JOEC;
                 console.log("The ID IS " + Id);
                 console.log(this.SymbolTable.lookupVariable(Id));
                 var type = this.SymbolTable.lookupVariable(Id).type;
-                var test = this.evaluateExpression(node.children[1]);
+                var joe = this.evaluateExpression(node.children[1]);
+                var test;
+                console.log(" The type is " + joe.type);
+                // Check to see if test is a Identifier
+                if (joe.type == "Identifier") {
+                    test = this.SymbolTable.lookupVariable(joe.name);
+                }
+                else {
+                    test = joe;
+                }
+                // Check for this boolean case and flip the string to use to match
+                if (test.type == "boolean") {
+                    test.type = "BoolVal";
+                }
+                if (test.type == "int") {
+                    test.type = "Digit";
+                }
                 // Check for this boolean case and flip the string to use to match
                 if (type == "boolean") {
                     type = "BoolVal";
@@ -80,6 +96,13 @@ var JOEC;
             }
         };
         TypeChecker.prototype.evaluateBooleanExpression = function (node) {
+            console.log("boolean node");
+            console.log(node);
+            if (node.type == "BoolVal") {
+                console.log("Idea might be working ");
+                console.log(node.children[0]);
+                return node;
+            }
             console.log("Evaluating a boolean expression in type checking");
             console.log(node);
             // Get both of the expression that need to be compared and evaluate them
