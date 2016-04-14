@@ -11,7 +11,7 @@ module JOEC {
 	export class TreeNode {
 
 		public name = "";
-		public value = "";
+		public value = null;
 		public type = "";
 		public lineNumber: number = 0;
 		public parent: TreeNode = null;
@@ -39,6 +39,10 @@ module JOEC {
 
 				// Check to see if the next node has been visited
 				if(!nextNode.visted) { // If the node has not been visted
+
+					// Mark the node as visted
+					nextNode.visted = true;
+
 					// Return it for use
 					return nextNode;
 				}

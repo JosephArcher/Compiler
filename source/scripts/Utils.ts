@@ -138,6 +138,18 @@ module JOEC {
 			var astArea = document.getElementById("astArea");
 			astArea.innerHTML = AST;
 		}
+		public static addNewToken(Token:JOEC.Token){
+			var tokenArea = <HTMLTextAreaElement> document.getElementById("tokenArea");
+			tokenArea.innerHTML = tokenArea.innerHTML + "Value: " + Token.getValue() + " Kind: " + Token.getKind() + " Line Number: " + Token.getLineNumber() + "\n";
+		}	
+		public static newHeadOfSymbolTable(){
+			var symbolTableArea = <HTMLTextAreaElement>document.getElementById("symbolTableArea");
+			symbolTableArea.innerHTML = symbolTableArea.innerHTML + "Name   " + "Value   " +  "Type   " + "Depth   " + "\n";
+		}
+		public static newVariableInSymbolTable(variable , depth){
+			var symbolTableArea = <HTMLTextAreaElement>document.getElementById("symbolTableArea");
+			symbolTableArea.innerHTML = symbolTableArea.innerHTML +  variable.name + "         " + variable.value + "         " + variable.type + "         " + depth + "\n";
+		}	
 		/**
 		 * resetCompilerStatusBar
 		 *
@@ -170,6 +182,31 @@ module JOEC {
 
 			var codeGenCheckUI = <HTMLSpanElement>document.getElementById("codeGenCheck");
 			codeGenCheckUI.style.visibility = "hidden";
+		}
+		/**
+		 * resetUISidebar
+		 *
+		 * Used to reset the text areas in the side bar 
+		 *
+		 */
+		public static resetUISideBar() {
+
+			// Token List
+			var tokenArea = <HTMLTextAreaElement>document.getElementById("tokenArea");
+			tokenArea.innerHTML = "";
+
+			// CST
+			var cstArea = <HTMLTextAreaElement>document.getElementById("cstArea");
+			cstArea.innerHTML = "";
+
+			// AST 
+			var astArea = <HTMLTextAreaElement>document.getElementById("astArea");
+			astArea.innerHTML = "";
+
+			// Symbol Table
+			var symbolTableArea = <HTMLTextAreaElement>document.getElementById("symbolTableArea");
+			symbolTableArea.innerHTML = "";
+
 		}
 		public static showVis() {
 			$('#main').animate({

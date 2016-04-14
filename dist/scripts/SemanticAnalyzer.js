@@ -13,8 +13,16 @@ var JOEC;
             this.AST = AST;
             this.SymbolTable = new JOEC.SymbolTable();
         }
+        SemanticAnalyzer.prototype.analyze = function () {
+            this.scopeCheck();
+            if (this.hasErrors) {
+                return;
+            }
+            this.typeCheck();
+        };
         SemanticAnalyzer.prototype.scopeCheck = function () {
             this.generateSymbolTable();
+            console.log(this.SymbolTable);
         };
         SemanticAnalyzer.prototype.typeCheck = function () {
             // Create a type checker
@@ -28,24 +36,26 @@ var JOEC;
             this.evaluateBlock(this.CST.rootNode.children[0]);
         };
         SemanticAnalyzer.prototype.checkForUnusedIdentifiers = function () {
+            console.log("Checking for unused identifiers");
+            console.log(this.SymbolTable);
             // Make a new stack to use while iterating over the tree
             var nodeStack = new JOEC.Stack();
             // Add the root node to the stack to start the iteration
             nodeStack.push(this.SymbolTable.rootScope);
             // Check the root node
-            this.checkScope(this.SymbolTable.rootScope);
+            this.checkScope(this.SymbolTable.rootScope, 0);
             // Mark the node as visited
-            this.SymbolTable.rootScope.visted = true;
+            this.SymbolTable.rootScope.visted1 = true;
             // Loop till you iterate over every node in the tree
             while (!nodeStack.isEmpty()) {
                 // Get the next node
                 var nextNode = nodeStack.peek();
-                var childNode = nextNode.getNextUnvistedChildNode();
+                var childNode = nextNode.getNextUnvistedChildNode1();
                 // Check to see if any children exist
                 if (childNode != null) {
                     // Mark the node as visted
-                    childNode.visted = true;
-                    this.checkScope(childNode);
+                    childNode.visted1 = true;
+                    this.checkScope(childNode, nodeStack.getSize());
                     // Add the node to the stack
                     nodeStack.push(childNode);
                 }
@@ -55,16 +65,16 @@ var JOEC;
                 }
             }
         };
-        SemanticAnalyzer.prototype.checkScope = function (node) {
+        SemanticAnalyzer.prototype.checkScope = function (node, depth) {
             var scope = node.scopeStuff;
             var len = Object.keys(scope).length;
             for (var i = 0; i < len; i++) {
                 var nextVariable = scope[Object.keys(scope)[i]];
+                JOEC.Utils.newVariableInSymbolTable(nextVariable, depth);
                 // Check each variable and if the value is null then report a warning to the user
-                if (nextVariable.value == null) {
-                    JOEC.Utils.createNewWarningMessage("Warning: " + nextVariable.name + " is unused");
+                if (nextVariable.used == false && nextVariable.value == null) {
+                    JOEC.Utils.createNewWarningMessage("Variable [ " + nextVariable.name + " ] of type " + nextVariable.type + " is unused ");
                 }
-                console.log(nextVariable);
             }
         };
         SemanticAnalyzer.prototype.evaluateBlock = function (node) {
@@ -87,8 +97,19 @@ var JOEC;
             var node = theNode.children[0];
             // Variable Declaration
             if (node.name == "VarDecl") {
-                // Declare a new variable
-                this.SymbolTable.declareVariable(node.children[1].children[0].name, node.children[0].children[0].name);
+                // Look up the variable to make sure that it does not already exist
+                var variable = this.SymbolTable.currentScope.lookupVariable(node.children[1].children[0].name);
+                console.log("THE VARIABLE " + variable);
+                if (variable == null) {
+                    // Declare a new variable
+                    this.SymbolTable.declareVariable(node.children[1].children[0].name, node.children[0].children[0].name);
+                }
+                else {
+                    // Redeclared Identifier
+                    JOEC.Utils.createNewErrorMessage("Redeclared identifier [ " + node.children[1].children[0].name + " ] on line " + node.children[1].children[0].lineNumber);
+                    this.hasErrors = true;
+                    return;
+                }
             }
             else if (node.name == "Block") {
                 this.evaluateBlock(node);
@@ -99,18 +120,20 @@ var JOEC;
             else if (node.name == "AssignmentStatement") {
                 //First lookup the variable to see if one is in scope
                 var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-                console.log(this.SymbolTable);
+                console.log("variable " + variable);
                 // If a variable exists
                 if (variable != null) {
-                    // Evaluate the expression
-                    var results = this.evaluateExpression(node.children[2]);
-                    // Assign the variable
-                    this.SymbolTable.assignVariable(node.children[0].children[0].name, "results");
+                    // // Get the type of the variable
+                    // console.log("The type of the variable is ... " + variable.type);
+                    // console.log("The node to evaluate from is ...");
+                    // console.log(node.children[2]);
+                    this.evaluateExpression(node.children[2]);
                 }
                 else {
                     // Undeclared Identifier
                     JOEC.Utils.createNewErrorMessage("Undeclared identifier [ " + node.children[0].children[0].name + " ] on line " + node.children[0].children[0].lineNumber);
                     this.hasErrors = true;
+                    return;
                 }
             }
             else if (node.name == "IfStatement") {
@@ -124,9 +147,12 @@ var JOEC;
         };
         SemanticAnalyzer.prototype.evaluateExpression = function (node) {
             var childNode = node.children[0];
+            console.log(" THE TEST NODE IS ");
+            console.log(childNode);
             // Integer Expression
             if (childNode.name == "IntegerExpression") {
                 if (childNode.children.length == 1) {
+                    childNode.children[0];
                 }
                 else if (childNode.children.length == 3) {
                     this.evaluateExpression(childNode.children[2]);
@@ -140,7 +166,7 @@ var JOEC;
             }
             else if (childNode.name == "Identifier") {
                 if (this.SymbolTable.lookupVariable(childNode.children[0].name) != null) {
-                    return childNode.children[0];
+                    return this.SymbolTable.lookupVariable(childNode.children[0].name).type;
                 }
                 else {
                     // Undeclared Identifier

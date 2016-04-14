@@ -10,6 +10,7 @@ var JOEC;
             this.rootScope = null;
         }
         SymbolTable.prototype.addNewScope = function () {
+            console.log("ADDING NEW SCOPE");
             // Make a new scope node
             var node = new JOEC.ScopeNode();
             // Check to see if it needs to be the root node.
@@ -28,7 +29,19 @@ var JOEC;
             // Update the current scope
             this.currentScope = node;
         };
+        SymbolTable.prototype.nextChildScope = function () {
+            if (this.currentScope == null) {
+                this.currentScope = this.rootScope;
+            }
+            else {
+                var nextPossibleNode = this.currentScope.getNextUnvistedChildNode();
+                if (nextPossibleNode != null) {
+                    this.currentScope = nextPossibleNode;
+                }
+            }
+        };
         SymbolTable.prototype.endScope = function () {
+            console.log("Ending Scope");
             // ... by moving "up" to our parent node (if possible).
             if ((this.currentScope.parent !== null) && (this.currentScope.parent.scopeLevel !== undefined)) {
                 this.currentScope = this.currentScope.parent;
@@ -37,7 +50,7 @@ var JOEC;
             }
         };
         SymbolTable.prototype.declareVariable = function (variableName, variableType) {
-            console.log("Declare " + variableName);
+            console.log("Declare " + variableName + "   with a type of " + variableType);
             this.currentScope.addNewVariable(variableName, variableType);
         };
         SymbolTable.prototype.assignVariable = function (variableName, variableValue) {
@@ -47,11 +60,11 @@ var JOEC;
             }
         };
         SymbolTable.prototype.lookupVariable = function (variableName) {
-            //console.log(this.currentScope);
             // save the curretn scope
             var testing = this.currentScope;
             // Check the current scope
             if (this.currentScope.lookupVariable(variableName) != null) {
+                this.currentScope = testing;
                 return this.currentScope.lookupVariable(variableName);
             }
             else {
@@ -67,39 +80,9 @@ var JOEC;
                         return answer;
                     }
                 }
+                this.currentScope = testing;
                 return null;
             }
-            this.currentScope = testing;
-        };
-        SymbolTable.prototype.toString = function () {
-            // Initialize the result string.
-            var traversalResult = "";
-            // Recursive function to handle the expansion of the nodes.
-            function expand(node, depth) {
-                // Space out based on the current depth so
-                // this looks at least a little tree-like.
-                for (var i = 0; i < depth; i++) {
-                    traversalResult += "-";
-                }
-                // If there are no children (i.e., leaf nodes)...
-                if (!node.children || node.children.length === 0) {
-                    // ... note the leaf node.
-                    traversalResult += "[" + node.scopeLevel + "]";
-                    traversalResult += "\n";
-                }
-                else {
-                    // There are children, so note these interior/branch nodes and ...
-                    traversalResult += "<" + node.scopeLevel + "> \n";
-                    // .. recursively expand them.
-                    for (var i = 0; i < node.children.length; i++) {
-                        expand(node.children[i], depth + 1);
-                    }
-                }
-            }
-            // Make the initial call to expand from the root.
-            expand(this.rootScope, 0);
-            // Return the result.
-            return traversalResult;
         };
         return SymbolTable;
     })();

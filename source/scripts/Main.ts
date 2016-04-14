@@ -19,15 +19,11 @@ module JOEC {
 
 	export class Main {
 
-		public static testing() {
-		}
-
 		/**
 		* Start Compiler
 		* 
 		* Used to start the compiler, called when the compile button is pressed
 		*/
-	
 		public static startCompiler() {
 
 			// Initalize verbose mode
@@ -39,8 +35,9 @@ module JOEC {
 			// Mark the compiler as running
 			_isRunning = true;
 
-			// Clear up the UI
+			// Clear/Reset the Interface and Sidebar
 			Utils.resetCompilerStatusBar();
+			Utils.resetUISideBar();
 
 			Utils.createNewMessage("Starting Compilation!\n");
 
@@ -55,18 +52,15 @@ module JOEC {
 				this.stopCompiler();
 				return;
 			}
-			$("#testMe").append("<li><a onclick=\"JOEC.Main.testing()\"> Test</a></li>");
-
 			//***************************************************\\
 			//                 Lexical  Analysis                 \\
 			//***************************************************\\
 
 			// Create a new Lexical Analzer
-			var LA = new LexicalAnalyzer(Utils.getSourceCode() );
+			var LA = new LexicalAnalyzer(Utils.getSourceCode());
 
 			// Generate the tokens
 			LA.generateTokens();
-			var tokenListUI = <HTMLInputElement>document.getElementById("tokenList");
 
 			// Check to see if verbose mode is enabled
 			if(_verboseMode.checked){
@@ -76,8 +70,7 @@ module JOEC {
 				for(var i = 0; i < LA.tokenArray.length; i++){
 					nextToken = LA.tokenArray[i];
 					Utils.createNewMessage("< Value: " +  nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
-					$("#tokenList").append('<li class="hostLogListItem" style="height:75px;"> <p class="" >' + nextToken.getValue() + '<span class="label logCounter">' + "hostCounter" + '</span> </p> <span class="logDateTime">' + "test" + ' </span > <span class="logSource" >' + "source" + '</span> </li>');
-
+					Utils.addNewToken(nextToken);
 				}
 				Utils.createNewMessage("============");
 			}
@@ -109,6 +102,7 @@ module JOEC {
 
 			// Finish off the lexer and update the UI for the User
 			Utils.createNewMessage("\nLex Completed... " + LA.tokenArray.length + " token(s) were found \n");
+
 
 			// Update the UI and mark the lexer phase as complete
 			var lexCheckUI = <HTMLSpanElement> document.getElementById("lexCheck");
@@ -147,6 +141,8 @@ module JOEC {
 
 			// Output the CST
 			Utils.addNewCST(Par.CST.toString());
+			Utils.createNewMessage("\nConcrete Syntax Tree");
+			Utils.createNewMessage("----------------------");
 			Utils.createNewMessage(Par.CST.toString());
 
 			// Traverse the CST to create an AST
@@ -154,6 +150,8 @@ module JOEC {
 
 			// Output the AST
 			Utils.addNewAST(Par.AST.toString());
+			Utils.createNewMessage("\nAbstract Syntax Tree");
+			Utils.createNewMessage("----------------------");
 			Utils.createNewMessage(Par.AST.toString());
 			
 			// Update the UI and mark the parser as complete
@@ -167,11 +165,8 @@ module JOEC {
 			 // Create a Semantic Analyzer
 			var SemanticAnalyzer = new JOEC.SemanticAnalyzer(Par.CST , Par.AST);
 
-			// Run a check for scope and build the symbol table
-			SemanticAnalyzer.scopeCheck();
-
-			// Run a check for type
-			SemanticAnalyzer.typeCheck();
+			// Run a check for scope and build the symbol table then check for type
+			SemanticAnalyzer.analyze();
 
 			// If either the scope or type check fail
 			if(SemanticAnalyzer.hasErrors) {
@@ -188,6 +183,9 @@ module JOEC {
 
 				return;
 			}
+			
+			// Output the Symbol Table
+			Utils.newHeadOfSymbolTable();
 
 			// Check the symbol table for unused Identifiers
 			SemanticAnalyzer.checkForUnusedIdentifiers();

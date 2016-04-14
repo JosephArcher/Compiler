@@ -18,8 +18,6 @@ var JOEC;
     var Main = (function () {
         function Main() {
         }
-        Main.testing = function () {
-        };
         /**
         * Start Compiler
         *
@@ -32,8 +30,9 @@ var JOEC;
             JOEC.Utils.initAlphabet();
             // Mark the compiler as running
             _isRunning = true;
-            // Clear up the UI
+            // Clear/Reset the Interface and Sidebar
             JOEC.Utils.resetCompilerStatusBar();
+            JOEC.Utils.resetUISideBar();
             JOEC.Utils.createNewMessage("Starting Compilation!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
@@ -44,7 +43,6 @@ var JOEC;
                 this.stopCompiler();
                 return;
             }
-            $("#testMe").append("<li><a onclick=\"JOEC.Main.testing()\"> Test</a></li>");
             //***************************************************\\
             //                 Lexical  Analysis                 \\
             //***************************************************\\
@@ -52,7 +50,6 @@ var JOEC;
             var LA = new JOEC.LexicalAnalyzer(JOEC.Utils.getSourceCode());
             // Generate the tokens
             LA.generateTokens();
-            var tokenListUI = document.getElementById("tokenList");
             // Check to see if verbose mode is enabled
             if (_verboseMode.checked) {
                 JOEC.Utils.createNewMessage("\nToken List \n============ ");
@@ -61,7 +58,7 @@ var JOEC;
                 for (var i = 0; i < LA.tokenArray.length; i++) {
                     nextToken = LA.tokenArray[i];
                     JOEC.Utils.createNewMessage("< Value: " + nextToken.getValue() + " Kind: " + nextToken.getKind() + " Line Number: " + nextToken.getLineNumber() + " >");
-                    $("#tokenList").append('<li class="hostLogListItem" style="height:75px;"> <p class="" >' + nextToken.getValue() + '<span class="label logCounter">' + "hostCounter" + '</span> </p> <span class="logDateTime">' + "test" + ' </span > <span class="logSource" >' + "source" + '</span> </li>');
+                    JOEC.Utils.addNewToken(nextToken);
                 }
                 JOEC.Utils.createNewMessage("============");
             }
@@ -110,11 +107,15 @@ var JOEC;
             JOEC.Utils.createNewMessage("\nParser Completed");
             // Output the CST
             JOEC.Utils.addNewCST(Par.CST.toString());
+            JOEC.Utils.createNewMessage("\nConcrete Syntax Tree");
+            JOEC.Utils.createNewMessage("----------------------");
             JOEC.Utils.createNewMessage(Par.CST.toString());
             // Traverse the CST to create an AST
             Par.traverseCST();
             // Output the AST
             JOEC.Utils.addNewAST(Par.AST.toString());
+            JOEC.Utils.createNewMessage("\nAbstract Syntax Tree");
+            JOEC.Utils.createNewMessage("----------------------");
             JOEC.Utils.createNewMessage(Par.AST.toString());
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
@@ -124,10 +125,8 @@ var JOEC;
             //***************************************************\\
             // Create a Semantic Analyzer
             var SemanticAnalyzer = new JOEC.SemanticAnalyzer(Par.CST, Par.AST);
-            // Run a check for scope and build the symbol table
-            SemanticAnalyzer.scopeCheck();
-            // Run a check for type
-            SemanticAnalyzer.typeCheck();
+            // Run a check for scope and build the symbol table then check for type
+            SemanticAnalyzer.analyze();
             // If either the scope or type check fail
             if (SemanticAnalyzer.hasErrors) {
                 // Tell the user
@@ -139,6 +138,8 @@ var JOEC;
                 this.stopCompiler();
                 return;
             }
+            // Output the Symbol Table
+            JOEC.Utils.newHeadOfSymbolTable();
             // Check the symbol table for unused Identifiers
             SemanticAnalyzer.checkForUnusedIdentifiers();
             // Update the User

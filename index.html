@@ -34,25 +34,9 @@
 </head>
 <body>
   <div id="wrapper" class = "toggled">
-
       <!-- Sidebar -->
       <div id="sidebar-wrapper">
-
         <div id="header1">
-        <p>
-         
-          <span>
-            <div style=""class="dropdown">
-              <span>Program ID </span> <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-               <span>ID#</span>
-                <span class="caret"></span>
-              </button>
-              <ul id="testMe"class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a href="#">Action</a></li>
-            </ul>
-          </div> 
-        </span>
-        </p>
         </div>
         <div style="text-align:center;">
           <ul class="nav nav-tabs " id="myTab">
@@ -61,88 +45,69 @@
             <li><a data-target="#ast"         data-toggle="tab">AST</a></li>
             <li><a data-target="#symbolTable" data-toggle="tab">Symbol Table</a></li>
           </ul>
-
            <div class="tab-content">
              <div class="tab-pane active" id="token">
-              <ul id="tokenList" class="list-group">
-              </ul>
+             <textarea id="tokenArea" rows = "25" style="width: 100%; height:100%;"></textarea>
              </div>
               <div class="tab-pane" id="cst">
                 <textarea id="cstArea" rows = "25" style="width: 100%; height:100%;"></textarea>
               </div>
               <div class="tab-pane" id="ast">
-               <textarea id="astArea"  rows = "25"   style="width: 100%; height:100%;"
-                  placeholder="Output will appear here..."></textarea>
+               <textarea id="astArea"  rows = "25" style="width: 100%; height:100%;"></textarea>
               </div>
               <div class="tab-pane" id="symbolTable">
-                <textarea id="symbolTableArea"  rows = "25" style="width: 100%; height:100%;" placeholder="Output will appear here...">                  
-                  </textarea>
+                <textarea id="symbolTableArea"  rows = "25" style="width: 100%; height:100%;"></textarea>
               </div>
             </div>
         </div>
       </div>
       <!-- /#sidebar-wrapper -->
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-             <div id="header">
-    <p> Joe's Compiler</p>
-  </div>
-                  <div id="main">
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <div id="header">
+            <p> Joe's Compiler</p>
+          </div>
+          <div id="main">
 
-    <div id="programInputSection">
-      <p>Program Input</p>
-      <textarea id="programInput" 
-                placeholder="Type your code here...">
-      </textarea>
-   </div>
-
-   <div id="buttonBar"> 
-      <div id="statusBar">
-        <p> Lex   <span id="lexCheck"  class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
-        <p> Parse <span id="parseCheck" class="glyphicon glyphicon-ok right "></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
-        <p> Sem. Analysis   <span id="SACheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="SAError" class="glyphicon glyphicon-remove right"  hidden="hidden">  </span> </p>
-        <p> Code Gen <span id="codeGenCheck" class="glyphicon glyphicon-ok right"></span> <span id="codeGenError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
-   </div>
-   
-    <button id="compileButton"
-            type="button" 
-            style="width: 150px;" 
-            class="btn btn-default" onclick="JOEC.Main.startCompiler();">Compile</button>
-
-    <button id="loadButton"
-            type="button" 
-            style="width: 150px; margin-top: 15px;"
-            data-toggle="modal" 
-            data-target="#myModal"
-            class="btn btn-default">Load...</button>
-
-     <button id="menu-toggle"
-            type="button" 
-            style="width: 150px; margin-top: 15px;"
-           href="#menu-toggle"
-            class="btn btn-default">Show</button>
-
-            
-
-    <span id="verboseCheckbox">  <input id = "vCheck" checked  type="checkbox" aria-label="Verbose ?"> Verbose Mode </span>  
-   </div>
-   <div id="programOutputSection">
-      <p>Program Output</p>
-      <textarea id="programOutput" 
-                placeholder="Output will appear here..."></textarea>
-   </div>
-  </div>
-    <div id="consoleSection">
-    <p>Console</p>
-     <textarea readonly id="console"></textarea>
-
-  </div>
+            <div id="programInputSection">
+              <p>Program Input</p>
+              <textarea id="programInput" placeholder="Type your code here..."></textarea>
             </div>
-        </div>
-        <!-- /#page-content-wrapper -->
 
+            <div id="buttonBar"> 
+              <div id="statusBar">
+                <p> Lex   <span id="lexCheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="lexError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
+                <p> Parse <span id="parseCheck" class="glyphicon glyphicon-ok right "></span> <span id="parseError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
+                <p> Sem. Analysis   <span id="SACheck" class="glyphicon glyphicon-ok right" hidden="hidden">  </span> <span id="SAError" class="glyphicon glyphicon-remove right" hidden="hidden">  </span> </p>
+                  <p> Code Gen <span id="codeGenCheck" class="glyphicon glyphicon-ok right"></span> <span id="codeGenError" class="glyphicon glyphicon-remove right" hidden="hidden" >  </span> </p>
+              </div>
+     
+              <button id="compileButton"
+                      type="button" 
+                      style="width: 150px;" 
+                      class="btn btn-default" onclick="JOEC.Main.startCompiler();">Compile</button>
+
+              <button id="menu-toggle"
+                      type="button" 
+                      style="width: 150px; margin-top: 15px;"
+                      href="#menu-toggle"
+                      class="btn btn-default">Show</button>
+
+              <span id="verboseCheckbox">  <input id = "vCheck" checked  type="checkbox" aria-label="Verbose ?"> Verbose Mode </span>  
+            </div>
+            <div id="programOutputSection">
+              <p>Program Output</p>
+              <textarea id="programOutput" placeholder="Output will appear here..."></textarea>
+            </div>
+          </div>
+          <div id="consoleSection">
+            <p>Console</p>
+            <textarea readonly id="console"></textarea>
+         </div>
+        </div>
+      </div> <!-- /#page-content-wrapper -->
     </div>
     <!-- /#wrapper -->
      <!-- Menu Toggle Script -->

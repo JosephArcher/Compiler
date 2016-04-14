@@ -134,6 +134,18 @@ var JOEC;
             var astArea = document.getElementById("astArea");
             astArea.innerHTML = AST;
         };
+        Utils.addNewToken = function (Token) {
+            var tokenArea = document.getElementById("tokenArea");
+            tokenArea.innerHTML = tokenArea.innerHTML + "Value: " + Token.getValue() + " Kind: " + Token.getKind() + " Line Number: " + Token.getLineNumber() + "\n";
+        };
+        Utils.newHeadOfSymbolTable = function () {
+            var symbolTableArea = document.getElementById("symbolTableArea");
+            symbolTableArea.innerHTML = symbolTableArea.innerHTML + "Name   " + "Value   " + "Type   " + "Depth   " + "\n";
+        };
+        Utils.newVariableInSymbolTable = function (variable, depth) {
+            var symbolTableArea = document.getElementById("symbolTableArea");
+            symbolTableArea.innerHTML = symbolTableArea.innerHTML + variable.name + "         " + variable.value + "         " + variable.type + "         " + depth + "\n";
+        };
         /**
          * resetCompilerStatusBar
          *
@@ -158,6 +170,26 @@ var JOEC;
             codeGenRemoveUI.style.visibility = "hidden";
             var codeGenCheckUI = document.getElementById("codeGenCheck");
             codeGenCheckUI.style.visibility = "hidden";
+        };
+        /**
+         * resetUISidebar
+         *
+         * Used to reset the text areas in the side bar
+         *
+         */
+        Utils.resetUISideBar = function () {
+            // Token List
+            var tokenArea = document.getElementById("tokenArea");
+            tokenArea.innerHTML = "";
+            // CST
+            var cstArea = document.getElementById("cstArea");
+            cstArea.innerHTML = "";
+            // AST 
+            var astArea = document.getElementById("astArea");
+            astArea.innerHTML = "";
+            // Symbol Table
+            var symbolTableArea = document.getElementById("symbolTableArea");
+            symbolTableArea.innerHTML = "";
         };
         Utils.showVis = function () {
             $('#main').animate({

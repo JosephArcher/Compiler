@@ -15,6 +15,8 @@ var JOEC;
             this.name = null;
             this.type = null;
             this.value = null;
+            this.lineNumber = null;
+            this.used = false;
             this.name = name;
             this.type = type;
         }

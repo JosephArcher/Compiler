@@ -10,7 +10,7 @@ var JOEC;
     var TreeNode = (function () {
         function TreeNode(theName, type, lineNumber) {
             this.name = "";
-            this.value = "";
+            this.value = null;
             this.type = "";
             this.lineNumber = 0;
             this.parent = null;
@@ -31,6 +31,8 @@ var JOEC;
                 nextNode = this.children[i];
                 // Check to see if the next node has been visited
                 if (!nextNode.visted) {
+                    // Mark the node as visted
+                    nextNode.visted = true;
                     // Return it for use
                     return nextNode;
                 }

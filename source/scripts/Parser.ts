@@ -355,7 +355,7 @@ module JOEC {
 		public parseBooleanExpression(){
 
 			this.CST.addNode("BooleanStatement", "Branch");
-			console.log("Boolean Express");
+		
 			if(this.currentToken.getValue() == "("){
 				console.log("Para found");
 				this.matchCharacter("(");
@@ -494,11 +494,10 @@ module JOEC {
 
 				this.AST.addNode("Block", "Branch");
 
-				// Add a new scope to the symbol table
-
 				// Get the list of statements that needs to be run before the block closes
 				var StatmentList = node.children[1];
 				this.evaluateStatementList(StatmentList);
+
 				this.AST.endChildren();
 			}
 		}
@@ -566,7 +565,7 @@ module JOEC {
 			}
 			// String Expression
 			else if (childNode.name == "StringExpression") {
-				this.AST.addNode(childNode.children[0].name, "Leaf", childNode.children[0].type);
+				this.AST.addNode(childNode.children[0].name, "Leaf", childNode.children[0].type , childNode.children[0].lineNumber);
 			}
 			// Boolean Expression
 			else if (childNode.name == "BooleanStatement") {
@@ -574,15 +573,14 @@ module JOEC {
 			}
 			// Identifier Expression
 			else if (childNode.name == "Identifier") {
-				this.AST.addNode(childNode.children[0].name, "Branch");
+				this.AST.addNode(childNode.children[0].name, "Branch", childNode.children[0].type , childNode.children[0].lineNumber);
 				this.AST.endChildren();
 			}
-
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode){
 
 			if (node.children.length == 1) {
-				this.AST.addNode(node.children[0].children[0].name, "Leaf");
+				this.AST.addNode(node.children[0].children[0].name, "Leaf", node.children[0].children[0].type, node.children[0].children[0].lineNumber);
 			}
 			else if (node.children.length == 5) {
 
@@ -591,10 +589,11 @@ module JOEC {
 				var boolOp = node.children[2];
 				var secondExpression = node.children[3];
 
+				// Combine the two parts of the boolean operator
 				var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
 
 				// Construct the subtree
-				this.AST.addNode(boolOpName, "Branch");
+				this.AST.addNode(boolOpName, "Branch", "BoolVal", boolOp.children[0].lineNumber);
 				this.evaluateExpression(firstExpression);
 				this.evaluateExpression(secondExpression);
 				this.AST.endChildren();

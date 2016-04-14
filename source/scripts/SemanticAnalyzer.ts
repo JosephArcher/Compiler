@@ -18,8 +18,18 @@ module JOEC {
 			this.AST = AST;
 			this.SymbolTable = new SymbolTable();
 		}
+		public analyze(){
+
+			this.scopeCheck();
+
+			if(this.hasErrors){
+				return;
+			}
+			this.typeCheck();
+		}
 		public scopeCheck() {
 			this.generateSymbolTable();
+			console.log(this.SymbolTable);
 		}
 		public typeCheck() {
 			// Create a type checker
@@ -36,6 +46,8 @@ module JOEC {
 		}
 		public checkForUnusedIdentifiers() {
 
+			console.log("Checking for unused identifiers");
+			console.log(this.SymbolTable);
 			// Make a new stack to use while iterating over the tree
 			var nodeStack = new JOEC.Stack();
 
@@ -43,23 +55,23 @@ module JOEC {
 			nodeStack.push(this.SymbolTable.rootScope);
 			
 			// Check the root node
-			this.checkScope(this.SymbolTable.rootScope);
+			this.checkScope(this.SymbolTable.rootScope, 0);
 
 			// Mark the node as visited
-			this.SymbolTable.rootScope.visted = true;
+			this.SymbolTable.rootScope.visted1 = true;
 
 			// Loop till you iterate over every node in the tree
 			while (!nodeStack.isEmpty()) {
 				// Get the next node
-				var nextNode: JOEC.ScopeNode = nodeStack.peek();
-				var childNode: JOEC.ScopeNode = nextNode.getNextUnvistedChildNode();
+				var nextNode: JOEC.ScopeNode = nodeStack.peek(); 
+				var childNode: JOEC.ScopeNode = nextNode.getNextUnvistedChildNode1();
 
 				// Check to see if any children exist
 				if (childNode != null) {
 
 					// Mark the node as visted
-					childNode.visted = true;
-					this.checkScope(childNode);
+					childNode.visted1 = true;
+					this.checkScope(childNode , nodeStack.getSize());
 					// Add the node to the stack
 					nodeStack.push(childNode);
 				}
@@ -69,7 +81,7 @@ module JOEC {
 				}
 			}
 		}
-		public checkScope(node: JOEC.ScopeNode) {
+		public checkScope(node: JOEC.ScopeNode , depth: number) {
 				
 			var scope = node.scopeStuff;
 			var len = Object.keys(scope).length;
@@ -77,12 +89,11 @@ module JOEC {
 			for (var i = 0; i < len; i++){
 
 				var nextVariable = scope[Object.keys(scope)[i]];
-
+				Utils.newVariableInSymbolTable(nextVariable, depth);
 				// Check each variable and if the value is null then report a warning to the user
-				if(nextVariable.value == null){
-					Utils.createNewWarningMessage("Warning: " + nextVariable.name + " is unused");
+				if(nextVariable.used == false && nextVariable.value == null){
+					Utils.createNewWarningMessage("Variable [ " + nextVariable.name + " ] of type " + nextVariable.type + " is unused " );
 				}
-				console.log(nextVariable);
 			}
 		}
 		public evaluateBlock(node: JOEC.TreeNode) {
@@ -111,8 +122,21 @@ module JOEC {
 
 			// Variable Declaration
 			if (node.name == "VarDecl") {
-				// Declare a new variable
+
+				// Look up the variable to make sure that it does not already exist
+				var variable = this.SymbolTable.currentScope.lookupVariable(node.children[1].children[0].name);
+				console.log("THE VARIABLE " + variable);
+				
+				if(variable == null){
+					// Declare a new variable
 				this.SymbolTable.declareVariable(node.children[1].children[0].name, node.children[0].children[0].name);
+				}
+				else{
+				 	// Redeclared Identifier
+				 	Utils.createNewErrorMessage("Redeclared identifier [ " + node.children[1].children[0].name + " ] on line " + node.children[1].children[0].lineNumber);
+				 	this.hasErrors = true;
+				 	return;
+				 }
 			}
 			// Block
 			else if (node.name == "Block") {
@@ -127,20 +151,33 @@ module JOEC {
 
 				//First lookup the variable to see if one is in scope
 				var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-				console.log(this.SymbolTable);
+				console.log("variable " + variable);
 				// If a variable exists
 				if(variable != null) {
 
+					// // Get the type of the variable
+					// console.log("The type of the variable is ... " + variable.type);
+					// console.log("The node to evaluate from is ...");
+					// console.log(node.children[2]);
+					this.evaluateExpression(node.children[2])
 					// Evaluate the expression
-					var results = this.evaluateExpression(node.children[2]);
-
+					//var results = this.evaluateExpression(node.children[2]);
+					//console.log("The type of the results is ... " + results.type);
+					// if(results != variable.type){
+					// 	// Type Mismatch
+					// 	Utils.createNewErrorMessage("Type Mismatch [  ] on line ") ;
+					// 	this.hasErrors = true;
+					// 	return;
+					// }
 					// Assign the variable
-					this.SymbolTable.assignVariable(node.children[0].children[0].name, "results");
+					//this.SymbolTable.assignVariable(node.children[0].children[0].name, "results");
+
 				}
 				else {
 					// Undeclared Identifier
 					Utils.createNewErrorMessage("Undeclared identifier [ " + node.children[0].children[0].name + " ] on line " + node.children[0].children[0].lineNumber);
 					this.hasErrors = true;
+					return;
 				}
 			}
 			// If Statement
@@ -158,12 +195,16 @@ module JOEC {
 
 			var childNode: JOEC.TreeNode = node.children[0];
 
+			console.log(" THE TEST NODE IS ");
+			console.log(childNode);
+
 			// Integer Expression
 			if (childNode.name == "IntegerExpression") {
 				
 			
 				if (childNode.children.length == 1)  {
-					
+					childNode.children[0];
+					//return "int";
 				}
 				else if (childNode.children.length == 3) {
 					this.evaluateExpression(childNode.children[2]);
@@ -181,7 +222,7 @@ module JOEC {
 			else if (childNode.name == "Identifier") {
 
 				if (this.SymbolTable.lookupVariable(childNode.children[0].name) != null) {
-					return childNode.children[0];
+					return this.SymbolTable.lookupVariable(childNode.children[0].name).type;
 				}
 				else {
 					// Undeclared Identifier
@@ -203,9 +244,10 @@ module JOEC {
 				var secondExpression = node.children[3];
 
 				var boolOpName = boolOp.children[0].name + boolOp.children[1].name;
-
+				
 				this.evaluateExpression(firstExpression);
 				this.evaluateExpression(secondExpression);
+				
 				
 			}
 		}

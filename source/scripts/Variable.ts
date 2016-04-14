@@ -7,16 +7,16 @@
 ///<reference path="Tree.ts"/>
 
 module JOEC {
-
    /*
 	* Variable
 	*/
-
 	export class Variable {
 
 		public name = null;
 		public type = null;
 		public value = null;
+		public lineNumber: number = null;
+		public used: boolean = false;
 
 		public constructor(name:string , type:string) {
 			this.name = name;
