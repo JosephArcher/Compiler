@@ -73,24 +73,42 @@ A = "hello"
 print(A)
 }$
 
+
+
+Test Program 8 (Out of Scope Error)
+
+{
+    int a
+    {
+     int b
+     b = 1
+    }
+   print(b)
+} $
+
+
+Test Program 9 (Redeclared Identifier)
+
+{
+string a
+a = "hello"
+string a
+}$
+
+Test Program 10 (Type Mismatch)
+
+{
+boolean a
+a= (1 == true)
+print(a)
+}$
+
+Test Program 11 (Use of Undeclared Identifier)
+
+{
+print(a)
+}$
+
+
+
 */
-function testProgram1() {
-    var sourceCodeHTML = document.getElementById("programInput");
-    sourceCodeHTML.value = "{\n" +
-        "int a\n" +
-        "a = 1\n" +
-        "print(a)\n" +
-        "}$";
-}
-function testProgram2() {
-    var sourceCodeHTML = document.getElementById("programInput");
-    sourceCodeHTML.value = "{\n" +
-        "abcd\n" +
-        "efgh\n" +
-        "ijkl\n" +
-        "mnop\n" +
-        "qrst\n" +
-        "uvwx\n" +
-        "yz\n" +
-        "}$";
-}
