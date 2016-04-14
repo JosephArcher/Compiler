@@ -91,7 +91,7 @@ module JOEC {
 				 console.log(test);
 				console.log("Eval Type " + test.type + "   compared to " + type);
 				if(type.toLowerCase() != test.type.toLowerCase()){
-					Utils.createNewMessage("Type Mismatch on line " + test.lineNumber);
+					Utils.createNewErrorMessage("Type Mismatch on line " + test.lineNumber + " , [ " + type + " ] is not equal to [ " + test.type + " ]");
 					this.hasErrors = true;
 				}
 				// Assign the variable
@@ -112,7 +112,7 @@ module JOEC {
 		public evaluateBooleanExpression(node: JOEC.TreeNode){
 			console.log("boolean node");
 			console.log(node);
-			if(node.type == "BoolVal"){
+			if(node.name != "==" && node.name != "!="){
 				console.log("Idea might be working ");
 				console.log(node.children[0]);
 				return node;
@@ -164,6 +164,7 @@ module JOEC {
 			console.log("Comparing " + type1 + "  with " + type2);
 			// Compare the types of both expressions
 			if(type1 != type2){
+				Utils.createNewErrorMessage("Type Mismatch on line " + node.lineNumber + " , [ " + type1 + " ] is not equal to [ " + type2 + " ]");
 				this.hasErrors = true;
 				return node;
 			}

@@ -39,7 +39,7 @@ module JOEC {
 			Utils.resetCompilerStatusBar();
 			Utils.resetUISideBar();
 
-			Utils.createNewMessage("Starting Compilation!\n");
+			Utils.createNewMessage("Starting Up Joe's Compiler!\n");
 
 			// Get the source code
 			var sourceCode = Utils.getSourceCode();
@@ -62,6 +62,7 @@ module JOEC {
 
 			// Program Object
 			var program: JOEC.Program;
+
 			// Split the programs into an array
 			tempPrograms = sourceCode.split("$");
 
@@ -177,19 +178,21 @@ module JOEC {
 
 			// Output the CST
 			Utils.addNewCST(Par.CST.toString());
-			Utils.createNewMessage("\nConcrete Syntax Tree");
-			Utils.createNewMessage("----------------------");
-			Utils.createNewMessage(Par.CST.toString());
-
+			if(_verboseMode.checked){
+				Utils.createNewMessage("\nConcrete Syntax Tree");
+				Utils.createNewMessage("----------------------");
+				Utils.createNewMessage(Par.CST.toString());
+			}
 			// Traverse the CST to create an AST
 			Par.traverseCST();
 
 			// Output the AST
 			Utils.addNewAST(Par.AST.toString());
-			Utils.createNewMessage("\nAbstract Syntax Tree");
-			Utils.createNewMessage("----------------------");
-			Utils.createNewMessage(Par.AST.toString());
-			
+			if (_verboseMode.checked) {
+				Utils.createNewMessage("\nAbstract Syntax Tree");
+				Utils.createNewMessage("----------------------");
+				Utils.createNewMessage(Par.AST.toString());
+			}
 			// Update the UI and mark the parser as complete
 			var parseCheckUI = <HTMLSpanElement>document.getElementById("parseCheck");
 			parseCheckUI.style.visibility = "visible";
@@ -197,7 +200,7 @@ module JOEC {
 			//***************************************************\\
 			//                 Semantic Analysis                 \\
 			//***************************************************\\
-
+			Utils.createNewMessage("Starting Semantic Analysis");
 			 // Create a Semantic Analyzer
 			var SemanticAnalyzer = new JOEC.SemanticAnalyzer(Par.CST , Par.AST);
 

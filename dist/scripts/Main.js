@@ -33,7 +33,7 @@ var JOEC;
             // Clear/Reset the Interface and Sidebar
             JOEC.Utils.resetCompilerStatusBar();
             JOEC.Utils.resetUISideBar();
-            JOEC.Utils.createNewMessage("Starting Compilation!\n");
+            JOEC.Utils.createNewMessage("Starting Up Joe's Compiler!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
             console.log(sourceCode);
@@ -133,22 +133,27 @@ var JOEC;
             JOEC.Utils.createNewMessage("\nParser Completed");
             // Output the CST
             JOEC.Utils.addNewCST(Par.CST.toString());
-            JOEC.Utils.createNewMessage("\nConcrete Syntax Tree");
-            JOEC.Utils.createNewMessage("----------------------");
-            JOEC.Utils.createNewMessage(Par.CST.toString());
+            if (_verboseMode.checked) {
+                JOEC.Utils.createNewMessage("\nConcrete Syntax Tree");
+                JOEC.Utils.createNewMessage("----------------------");
+                JOEC.Utils.createNewMessage(Par.CST.toString());
+            }
             // Traverse the CST to create an AST
             Par.traverseCST();
             // Output the AST
             JOEC.Utils.addNewAST(Par.AST.toString());
-            JOEC.Utils.createNewMessage("\nAbstract Syntax Tree");
-            JOEC.Utils.createNewMessage("----------------------");
-            JOEC.Utils.createNewMessage(Par.AST.toString());
+            if (_verboseMode.checked) {
+                JOEC.Utils.createNewMessage("\nAbstract Syntax Tree");
+                JOEC.Utils.createNewMessage("----------------------");
+                JOEC.Utils.createNewMessage(Par.AST.toString());
+            }
             // Update the UI and mark the parser as complete
             var parseCheckUI = document.getElementById("parseCheck");
             parseCheckUI.style.visibility = "visible";
             //***************************************************\\
             //                 Semantic Analysis                 \\
             //***************************************************\\
+            JOEC.Utils.createNewMessage("Starting Semantic Analysis");
             // Create a Semantic Analyzer
             var SemanticAnalyzer = new JOEC.SemanticAnalyzer(Par.CST, Par.AST);
             // Run a check for scope and build the symbol table then check for type
