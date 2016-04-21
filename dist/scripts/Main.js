@@ -7,6 +7,7 @@
 ///<reference path="d3.d.ts"/>
 /// <reference path="jquery.d.ts" />
 /// <reference path="TypeChecker.ts" />
+/// <reference path="CodeGenerator.ts" />
 var JOEC;
 (function (JOEC) {
     /*
@@ -178,6 +179,31 @@ var JOEC;
             // Update the UI and mark the SA as complete
             var SACheckUI = document.getElementById("SACheck");
             SACheckUI.style.visibility = "visible";
+            //***************************************************\\
+            //                  Code Generation                  \\
+            //***************************************************\\
+            // Create the code generator
+            var CodeGenerator = new JOEC.CodeGenerator();
+            // Start to generate code
+            CodeGenerator.generateCode(Par.AST);
+            // Check to see if any errors
+            if (CodeGenerator.hasErrors) {
+                // Tell the user
+                JOEC.Utils.createNewErrorMessage("Compilation Failed :( ");
+                // Update the Semantic Analysis UI with a error mark
+                var codeGenErrorUI = document.getElementById("codeGenError");
+                codeGenErrorUI.style.visibility = "visible";
+                // Stop the comiler
+                this.stopCompiler();
+                return;
+            }
+            // Update the User
+            JOEC.Utils.createNewMessage("\nCode Generation Completed");
+            // Update the UI and mark the codeGenCheck as complete
+            var codeGenCheckUI = document.getElementById("codeGenCheck");
+            codeGenCheckUI.style.visibility = "visible";
+            // End Compilation
+            JOEC.Utils.createNewMessage("\n Compilation Completed Successfully :)");
         };
         /**
         * Stop Comiler
