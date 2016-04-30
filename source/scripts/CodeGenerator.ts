@@ -5,10 +5,37 @@ module JOEC {
 	export class CodeGenerator {
 
 		public programCode = [];
+		public programCounter = 0;
 		public hasErrors: boolean = false;
+		public staticTable = {};
+		public jumpTable = {};
 
-		public constructor() {}
+		public constructor() {
 
+			// Create a new static table 
+
+			// Create a new jump table
+
+		}
+		public newStaticVariable(name, type, value){
+
+
+
+
+		}
+		public newJumpVariable(name, type, value){
+
+
+
+		}
+
+		public addNextOpCode(opCode: string){
+			// Add the new opcode to the next available address in memory
+			this.programCode[this.programCounter] = opCode;
+
+			// Increment the next available address
+			this.programCounter++;
+		}
 		 /*
 		  * Used to convert a given AST into 6502A opcodes
 		  * @params Tree - The AST to be converted into code
@@ -16,7 +43,7 @@ module JOEC {
 		  */
 		 public generateCode(AST: JOEC.Tree) {
 
-
+		 	this.evaluateBlock(AST.rootNode);
 		} 
 		/*
 		* Block
@@ -31,6 +58,57 @@ module JOEC {
 				this.evaluateStatement(node.children[i]);
 			}
 		}
+		public generatePrintCode( ) {
+
+			// AC
+			this.addNextOpCode("AC");
+
+			// T0
+			this.addNextOpCode("T0");
+
+			// XX
+			this.addNextOpCode("XX");
+
+			// A2
+			this.addNextOpCode("A2");
+
+			// Depening on the type place either a 0 or 1 in this spot
+			this.addNextOpCode("0");
+
+			// FF
+			this.addNextOpCode("FF");
+		}
+		public intDeclaration() {
+
+			// A9
+			this.addNextOpCode("A9");
+
+			// 00
+			this.addNextOpCode("00");
+
+			// 8D
+			this.addNextOpCode("8D");
+
+			// Create a new variable for the static table
+			var staticVariableNumber = Object.keys(this.staticTable).length;
+
+			// Temp Variable Number
+			this.addNextOpCode("T0");
+
+			// XX
+			this.addNextOpCode("XX");
+
+		}
+		public booleanDeclaration() {
+
+
+
+		}
+		public stringDeclaration() {
+
+
+
+		}
 		/*
 		* Statement
 		*/
@@ -39,6 +117,19 @@ module JOEC {
 			// Variable Declaration
 			if (node.name == "Variable Declaration") {
 
+				// Get the type
+				var type = node.children[0].name;
+
+				// Call the right function
+				if(type == "int"){
+					this.intDeclaration();
+				}
+				else if(type == "string"){
+					this.stringDeclaration();
+				}
+				else if(type == "boolean"){
+					this.booleanDeclaration();
+				}
 			}
 			// Block
 			else if (node.name == "Block") {
@@ -46,7 +137,8 @@ module JOEC {
 			}
 			// Assignment
 			else if (node.name == "Assign") {
-				this.evaluateExpression(node.children[1]);
+
+				var rightSide = this.evaluateExpression(node.children[1]);
 			}
 			// Print
 			else if (node.name == "Print") {
@@ -86,6 +178,7 @@ module JOEC {
 
 			// Integer Expression
 			if (node.name == "+") {
+				return this.evaluateExpression(node.children[1]);
 			}
 			// Boolean Expression
 			else if (node.name == "==" || node.name == "!=") {
@@ -112,7 +205,7 @@ module JOEC {
 		 * Create new string variable
 		 */
 		 public createNewStringVariable(variableName: string){
-		 	
+
 		 }
 	}	
 }

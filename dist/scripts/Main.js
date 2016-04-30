@@ -186,6 +186,7 @@ var JOEC;
             var CodeGenerator = new JOEC.CodeGenerator();
             // Start to generate code
             CodeGenerator.generateCode(Par.AST);
+            console.log(CodeGenerator.programCode);
             // Check to see if any errors
             if (CodeGenerator.hasErrors) {
                 // Tell the user
