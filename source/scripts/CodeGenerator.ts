@@ -1,3 +1,13 @@
+///<reference path="Utils.ts"/>
+///<reference path="Globals.ts"/>
+///<reference path="LexicalAnalyzer.ts"/>
+///<reference path="Token.ts"/>
+///<reference path="Parser.ts"/>
+///<reference path="Queue.ts"/>
+///<reference path="d3.d.ts"/>
+/// <reference path="jquery.d.ts" />
+/// <reference path="TypeChecker.ts" />
+/// <reference path="StaticTableEntry.ts" />
 module JOEC {
    /*
 	* Code Generator
@@ -6,6 +16,7 @@ module JOEC {
 
 		public programCode = [];
 		public programCounter = 0;
+		public heapPointer = 255;
 		public hasErrors: boolean = false;
 		public staticTable = {};
 		public jumpTable = {};
@@ -16,12 +27,30 @@ module JOEC {
 
 			// Create a new jump table
 
+			// Initalize the program code arrray
+			for (var i = 0; i < 256; i++){
+				this.programCode[i] = "00";
+			}
+
 		}
-		public newStaticVariable(name, type, value){
+		public writeDataIntoHeap(data: string){
 
+			for (var i = 0; i < data.length; i++) {
+				this.programCode[this.heapPointer] = data.charAt(i);
+				this.heapPointer--;
+			}
 
+		}
+		public newStaticVariable(name){
 
+			// Get length of the table and increment by 1
+			var staticVariableNumber = Object.keys(this.staticTable).length;
 
+			console.log("adding new static variable " + name);
+
+			this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry();
+
+			return staticVariableNumber;
 		}
 		public newJumpVariable(name, type, value){
 
@@ -58,7 +87,7 @@ module JOEC {
 				this.evaluateStatement(node.children[i]);
 			}
 		}
-		public generatePrintCode( ) {
+		public generatePrintCode(data) {
 
 			// AC
 			this.addNextOpCode("AC");
@@ -73,12 +102,33 @@ module JOEC {
 			this.addNextOpCode("A2");
 
 			// Depening on the type place either a 0 or 1 in this spot
-			this.addNextOpCode("0");
+			this.addNextOpCode("00");
 
 			// FF
 			this.addNextOpCode("FF");
 		}
-		public intDeclaration() {
+		public intDeclaration(name) {
+
+			// A9
+			this.addNextOpCode("A9");
+
+			// 00
+			this.addNextOpCode("00");
+
+			// 8D
+			this.addNextOpCode("8D");
+
+			// Create a new variable for the static table
+			var staticVariableNumber = this.newStaticVariable(name) + "";
+
+			// Temp Variable Number
+			this.addNextOpCode("T" + staticVariableNumber);
+
+			// XX
+			this.addNextOpCode("XX");
+
+		}
+		public booleanDeclaration() {
 
 			// A9
 			this.addNextOpCode("A9");
@@ -98,15 +148,37 @@ module JOEC {
 			// XX
 			this.addNextOpCode("XX");
 
-		}
-		public booleanDeclaration() {
-
 
 
 		}
-		public stringDeclaration() {
+		public stringDeclaration(name) {
 
+			// Create a new variable for the static table
+			var staticVariableNumber = this.newStaticVariable(name) + "";
 
+		}
+		public intAssignment(value){
+
+			// A9
+			this.addNextOpCode("A9");
+
+			// Value
+			this.addNextOpCode("0" + value);
+
+			// 8D
+			this.addNextOpCode("8D");
+
+			// T0
+			this.addNextOpCode("T0");
+
+			// XX
+			this.addNextOpCode("XX");
+
+		}
+		public booleanAssignment(){
+
+		}
+		public stringAssignment(){
 
 		}
 		/*
@@ -116,16 +188,19 @@ module JOEC {
 
 			// Variable Declaration
 			if (node.name == "Variable Declaration") {
-
+				console.log("Variable Declaration was found");
 				// Get the type
 				var type = node.children[0].name;
 
-				// Call the right function
+				// Get the name
+				var name = node.children[1].name;
+
+				// Call the appropriate function to generate the code for that section
 				if(type == "int"){
-					this.intDeclaration();
+					this.intDeclaration(name);
 				}
 				else if(type == "string"){
-					this.stringDeclaration();
+					this.stringDeclaration(name);
 				}
 				else if(type == "boolean"){
 					this.booleanDeclaration();
@@ -137,12 +212,27 @@ module JOEC {
 			}
 			// Assignment
 			else if (node.name == "Assign") {
-
+				console.log("Assignment Statement was found");
+				// Evaluate the Right Hand Side of the statement
 				var rightSide = this.evaluateExpression(node.children[1]);
+				console.log(rightSide);
+				if(rightSide.type == "Digit"){
+					this.intAssignment(rightSide.name);
+				}
+				else if(rightSide.type == "String"){
+					this.stringAssignment();
+				}
+				else if(rightSide.type == "BoolVal"){
+					this.booleanAssignment();
+				}
+				else{
+					console.log("This should never happen");
+				}
 			}
 			// Print
 			else if (node.name == "Print") {
-				this.evaluateExpression(node.children[0]);
+				var evaluation = this.evaluateExpression(node.children[0]);
+				this.generatePrintCode(evaluation);
 			}
 			// While
 			else if (node.name == "While") {

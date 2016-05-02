@@ -90,6 +90,10 @@ var JOEC;
             var sourceCodeHTML = document.getElementById("programInput");
             return sourceCodeHTML.value;
         };
+        Utils.writeNextRowOfCode = function (code) {
+            var outputCodeHTML = document.getElementById("programOutput");
+            outputCodeHTML.innerHTML = outputCodeHTML.value + code;
+        };
         /**
         * createNewErrorMessage
         *

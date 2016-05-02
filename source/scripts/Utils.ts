@@ -94,6 +94,11 @@ module JOEC {
 			var sourceCodeHTML = <HTMLTextAreaElement>document.getElementById("programInput");
 			return sourceCodeHTML.value;
 		}
+		public static writeNextRowOfCode(code:string){
+			var outputCodeHTML = <HTMLTextAreaElement>document.getElementById("programOutput");
+			outputCodeHTML.innerHTML = outputCodeHTML.value + code;
+
+		}	
 		/**	
 		* createNewErrorMessage
 		* 

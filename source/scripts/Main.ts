@@ -8,7 +8,7 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="TypeChecker.ts" />
 /// <reference path="CodeGenerator.ts" />
-
+/// <reference path="CodeGenerator.ts" />
 module JOEC {
 
 	/*
@@ -265,9 +265,23 @@ module JOEC {
 				return;
 
 			}
+			console.log("Static Table");
+			console.log(CodeGenerator.staticTable);
 			// Update the User
 			Utils.createNewMessage("\nCode Generation Completed");
 
+			// Add the code to UI in a nice way
+
+			var nextRow = "";
+			var code = [];
+			code = CodeGenerator.programCode;
+			console.log("Code");
+			console.log(code);
+			for (var i = 0; i < 256; i = i + 8){
+				nextRow =  code[i] + "  " + code[i + 1] + "  " + code[i + 2] + "  " + code[i + 3] + "  " + code[i + 4] + "  " + code[i + 5] + "  " + code[i + 6] + "  " + code[i + 7] + "\n";
+				console.log(code[i + 1]);
+				Utils.writeNextRowOfCode(nextRow);
+			}
 			// Update the UI and mark the codeGenCheck as complete
 			var codeGenCheckUI = <HTMLSpanElement>document.getElementById("codeGenCheck");
 			codeGenCheckUI.style.visibility = "visible";
