@@ -34,12 +34,40 @@ var JOEC;
                 this.heapPointer--;
             }
         };
-        CodeGenerator.prototype.newStaticVariable = function (name) {
+        CodeGenerator.prototype.newStaticVariable = function (name, type, scope) {
             // Get length of the table and increment by 1
             var staticVariableNumber = Object.keys(this.staticTable).length;
             console.log("adding new static variable " + name);
-            this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry();
+            this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry(name, type, scope);
             return staticVariableNumber;
+        };
+        CodeGenerator.prototype.writeStaticInt = function (address, value) {
+            this.programCounter++;
+            var output = this.decimalToHex(address);
+            // Check to see if you need to stuff a zero in front cause of dumb shit
+            if (output.length == 1) {
+                output = "0" + output;
+            }
+            return output;
+        };
+        CodeGenerator.prototype.writeStaticBoolean = function (address, value) {
+            this.programCounter++;
+            var output = this.decimalToHex(address);
+            // Check to see if you need to stuff a zero in front cause of dumb shit
+            if (output.length == 1) {
+                output = "0" + output;
+            }
+            return output;
+        };
+        /**
+        * Used to convert a decimal string into a hex string
+           @Params {String} - A decimal string
+           @Returns {String} - A hex string
+        */
+        CodeGenerator.prototype.decimalToHex = function (input) {
+            var decimalNumber = parseInt(input, 10);
+            var hexNumber = decimalNumber.toString(16);
+            return hexNumber.toUpperCase();
         };
         CodeGenerator.prototype.newJumpVariable = function (name, type, value) {
         };
@@ -56,6 +84,46 @@ var JOEC;
          */
         CodeGenerator.prototype.generateCode = function (AST) {
             this.evaluateBlock(AST.rootNode);
+            // Add a break to the end of the program
+            this.addNextOpCode("00");
+            // Start to write the static area
+            this.calculateStaticArea();
+        };
+        CodeGenerator.prototype.calculateStaticArea = function () {
+            // Get the start of the static 
+            var startingAddress = this.programCounter;
+            // Get the length of the static table
+            var len = Object.keys(this.staticTable).length;
+            // The next row in the static table
+            var nextRow;
+            // Loop over the static table
+            for (var i = 0; i < len; i++) {
+                nextRow = this.staticTable[i];
+                console.log("Next Row");
+                console.log(nextRow);
+                if (nextRow.type == "Int") {
+                    var replace = this.writeStaticInt(this.programCounter, nextRow.Var + nextRow.Var);
+                    var search = "T" + i;
+                    this.FindAndReplace(search, replace);
+                }
+                else if (nextRow.type == "BoolVal") {
+                    var replace = this.writeStaticBoolean(this.programCounter, nextRow.Var + nextRow.Var);
+                    var search = "T" + i;
+                    this.FindAndReplace(search, replace);
+                }
+            }
+        };
+        CodeGenerator.prototype.FindAndReplace = function (search, replace) {
+            console.log("Finding" + search + "and replacing with " + replace);
+            var nextLocation;
+            for (var i = 0; i < this.programCode.length; i++) {
+                nextLocation = this.programCode[i];
+                if (nextLocation == search) {
+                    console.log("FOUND");
+                    this.programCode[i] = replace;
+                    this.programCode[i + 1] = "00";
+                }
+            }
         };
         /*
         * Block
@@ -68,65 +136,130 @@ var JOEC;
                 this.evaluateStatement(node.children[i]);
             }
         };
-        CodeGenerator.prototype.generatePrintCode = function (data) {
+        CodeGenerator.prototype.generateConstantIntPrintCode = function (value) {
+            // Load the y register withn a constant
+            this.addNextOpCode("A0");
+            // Constant value
+            var constantValue = "0" + value;
+            this.addNextOpCode(constantValue);
+            // Load the x register with a constant
+            this.addNextOpCode("A2");
+            // load 1 cause we want to print a integer
+            this.addNextOpCode("01");
+            // Make a system call to output the results
+            this.addNextOpCode("FF");
+        };
+        CodeGenerator.prototype.generateConstantBooleanPrintCode = function (value) {
+            // Load the y register withn a constant
+            this.addNextOpCode("A0");
+            // Check to see if true or false
+            if (value == "true") {
+                this.addNextOpCode("01");
+            }
+            else if (value == "false") {
+                this.addNextOpCode("00");
+            }
+            // Load the x register with a constant
+            this.addNextOpCode("A2");
+            // load 1 cause we want to print a integer
+            this.addNextOpCode("01");
+            // Make a system call to output the results
+            this.addNextOpCode("FF");
+        };
+        CodeGenerator.prototype.generateIdentifierPrintCode = function (data, type) {
+            // Lookup the variable in the static table to get its position
+            var variablePos = this.lookupStaticVariable(data);
             // AC
             this.addNextOpCode("AC");
             // T0
-            this.addNextOpCode("T0");
+            this.addNextOpCode("T" + variablePos);
             // XX
             this.addNextOpCode("XX");
+            // Decide what needs to be done based on the type
+            if (type == "Digit" || type == "BoolVal") {
+                this.addNextOpCode("01");
+            }
+            else if (type == "String") {
+                this.addNextOpCode("02");
+            }
             // A2
             this.addNextOpCode("A2");
-            // Depening on the type place either a 0 or 1 in this spot
-            this.addNextOpCode("00");
             // FF
             this.addNextOpCode("FF");
         };
         CodeGenerator.prototype.intDeclaration = function (name) {
-            // A9
+            // Load the accumulator
             this.addNextOpCode("A9");
-            // 00
+            // With 00
             this.addNextOpCode("00");
-            // 8D
+            // Store the accumulator in memory 
             this.addNextOpCode("8D");
             // Create a new variable for the static table
-            var staticVariableNumber = this.newStaticVariable(name) + "";
-            // Temp Variable Number
+            var staticVariableNumber = this.newStaticVariable(name, "Int", "0") + "";
+            // Store it at this temporary address
             this.addNextOpCode("T" + staticVariableNumber);
-            // XX
             this.addNextOpCode("XX");
         };
-        CodeGenerator.prototype.booleanDeclaration = function () {
-            // A9
+        CodeGenerator.prototype.booleanDeclaration = function (name) {
+            // Load the accumulator
             this.addNextOpCode("A9");
-            // 00
+            // With 00
             this.addNextOpCode("00");
-            // 8D
+            // Store the accumulator in memory 
             this.addNextOpCode("8D");
             // Create a new variable for the static table
-            var staticVariableNumber = Object.keys(this.staticTable).length;
-            // Temp Variable Number
-            this.addNextOpCode("T0");
-            // XX
+            var staticVariableNumber = this.newStaticVariable(name, "BoolVal", "0") + "";
+            // Store it at this temporary address
+            this.addNextOpCode("T" + staticVariableNumber);
             this.addNextOpCode("XX");
         };
         CodeGenerator.prototype.stringDeclaration = function (name) {
             // Create a new variable for the static table
-            var staticVariableNumber = this.newStaticVariable(name) + "";
+            var staticVariableNumber = this.newStaticVariable(name, "String", "0") + "";
         };
-        CodeGenerator.prototype.intAssignment = function (value) {
+        CodeGenerator.prototype.intAssignment = function (value1, value2) {
+            var variablePos = this.lookupStaticVariable(value1);
             // A9
             this.addNextOpCode("A9");
             // Value
-            this.addNextOpCode("0" + value);
+            this.addNextOpCode("0" + value2);
             // 8D
             this.addNextOpCode("8D");
             // T0
-            this.addNextOpCode("T0");
+            this.addNextOpCode("T" + variablePos);
             // XX
             this.addNextOpCode("XX");
         };
-        CodeGenerator.prototype.booleanAssignment = function () {
+        CodeGenerator.prototype.lookupStaticVariable = function (name) {
+            var len = Object.keys(this.staticTable).length;
+            var nextVariable;
+            for (var i = 0; i < len; i++) {
+                nextVariable = this.staticTable[i];
+                // Check to see if they match
+                if (name == nextVariable.Var) {
+                    return i;
+                }
+            }
+        };
+        CodeGenerator.prototype.booleanAssignment = function (value1, value2) {
+            // Look up the variable in the static table
+            var variablePos = this.lookupStaticVariable(value1);
+            // Load the accumulator
+            this.addNextOpCode("A9");
+            // With either
+            if (value2 == "false") {
+                // 0 for false
+                this.addNextOpCode("00");
+            }
+            else if (value2 == "true") {
+                // 1 for true
+                this.addNextOpCode("01");
+            }
+            // Write the accumulator to memory
+            this.addNextOpCode("8D");
+            // To the temp location
+            this.addNextOpCode("T" + variablePos);
+            this.addNextOpCode("XX");
         };
         CodeGenerator.prototype.stringAssignment = function () {
         };
@@ -149,7 +282,7 @@ var JOEC;
                     this.stringDeclaration(name);
                 }
                 else if (type == "boolean") {
-                    this.booleanDeclaration();
+                    this.booleanDeclaration(name);
                 }
             }
             else if (node.name == "Block") {
@@ -159,23 +292,39 @@ var JOEC;
                 console.log("Assignment Statement was found");
                 // Evaluate the Right Hand Side of the statement
                 var rightSide = this.evaluateExpression(node.children[1]);
-                console.log(rightSide);
+                var leftSide = node.children[0];
                 if (rightSide.type == "Digit") {
-                    this.intAssignment(rightSide.name);
+                    this.intAssignment(leftSide.name, rightSide.name);
                 }
                 else if (rightSide.type == "String") {
                     this.stringAssignment();
                 }
                 else if (rightSide.type == "BoolVal") {
-                    this.booleanAssignment();
+                    this.booleanAssignment(leftSide.name, rightSide.name);
                 }
                 else {
                     console.log("This should never happen");
                 }
             }
             else if (node.name == "Print") {
+                // Evaluate out the expression
                 var evaluation = this.evaluateExpression(node.children[0]);
-                this.generatePrintCode(evaluation);
+                var evalType = evaluation.type;
+                // If the expression is a integer constant
+                if (evalType == "Digit") {
+                    // Generate Code for a constant integer print statement
+                    this.generateConstantIntPrintCode(evaluation.name);
+                }
+                else if (evalType == "String") {
+                }
+                else if (evalType == "BoolVal") {
+                    // Generate Code for a boolean constant print statement
+                    this.generateConstantBooleanPrintCode(evaluation.name);
+                }
+                else if (evalType == "Identifer") {
+                    // Generate Code for a identifer print statement
+                    this.generateIdentifierPrintCode(evaluation.name, evaluation.type);
+                }
             }
             else if (node.name == "While") {
                 this.evaluateBooleanExpression(node.children[0]);
