@@ -22,37 +22,34 @@ module JOEC {
 		public jumpTable = {};
 
 		public constructor() {
-
-			// Create a new static table 
-
-			// Create a new jump table
-
 			// Initalize the program code arrray
 			for (var i = 0; i < 256; i++){
 				this.programCode[i] = "00";
 			}
-
 		}
 		/**
-		 *
+		 * writeDataIntoHeap
+		 * @Params Data: String - The string to write into the heap
 		 *
 		 */
 		public writeDataIntoHeap(data: string){
 
-			console.log("Writing Data into the heap");
+			console.log("Writing Data into the heap " + data);
+
 			// First rip the quotes out of this bitch
-			data = data.replace(/"/g, "");
+			var test = data.replace(/"/g,"").trim();
 
 			// Write the 00 to into the program code
 			this.programCode[this.heapPointer] = "00";
 			this.heapPointer--;
 
 			// Get the length and sub 1 to loop
-			var len = data.length - 1;
-			
+			var len = test.length;
+			console.log(len + "looping ");
 			// Loop over the string backwords and write the string into heap
 			for (var i = len; i > 0; i--) {
-				this.programCode[this.heapPointer] = this.decimalToHex(data.charCodeAt(i) + "");
+				console.log("Writing character:  " + test.charAt(i - 1));
+				this.programCode[this.heapPointer] = this.decimalToHex(test.charCodeAt(i - 1) + "");
 				this.heapPointer--;	
 			}
 		}
@@ -217,7 +214,6 @@ module JOEC {
 			else if (value == "false"){
 				this.addNextOpCode("00");
 			}
-
 			// Load the x register with a constant
 			this.addNextOpCode("A2");
 
@@ -225,6 +221,32 @@ module JOEC {
 			this.addNextOpCode("01");
 
 			// Make a system call to output the results
+			this.addNextOpCode("FF");
+		}
+		public generateConstantStringPrintCode(value1) {
+			console.log(value1 + "value1");
+			// A0
+			this.addNextOpCode("A0");
+			// Write the constant into the heap
+			this.writeDataIntoHeap(value1);
+			// Get the location of the heap point +1 to account for the off by 1 issue
+			var heapPointer = this.heapPointer;
+
+			heapPointer++;
+
+			console.log("JOE THE HEAP POINT IS ");
+			console.log(this.decimalToHex(heapPointer + ""));
+
+			// Load the value into the accumulator
+			this.addNextOpCode(this.decimalToHex(heapPointer + ""));
+
+			// A2
+			this.addNextOpCode("A2");
+
+			// 02
+			this.addNextOpCode("02");
+
+			// FF
 			this.addNextOpCode("FF");
 		}
 		public generateIdentifierPrintCode(data , type) {
@@ -248,7 +270,7 @@ module JOEC {
 
 			// A2
 			this.addNextOpCode("A2");
-			
+
 			// Decide what needs to be done based on the type
 			if(variableType == "Digit" || variableType == "BoolVal"){
 				this.addNextOpCode("01");
@@ -256,10 +278,6 @@ module JOEC {
 			else if(variableType == "String"){
 				this.addNextOpCode("02");
 			}
-
-		
-
-
 			// FF
 			this.addNextOpCode("FF");
 		}
@@ -329,8 +347,11 @@ module JOEC {
 			// Write the string into the heap
 			this.writeDataIntoHeap(value2);
 
-			// Get the location of the heap point +1 to account for the off by 1 issue
-			var heapPointer = this.heapPointer + 1;
+			// Get the location of the heap point 
+			var heapPointer = this.heapPointer;
+
+			//+1 to account for the off by 1 issue
+			heapPointer++;
 
 			console.log("JOE THE HEAP POINT IS ");
 			console.log(this.decimalToHex(heapPointer + ""));
@@ -488,7 +509,7 @@ module JOEC {
 				// If the expression is a string constant
 				else if(evalType == "String"){
 					// Generate Code for a string constant print statement
-					//this.generateConstantStringPrintCode(evaluation.name);
+					this.generateConstantStringPrintCode(evaluation.name);
 				}
 				// If the expression is a boolean constant
 				else if(evalType == "BoolVal"){

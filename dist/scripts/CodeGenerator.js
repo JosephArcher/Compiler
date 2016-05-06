@@ -15,35 +15,36 @@ var JOEC;
      */
     var CodeGenerator = (function () {
         function CodeGenerator() {
-            // Create a new static table 
             this.programCode = [];
             this.programCounter = 0;
             this.heapPointer = 255;
             this.hasErrors = false;
             this.staticTable = {};
             this.jumpTable = {};
-            // Create a new jump table
             // Initalize the program code arrray
             for (var i = 0; i < 256; i++) {
                 this.programCode[i] = "00";
             }
         }
         /**
-         *
+         * writeDataIntoHeap
+         * @Params Data: String - The string to write into the heap
          *
          */
         CodeGenerator.prototype.writeDataIntoHeap = function (data) {
-            console.log("Writing Data into the heap");
+            console.log("Writing Data into the heap " + data);
             // First rip the quotes out of this bitch
-            data = data.replace(/"/g, "");
+            var test = data.replace(/"/g, "").trim();
             // Write the 00 to into the program code
             this.programCode[this.heapPointer] = "00";
             this.heapPointer--;
             // Get the length and sub 1 to loop
-            var len = data.length - 1;
+            var len = test.length;
+            console.log(len + "looping ");
             // Loop over the string backwords and write the string into heap
             for (var i = len; i > 0; i--) {
-                this.programCode[this.heapPointer] = this.decimalToHex(data.charCodeAt(i) + "");
+                console.log("Writing character:  " + test.charAt(i - 1));
+                this.programCode[this.heapPointer] = this.decimalToHex(test.charCodeAt(i - 1) + "");
                 this.heapPointer--;
             }
         };
@@ -184,6 +185,26 @@ var JOEC;
             // Make a system call to output the results
             this.addNextOpCode("FF");
         };
+        CodeGenerator.prototype.generateConstantStringPrintCode = function (value1) {
+            console.log(value1 + "value1");
+            // A0
+            this.addNextOpCode("A0");
+            // Write the constant into the heap
+            this.writeDataIntoHeap(value1);
+            // Get the location of the heap point +1 to account for the off by 1 issue
+            var heapPointer = this.heapPointer;
+            heapPointer++;
+            console.log("JOE THE HEAP POINT IS ");
+            console.log(this.decimalToHex(heapPointer + ""));
+            // Load the value into the accumulator
+            this.addNextOpCode(this.decimalToHex(heapPointer + ""));
+            // A2
+            this.addNextOpCode("A2");
+            // 02
+            this.addNextOpCode("02");
+            // FF
+            this.addNextOpCode("FF");
+        };
         CodeGenerator.prototype.generateIdentifierPrintCode = function (data, type) {
             console.log("THE data IS " + data);
             // Lookup the variable in the static table to get its position
@@ -255,8 +276,10 @@ var JOEC;
             this.addNextOpCode("A9");
             // Write the string into the heap
             this.writeDataIntoHeap(value2);
-            // Get the location of the heap point +1 to account for the off by 1 issue
-            var heapPointer = this.heapPointer + 1;
+            // Get the location of the heap point 
+            var heapPointer = this.heapPointer;
+            //+1 to account for the off by 1 issue
+            heapPointer++;
             console.log("JOE THE HEAP POINT IS ");
             console.log(this.decimalToHex(heapPointer + ""));
             // Load the value into the accumulator
@@ -378,6 +401,8 @@ var JOEC;
                     this.generateConstantIntPrintCode(evaluation.name);
                 }
                 else if (evalType == "String") {
+                    // Generate Code for a string constant print statement
+                    this.generateConstantStringPrintCode(evaluation.name);
                 }
                 else if (evalType == "BoolVal") {
                     // Generate Code for a boolean constant print statement
