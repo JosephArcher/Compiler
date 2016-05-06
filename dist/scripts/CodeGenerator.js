@@ -28,9 +28,22 @@ var JOEC;
                 this.programCode[i] = "00";
             }
         }
+        /**
+         *
+         *
+         */
         CodeGenerator.prototype.writeDataIntoHeap = function (data) {
-            for (var i = 0; i < data.length; i++) {
-                this.programCode[this.heapPointer] = data.charAt(i);
+            console.log("Writing Data into the heap");
+            // First rip the quotes out of this bitch
+            data = data.replace(/"/g, "");
+            // Write the 00 to into the program code
+            this.programCode[this.heapPointer] = "00";
+            this.heapPointer--;
+            // Get the length and sub 1 to loop
+            var len = data.length - 1;
+            // Loop over the string backwords and write the string into heap
+            for (var i = len; i > 0; i--) {
+                this.programCode[this.heapPointer] = this.decimalToHex(data.charCodeAt(i) + "");
                 this.heapPointer--;
             }
         };
@@ -111,6 +124,11 @@ var JOEC;
                     var search = "T" + i;
                     this.FindAndReplace(search, replace);
                 }
+                else if (nextRow.type == "String") {
+                    var replace = this.writeStaticBoolean(this.programCounter, nextRow.Var + nextRow.Var);
+                    var search = "T" + i;
+                    this.FindAndReplace(search, replace);
+                }
             }
         };
         CodeGenerator.prototype.FindAndReplace = function (search, replace) {
@@ -167,23 +185,27 @@ var JOEC;
             this.addNextOpCode("FF");
         };
         CodeGenerator.prototype.generateIdentifierPrintCode = function (data, type) {
+            console.log("THE data IS " + data);
             // Lookup the variable in the static table to get its position
-            var variablePos = this.lookupStaticVariable(data);
+            var variablePos = this.lookupStaticVariablePos(data);
+            var variableType = this.lookupStaticVariable(data).type;
+            console.log("THE DATA TYPE IS !!!!!! ");
+            console.log(variableType);
             // AC
             this.addNextOpCode("AC");
             // T0
             this.addNextOpCode("T" + variablePos);
             // XX
             this.addNextOpCode("XX");
-            // Decide what needs to be done based on the type
-            if (type == "Digit" || type == "BoolVal") {
-                this.addNextOpCode("01");
-            }
-            else if (type == "String") {
-                this.addNextOpCode("02");
-            }
             // A2
             this.addNextOpCode("A2");
+            // Decide what needs to be done based on the type
+            if (variableType == "Digit" || variableType == "BoolVal") {
+                this.addNextOpCode("01");
+            }
+            else if (variableType == "String") {
+                this.addNextOpCode("02");
+            }
             // FF
             this.addNextOpCode("FF");
         };
@@ -214,11 +236,40 @@ var JOEC;
             this.addNextOpCode("XX");
         };
         CodeGenerator.prototype.stringDeclaration = function (name) {
+            // Load the accumulator
+            //this.addNextOpCode("A9");
+            // With 00
+            //this.addNextOpCode("00");
+            // Store the accumulator in memory
+            //this.addNextOpCode("8D");
             // Create a new variable for the static table
             var staticVariableNumber = this.newStaticVariable(name, "String", "0") + "";
+            // Store it at this temporary address
+            //this.addNextOpCode("T" + staticVariableNumber);
+            //this.addNextOpCode("XX");
+        };
+        CodeGenerator.prototype.stringAssignment = function (value1, value2) {
+            // Lookup the variable in the static table
+            var variablePos = this.lookupStaticVariablePos(value1);
+            // Load the accumulator
+            this.addNextOpCode("A9");
+            // Write the string into the heap
+            this.writeDataIntoHeap(value2);
+            // Get the location of the heap point +1 to account for the off by 1 issue
+            var heapPointer = this.heapPointer + 1;
+            console.log("JOE THE HEAP POINT IS ");
+            console.log(this.decimalToHex(heapPointer + ""));
+            // Load the value into the accumulator
+            this.addNextOpCode(this.decimalToHex(heapPointer + ""));
+            // 8D
+            this.addNextOpCode("8D");
+            // T0
+            this.addNextOpCode("T" + variablePos);
+            // XX
+            this.addNextOpCode("XX");
         };
         CodeGenerator.prototype.intAssignment = function (value1, value2) {
-            var variablePos = this.lookupStaticVariable(value1);
+            var variablePos = this.lookupStaticVariablePos(value1);
             // A9
             this.addNextOpCode("A9");
             // Value
@@ -230,7 +281,7 @@ var JOEC;
             // XX
             this.addNextOpCode("XX");
         };
-        CodeGenerator.prototype.lookupStaticVariable = function (name) {
+        CodeGenerator.prototype.lookupStaticVariablePos = function (name) {
             var len = Object.keys(this.staticTable).length;
             var nextVariable;
             for (var i = 0; i < len; i++) {
@@ -241,9 +292,20 @@ var JOEC;
                 }
             }
         };
+        CodeGenerator.prototype.lookupStaticVariable = function (name) {
+            var len = Object.keys(this.staticTable).length;
+            var nextVariable;
+            for (var i = 0; i < len; i++) {
+                nextVariable = this.staticTable[i];
+                // Check to see if they match
+                if (name == nextVariable.Var) {
+                    return nextVariable;
+                }
+            }
+        };
         CodeGenerator.prototype.booleanAssignment = function (value1, value2) {
             // Look up the variable in the static table
-            var variablePos = this.lookupStaticVariable(value1);
+            var variablePos = this.lookupStaticVariablePos(value1);
             // Load the accumulator
             this.addNextOpCode("A9");
             // With either
@@ -260,8 +322,6 @@ var JOEC;
             // To the temp location
             this.addNextOpCode("T" + variablePos);
             this.addNextOpCode("XX");
-        };
-        CodeGenerator.prototype.stringAssignment = function () {
         };
         /*
         * Statement
@@ -297,7 +357,7 @@ var JOEC;
                     this.intAssignment(leftSide.name, rightSide.name);
                 }
                 else if (rightSide.type == "String") {
-                    this.stringAssignment();
+                    this.stringAssignment(leftSide.name, rightSide.name);
                 }
                 else if (rightSide.type == "BoolVal") {
                     this.booleanAssignment(leftSide.name, rightSide.name);
@@ -310,6 +370,8 @@ var JOEC;
                 // Evaluate out the expression
                 var evaluation = this.evaluateExpression(node.children[0]);
                 var evalType = evaluation.type;
+                console.log("EVAL TYPE");
+                console.log(evalType);
                 // If the expression is a integer constant
                 if (evalType == "Digit") {
                     // Generate Code for a constant integer print statement
@@ -321,7 +383,8 @@ var JOEC;
                     // Generate Code for a boolean constant print statement
                     this.generateConstantBooleanPrintCode(evaluation.name);
                 }
-                else if (evalType == "Identifer") {
+                else if (evalType == "Identifier") {
+                    console.log("TESTING LEAGUE OPSDF");
                     // Generate Code for a identifer print statement
                     this.generateIdentifierPrintCode(evaluation.name, evaluation.type);
                 }
@@ -351,6 +414,8 @@ var JOEC;
          *  Expression
          */
         CodeGenerator.prototype.evaluateExpression = function (node) {
+            console.log('Evaluating the expression...');
+            console.log(node);
             // Integer Expression
             if (node.name == "+") {
                 return this.evaluateExpression(node.children[1]);
@@ -375,6 +440,10 @@ var JOEC;
          * Create new string variable
          */
         CodeGenerator.prototype.createNewStringVariable = function (variableName) {
+        };
+        CodeGenerator.prototype.simplifyBooleanExpression = function () {
+        };
+        CodeGenerator.prototype.simplifyIntegerExpression = function () {
         };
         return CodeGenerator;
     })();

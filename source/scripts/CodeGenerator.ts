@@ -33,13 +33,28 @@ module JOEC {
 			}
 
 		}
+		/**
+		 *
+		 *
+		 */
 		public writeDataIntoHeap(data: string){
 
-			for (var i = 0; i < data.length; i++) {
-				this.programCode[this.heapPointer] = data.charAt(i);
+			console.log("Writing Data into the heap");
+			// First rip the quotes out of this bitch
+			data = data.replace(/"/g, "");
+
+			// Write the 00 to into the program code
+			this.programCode[this.heapPointer] = "00";
+			this.heapPointer--;
+
+			// Get the length and sub 1 to loop
+			var len = data.length - 1;
+			
+			// Loop over the string backwords and write the string into heap
+			for (var i = len; i > 0; i--) {
+				this.programCode[this.heapPointer] = this.decimalToHex(data.charCodeAt(i) + "");
 				this.heapPointer--;	
 			}
-
 		}
 		public newStaticVariable(name,type, scope){
 
@@ -139,6 +154,11 @@ module JOEC {
 					var search = "T" + i;
 					this.FindAndReplace(search, replace);
 				}
+				else if(nextRow.type == "String"){
+					var replace = this.writeStaticBoolean(this.programCounter, nextRow.Var + nextRow.Var);
+					var search = "T" + i;
+					this.FindAndReplace(search, replace);
+				}
 			}
 		}
 		public FindAndReplace(search, replace){
@@ -209,8 +229,13 @@ module JOEC {
 		}
 		public generateIdentifierPrintCode(data , type) {
 
+			console.log("THE data IS " + data);
 			// Lookup the variable in the static table to get its position
-			var variablePos = this.lookupStaticVariable(data);
+			var variablePos = this.lookupStaticVariablePos(data);
+			var variableType = this.lookupStaticVariable(data).type;
+
+			console.log("THE DATA TYPE IS !!!!!! ");
+			console.log(variableType);
 
 			// AC
 			this.addNextOpCode("AC");
@@ -221,16 +246,18 @@ module JOEC {
 			// XX
 			this.addNextOpCode("XX");
 
+			// A2
+			this.addNextOpCode("A2");
+			
 			// Decide what needs to be done based on the type
-			if(type == "Digit" || type == "BoolVal"){
+			if(variableType == "Digit" || variableType == "BoolVal"){
 				this.addNextOpCode("01");
 			}
-			else if(type == "String"){
+			else if(variableType == "String"){
 				this.addNextOpCode("02");
 			}
 
-			// A2
-			this.addNextOpCode("A2");
+		
 
 
 			// FF
@@ -275,13 +302,54 @@ module JOEC {
 		}
 		public stringDeclaration(name) {
 
+			// Load the accumulator
+			//this.addNextOpCode("A9");
+
+			// With 00
+			//this.addNextOpCode("00");
+
+			// Store the accumulator in memory
+			//this.addNextOpCode("8D");
+
 			// Create a new variable for the static table
 			var staticVariableNumber = this.newStaticVariable(name , "String" , "0") + "";
 
+			// Store it at this temporary address
+			//this.addNextOpCode("T" + staticVariableNumber);
+			//this.addNextOpCode("XX");
+		}
+		public stringAssignment(value1, value2) {
+
+			// Lookup the variable in the static table
+			var variablePos = this.lookupStaticVariablePos(value1);
+
+			// Load the accumulator
+			this.addNextOpCode("A9");
+
+			// Write the string into the heap
+			this.writeDataIntoHeap(value2);
+
+			// Get the location of the heap point +1 to account for the off by 1 issue
+			var heapPointer = this.heapPointer + 1;
+
+			console.log("JOE THE HEAP POINT IS ");
+			console.log(this.decimalToHex(heapPointer + ""));
+
+			// Load the value into the accumulator
+			this.addNextOpCode(this.decimalToHex(heapPointer + ""));
+
+			// 8D
+			this.addNextOpCode("8D");
+
+			// T0
+			this.addNextOpCode("T" + variablePos);
+
+			// XX
+			this.addNextOpCode("XX");
 		}
 		public intAssignment(value1, value2){
 
-			var variablePos = this.lookupStaticVariable(value1);
+			var variablePos = this.lookupStaticVariablePos(value1);
 
 			// A9
 			this.addNextOpCode("A9");
@@ -299,7 +367,7 @@ module JOEC {
 			this.addNextOpCode("XX");
 
 		}
-		public lookupStaticVariable(name){
+		public lookupStaticVariablePos(name){
 
 			var len = Object.keys(this.staticTable).length;
 			var nextVariable;
@@ -313,10 +381,24 @@ module JOEC {
 				
 			}
 		}
+		public lookupStaticVariable(name) {
+
+			var len = Object.keys(this.staticTable).length;
+			var nextVariable;
+			for (var i = 0; i < len; i++) {
+				nextVariable = this.staticTable[i];
+
+				// Check to see if they match
+				if (name == nextVariable.Var) {
+					return nextVariable;
+				}
+
+			}
+		}
 		public booleanAssignment(value1, value2){
 
 			// Look up the variable in the static table
-			var variablePos = this.lookupStaticVariable(value1);
+			var variablePos = this.lookupStaticVariablePos(value1);
 
 			// Load the accumulator
 			this.addNextOpCode("A9");
@@ -337,9 +419,6 @@ module JOEC {
 			// To the temp location
 			this.addNextOpCode("T" + variablePos);
 			this.addNextOpCode("XX");
-
-		}
-		public stringAssignment(){
 
 		}
 		/*
@@ -383,7 +462,7 @@ module JOEC {
 					this.intAssignment(leftSide.name , rightSide.name);
 				}
 				else if(rightSide.type == "String"){
-					this.stringAssignment();
+					this.stringAssignment(leftSide.name, rightSide.name);
 				}
 				else if(rightSide.type == "BoolVal"){
 					this.booleanAssignment(leftSide.name, rightSide.name);
@@ -398,6 +477,8 @@ module JOEC {
 				// Evaluate out the expression
 				var evaluation = this.evaluateExpression(node.children[0]);
 				var evalType = evaluation.type;
+				console.log("EVAL TYPE");
+				console.log(evalType);
 
 				// If the expression is a integer constant
 				if(evalType == "Digit"){
@@ -415,7 +496,8 @@ module JOEC {
 					this.generateConstantBooleanPrintCode(evaluation.name);
 				}
 				// If the expression is a identifer
-				else if(evalType == "Identifer"){
+				else if (evalType == "Identifier") {
+					console.log("TESTING LEAGUE OPSDF");
 					// Generate Code for a identifer print statement
 					this.generateIdentifierPrintCode(evaluation.name, evaluation.type);
 				}	
@@ -452,6 +534,9 @@ module JOEC {
 		 */
 		public evaluateExpression(node: JOEC.TreeNode) {
 
+			console.log('Evaluating the expression...');
+			console.log(node);
+
 			// Integer Expression
 			if (node.name == "+") {
 				return this.evaluateExpression(node.children[1]);
@@ -481,6 +566,12 @@ module JOEC {
 		 * Create new string variable
 		 */
 		 public createNewStringVariable(variableName: string){
+
+		 }
+		 public simplifyBooleanExpression(){
+
+		 }
+		 public simplifyIntegerExpression(){
 
 		 }
 	}	
