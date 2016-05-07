@@ -1,7 +1,7 @@
 var JOEC;
 (function (JOEC) {
     /*
-     * Static Table
+     * Static Table Entry
      */
     var StaticTableEntry = (function () {
         function StaticTableEntry(name, type, scope) {

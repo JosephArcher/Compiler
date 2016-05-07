@@ -1,6 +1,6 @@
 module JOEC {
 	/*
-	 * Static Table
+	 * Static Table Entry
 	 */
 	export class StaticTableEntry {
 

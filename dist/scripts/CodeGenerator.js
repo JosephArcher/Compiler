@@ -8,6 +8,7 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="TypeChecker.ts" />
 /// <reference path="StaticTableEntry.ts" />
+/// <reference path="JumpTableEntry.ts" />
 var JOEC;
 (function (JOEC) {
     /*
@@ -46,10 +47,16 @@ var JOEC;
             }
         };
         CodeGenerator.prototype.newStaticVariable = function (name, type, scope) {
-            // Get length of the table and increment by 1
+            // Get length of the table
             var staticVariableNumber = Object.keys(this.staticTable).length;
             this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry(name, type, scope);
             return staticVariableNumber;
+        };
+        CodeGenerator.prototype.newJumpVariable = function () {
+            // get the length of the table
+            var jumpVariableNumber = Object.keys(this.jumpTable).length;
+            this.jumpTable[jumpVariableNumber] = new JOEC.JumpTableEntry(jumpVariableNumber);
+            return jumpVariableNumber;
         };
         CodeGenerator.prototype.writeStaticInt = function (address, value) {
             this.programCounter++;
@@ -79,8 +86,6 @@ var JOEC;
             var hexNumber = decimalNumber.toString(16);
             return hexNumber.toUpperCase();
         };
-        CodeGenerator.prototype.newJumpVariable = function (name, type, value) {
-        };
         CodeGenerator.prototype.addNextOpCode = function (opCode) {
             // Add the new opcode to the next available address in memory
             this.programCode[this.programCounter] = opCode;
@@ -96,8 +101,32 @@ var JOEC;
             this.evaluateBlock(AST.rootNode);
             // Add a break to the end of the program
             this.addNextOpCode("00");
+            this.calculateJumpArea();
             // Start to write the static area
             this.calculateStaticArea();
+        };
+        CodeGenerator.prototype.calculateJumpArea = function () {
+            //the next instruction 
+            var nextInstruction;
+            // Loop over the program code
+            for (var i = 0; i < 256; i++) {
+                nextInstruction = this.programCode[i];
+                // Check for any that start with a uppercase J
+                if (nextInstruction.charAt(0) == "J") {
+                    // Rip the J out of the string
+                    var test = nextInstruction.replace("J", "");
+                    // Look it up in the jump table
+                    var jumpTableEntry = this.jumpTable[test];
+                    // Convert to hex
+                    var hexOutput = this.decimalToHex(jumpTableEntry.address + "");
+                    if (hexOutput.length == 1) {
+                        hexOutput = "0" + hexOutput;
+                    }
+                    // backpatch the jump adress finally
+                    this.programCode[i] = hexOutput;
+                    console.log("HEX OUTPUT:" + hexOutput);
+                }
+            }
         };
         CodeGenerator.prototype.calculateStaticArea = function () {
             // Get the start of the static 
@@ -330,6 +359,8 @@ var JOEC;
             var variablePos = this.lookupStaticVariablePos(value1);
             // Load the accumulator
             this.addNextOpCode("A9");
+            console.log("Value 2");
+            console.log(value2);
             // With either
             if (value2 == "false") {
                 // 0 for false
@@ -384,6 +415,10 @@ var JOEC;
                     this.stringAssignment(leftSide.name, rightSide.name);
                 }
                 else if (rightSide.type == "BoolVal") {
+                    // Check to see if its advanced BoolVal or normal BoolVal
+                    // if(rightSide.name == "==" || rightSide.name == "!="){
+                    // }
+                    //else {
                     this.booleanAssignment(leftSide.name, rightSide.name);
                 }
                 else if (rightSide.type == "Identifier") {
@@ -397,6 +432,7 @@ var JOEC;
                 // Evaluate out the expression
                 var evaluation = this.evaluateExpression(node.children[0]);
                 var evalType = evaluation.type;
+                console.log(evaluation);
                 // If the expression is a integer constant
                 if (evalType == "Digit") {
                     // Generate Code for a constant integer print statement
@@ -411,22 +447,34 @@ var JOEC;
                     this.generateConstantBooleanPrintCode(evaluation.name);
                 }
                 else if (evalType == "Identifier") {
-                    // Generate Code for a identifer print statement
+                    // Generate Code for a identifier print statement
                     this.generateIdentifierPrintCode(evaluation.name, evaluation.type);
                 }
             }
             else if (node.name == "While") {
-                this.evaluateBooleanExpression(node.children[0]);
-                this.evaluateBlock(node.children[1]);
+                var booleanEval = this.evaluateBooleanExpression(node.children[0]);
+                var blockEval = this.evaluateBlock(node.children[1]);
             }
             else if (node.name == "If") {
-                this.evaluateBooleanExpression(node.children[0]);
-                this.evaluateBlock(node.children[1]);
+                // Evaluate out the boolean expression
+                var booleanEval = this.evaluateBooleanExpression(node.children[0]);
+                // Branch on not equal
+                this.addNextOpCode("DO");
+                // Create a new variable for the jump table
+                var jumpVariableNumber = this.newJumpVariable();
+                this.addNextOpCode("J" + jumpVariableNumber);
+                // Get the program counter before the jump
+                var before = this.programCounter;
+                // Evaluate out the block
+                var blockEval = this.evaluateBlock(node.children[1]);
+                // Get the program counter after the jump
+                var after = this.programCounter;
+                // Update the variable in jump table
+                console.log("TSETING THE TEST");
+                this.jumpTable[jumpVariableNumber].address = after - before + 1;
+                console.log(this.jumpTable[jumpVariableNumber]);
             }
         };
-        /*
-         * Boolean Expression
-         */
         CodeGenerator.prototype.evaluateBooleanExpression = function (node) {
             if (node.name != "==" && node.name != "!=") {
                 return node;
@@ -434,6 +482,25 @@ var JOEC;
             // Get both of the expression that need to be compared and evaluate them
             var expressionOne = this.evaluateExpression(node.children[0]);
             var expressionTwo = this.evaluateExpression(node.children[1]);
+            // Handles Identifier comparison
+            if (expressionOne.type == "Identifier" && expressionTwo.type == "Identifier") {
+                this.addNextOpCode("AE");
+                // Memory Location
+                var variablePos1 = this.lookupStaticVariablePos(expressionOne.name);
+                this.addNextOpCode("T" + variablePos1);
+                this.addNextOpCode("XX");
+                // Compare the next contents of the x register
+                this.addNextOpCode("EC");
+                // With this memory location
+                var variablePos2 = this.lookupStaticVariablePos(expressionTwo.name);
+                this.addNextOpCode("T" + variablePos2);
+                this.addNextOpCode("XX");
+            }
+            else if (expressionOne.type == "BoolVal" && expressionTwo.type == "BoolVal") {
+            }
+            console.log("Comparing Expressions");
+            console.log(expressionOne);
+            console.log(expressionTwo);
             return node;
         };
         /*
