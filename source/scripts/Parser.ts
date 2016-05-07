@@ -57,7 +57,6 @@ module JOEC {
 				// Check to see if they match
 				if (this.currentToken.getValue() == toMatch) {
 
-					console.log("A match was found for " + toMatch);
 					this.CST.addNode(this.currentToken.getValue(), "Leaf", this.currentToken.getKind(), this.currentToken.getLineNumber());
 					this.currentToken = this.tokenQueue.dequeue();
 				}

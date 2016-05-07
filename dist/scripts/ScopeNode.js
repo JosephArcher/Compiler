@@ -21,7 +21,7 @@ var JOEC;
             this.children.push(node);
         };
         ScopeNode.prototype.addNewVariable = function (variableName, variableType) {
-            console.log("adding new variable");
+            //console.log("adding new variable");
             this.scopeStuff[variableName] = new JOEC.Variable(variableName, variableType);
         };
         ScopeNode.prototype.lookupVariable = function (variableName) {

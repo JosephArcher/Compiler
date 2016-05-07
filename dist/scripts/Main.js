@@ -38,7 +38,6 @@ var JOEC;
             JOEC.Utils.createNewMessage("Starting Up Joe's Compiler!\n");
             // Get the source code
             var sourceCode = JOEC.Utils.getSourceCode();
-            console.log(sourceCode);
             // Check to see if any source code exists
             if (sourceCode.length < 1) {
                 // Tell the user and stop 
@@ -187,7 +186,6 @@ var JOEC;
             var CodeGenerator = new JOEC.CodeGenerator();
             // Start to generate code
             CodeGenerator.generateCode(Par.AST);
-            console.log(CodeGenerator.programCode);
             // Check to see if any errors
             if (CodeGenerator.hasErrors) {
                 // Tell the user
@@ -207,11 +205,8 @@ var JOEC;
             var nextRow = "";
             var code = [];
             code = CodeGenerator.programCode;
-            console.log("Code");
-            console.log(code);
             for (var i = 0; i < 256; i = i + 8) {
                 nextRow = code[i] + "  " + code[i + 1] + "  " + code[i + 2] + "  " + code[i + 3] + "  " + code[i + 4] + "  " + code[i + 5] + "  " + code[i + 6] + "  " + code[i + 7] + "\n";
-                console.log(code[i + 1]);
                 JOEC.Utils.writeNextRowOfCode(nextRow);
             }
             // Update the UI and mark the codeGenCheck as complete

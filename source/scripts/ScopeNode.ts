@@ -21,7 +21,7 @@ module JOEC {
 			this.children.push(node);
 		}
 		public addNewVariable(variableName: string , variableType) {
-			console.log("adding new variable");
+			//console.log("adding new variable");
 			this.scopeStuff[variableName] = new JOEC.Variable(variableName , variableType);
 		}
 		public lookupVariable(variableName: string){

@@ -40,13 +40,13 @@ module JOEC {
         	}
     	}
     	public endChildren() {
-    		console.log("current" + this.currentNode.parent);
+    		
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.currentNode.parent !== null) && (this.currentNode.parent.name !== undefined)) {
 				this.currentNode = this.currentNode.parent;
 			}
 			else {
-				console.log("TRYING TO END CHILDREN BUT CANT");
+
 				// TODO: Some sort of error logging.
 				// This really should not happen, but it will, of course.
 			}

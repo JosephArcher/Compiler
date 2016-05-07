@@ -29,7 +29,7 @@ module JOEC {
 		}
 		public scopeCheck() {
 			this.generateSymbolTable();
-			console.log(this.SymbolTable);
+			//console.log(this.SymbolTable);
 		}
 		public typeCheck() {
 			// Create a type checker
@@ -46,8 +46,8 @@ module JOEC {
 		}
 		public checkForUnusedIdentifiers() {
 
-			console.log("Checking for unused identifiers");
-			console.log(this.SymbolTable);
+			//console.log("Checking for unused identifiers");
+			//console.log(this.SymbolTable);
 			// Make a new stack to use while iterating over the tree
 			var nodeStack = new JOEC.Stack();
 
@@ -125,7 +125,7 @@ module JOEC {
 
 				// Look up the variable to make sure that it does not already exist
 				var variable = this.SymbolTable.currentScope.lookupVariable(node.children[1].children[0].name);
-				console.log("THE VARIABLE " + variable);
+				//console.log("THE VARIABLE " + variable);
 				
 				if(variable == null){
 					// Declare a new variable
@@ -151,7 +151,7 @@ module JOEC {
 
 				//First lookup the variable to see if one is in scope
 				var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-				console.log("variable " + variable);
+				//console.log("variable " + variable);
 				// If a variable exists
 				if(variable != null) {
 
@@ -195,8 +195,8 @@ module JOEC {
 
 			var childNode: JOEC.TreeNode = node.children[0];
 
-			console.log(" THE TEST NODE IS ");
-			console.log(childNode);
+			//console.log(" THE TEST NODE IS ");
+			//console.log(childNode);
 
 			// Integer Expression
 			if (childNode.name == "IntegerExpression") {

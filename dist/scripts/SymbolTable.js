@@ -10,7 +10,7 @@ var JOEC;
             this.rootScope = null;
         }
         SymbolTable.prototype.addNewScope = function () {
-            console.log("ADDING NEW SCOPE");
+            //console.log("ADDING NEW SCOPE");
             // Make a new scope node
             var node = new JOEC.ScopeNode();
             // Check to see if it needs to be the root node.
@@ -41,7 +41,7 @@ var JOEC;
             }
         };
         SymbolTable.prototype.endScope = function () {
-            console.log("Ending Scope");
+            //console.log("Ending Scope");
             // ... by moving "up" to our parent node (if possible).
             if ((this.currentScope.parent !== null) && (this.currentScope.parent.scopeLevel !== undefined)) {
                 this.currentScope = this.currentScope.parent;
@@ -50,7 +50,7 @@ var JOEC;
             }
         };
         SymbolTable.prototype.declareVariable = function (variableName, variableType) {
-            console.log("Declare " + variableName + "   with a type of " + variableType);
+            //console.log("Declare " + variableName  + "   with a type of " + variableType);
             this.currentScope.addNewVariable(variableName, variableType);
         };
         SymbolTable.prototype.assignVariable = function (variableName, variableValue) {

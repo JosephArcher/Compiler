@@ -23,8 +23,8 @@ module JOEC {
 		}
 		public typeCheckAST() {
 
-			console.log("Starting Type Checking");
-			console.log(this.SymbolTable);
+			//console.log("Starting Type Checking");
+			//console.log(this.SymbolTable);
 			// Get the block that is the root node
 			var blockNode: JOEC.TreeNode = this.AST.rootNode;
 			this.SymbolTable.currentScope = null;
@@ -45,7 +45,7 @@ module JOEC {
 		}
 		public evaluateStatement(node: JOEC.TreeNode) {
 
-			console.log(node);
+			//console.log(node);
 
 			if (node.name == "Variable Declaration") {
 
@@ -57,12 +57,12 @@ module JOEC {
 
 				// Get the ID name and lookup the type in the symbol table
 				var Id = node.children[0].name;
-				console.log("The ID IS " + Id);
-				console.log(this.SymbolTable.lookupVariable(Id));
+				//console.log("The ID IS " + Id);
+				//console.log(this.SymbolTable.lookupVariable(Id));
 				var type = this.SymbolTable.lookupVariable(Id).type;
 				var joe = this.evaluateExpression(node.children[1]);
 				var test;
-				console.log( " The type is " + joe.type);
+				//console.log( " The type is " + joe.type);
 				// Check to see if test is a Identifier
 				if(joe.type == "Identifier"){
 					test = this.SymbolTable.lookupVariable(joe.name);
@@ -87,9 +87,9 @@ module JOEC {
 				if(type == "int") {
 					type = "Digit";
 				}
-				console.log("THE TEST VALUE IS");
-				 console.log(test);
-				console.log("Eval Type " + test.type + "   compared to " + type);
+				//console.log("THE TEST VALUE IS");
+				// console.log(test);
+				//console.log("Eval Type " + test.type + "   compared to " + type);
 				if(type.toLowerCase() != test.type.toLowerCase()){
 					Utils.createNewErrorMessage("Type Mismatch on line " + test.lineNumber + " , [ " + type + " ] is not equal to [ " + test.type + " ]");
 					this.hasErrors = true;
@@ -110,16 +110,16 @@ module JOEC {
 			}
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode){
-			console.log("boolean node");
-			console.log(node);
+			//console.log("boolean node");
+			//console.log(node);
 			if(node.name != "==" && node.name != "!="){
-				console.log("Idea might be working ");
-				console.log(node.children[0]);
+				//console.log("Idea might be working ");
+				//console.log(node.children[0]);
 				return node;
 			}
 
-			console.log("Evaluating a boolean expression in type checking");
-			console.log(node);
+			//console.log("Evaluating a boolean expression in type checking");
+			//console.log(node);
 
 			// Get both of the expression that need to be compared and evaluate them
 			var expressionOne = this.evaluateExpression(node.children[0]);
@@ -127,10 +127,10 @@ module JOEC {
 			var type1 = expressionOne.type;
 			var type2 = expressionTwo.type;
 			// Get both of the types
-			console.log("Expression One");
-			console.log(expressionOne);
-			console.log("Expression Two");
-			console.log(expressionTwo);
+			//console.log("Expression One");
+			//console.log(expressionOne);
+			//.log("Expression Two");
+			//console.log(expressionTwo);
 
 			// Check to see if expression 1 is an identifier
 			if (type1 == "Identifier"){
@@ -161,7 +161,7 @@ module JOEC {
 			type1 = type1.toLowerCase();
 			type2 = type2.toLowerCase();
 
-			console.log("Comparing " + type1 + "  with " + type2);
+			//console.log("Comparing " + type1 + "  with " + type2);
 			// Compare the types of both expressions
 			if(type1 != type2){
 				Utils.createNewErrorMessage("Type Mismatch on line " + node.lineNumber + " , [ " + type1 + " ] is not equal to [ " + type2 + " ]");
@@ -208,7 +208,7 @@ module JOEC {
 				return node;
 			}
 			else if(node.type == "Identifier"){
-				console.log("JOE I FOUND AN IDENTIFIER ");
+				//console.log("JOE I FOUND AN IDENTIFIER ");
 
 				// Lookup the variable in the current scope
 				var variable = this.SymbolTable.lookupVariable(node.name);
@@ -216,8 +216,8 @@ module JOEC {
 				// Mark the variable as used
 				variable.used = true;
 
-				console.log("Joe the ID Variable is .. " + variable);
-				console.log(variable);
+				//console.log("Joe the ID Variable is .. " + variable);
+				//console.log(variable);
 
 				// Check to see if the variable has a value of not
 				if(variable.value == null) {

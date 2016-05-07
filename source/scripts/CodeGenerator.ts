@@ -34,8 +34,6 @@ module JOEC {
 		 */
 		public writeDataIntoHeap(data: string){
 
-			console.log("Writing Data into the heap " + data);
-
 			// First rip the quotes out of this bitch
 			var test = data.replace(/"/g,"").trim();
 
@@ -45,10 +43,9 @@ module JOEC {
 
 			// Get the length and sub 1 to loop
 			var len = test.length;
-			console.log(len + "looping ");
+			
 			// Loop over the string backwords and write the string into heap
 			for (var i = len; i > 0; i--) {
-				console.log("Writing character:  " + test.charAt(i - 1));
 				this.programCode[this.heapPointer] = this.decimalToHex(test.charCodeAt(i - 1) + "");
 				this.heapPointer--;	
 			}
@@ -57,8 +54,6 @@ module JOEC {
 
 			// Get length of the table and increment by 1
 			var staticVariableNumber = Object.keys(this.staticTable).length;
-
-			console.log("adding new static variable " + name);
 
 			this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry(name, type, scope);
 
@@ -138,9 +133,6 @@ module JOEC {
 			for (var i = 0; i < len; i++) {
 				nextRow = this.staticTable[i];
 
-				console.log("Next Row");
-				console.log(nextRow);
-
 				if(nextRow.type == "Int"){
 					var replace = this.writeStaticInt(this.programCounter, nextRow.Var + nextRow.Var);
 					var search = "T" + i;
@@ -159,13 +151,13 @@ module JOEC {
 			}
 		}
 		public FindAndReplace(search, replace){
-			console.log("Finding" + search + "and replacing with " + replace);
+			
 			var nextLocation;
 			for (var i = 0; i < this.programCode.length; i++){
 				nextLocation = this.programCode[i];
 
 				if(nextLocation == search){
-					console.log("FOUND");
+					
 					this.programCode[i] = replace;
 					this.programCode[i + 1] = "00";
 				}
@@ -224,18 +216,15 @@ module JOEC {
 			this.addNextOpCode("FF");
 		}
 		public generateConstantStringPrintCode(value1) {
-			console.log(value1 + "value1");
+
 			// A0
 			this.addNextOpCode("A0");
 			// Write the constant into the heap
 			this.writeDataIntoHeap(value1);
+
 			// Get the location of the heap point +1 to account for the off by 1 issue
 			var heapPointer = this.heapPointer;
-
 			heapPointer++;
-
-			console.log("JOE THE HEAP POINT IS ");
-			console.log(this.decimalToHex(heapPointer + ""));
 
 			// Load the value into the accumulator
 			this.addNextOpCode(this.decimalToHex(heapPointer + ""));
@@ -251,13 +240,12 @@ module JOEC {
 		}
 		public generateIdentifierPrintCode(data , type) {
 
-			console.log("THE data IS " + data);
+			
 			// Lookup the variable in the static table to get its position
 			var variablePos = this.lookupStaticVariablePos(data);
 			var variableType = this.lookupStaticVariable(data).type;
-
-			console.log("THE DATA TYPE IS !!!!!! ");
-			console.log(variableType);
+			console.log("The variable type is " + variableType);
+		
 
 			// AC
 			this.addNextOpCode("AC");
@@ -272,7 +260,7 @@ module JOEC {
 			this.addNextOpCode("A2");
 
 			// Decide what needs to be done based on the type
-			if(variableType == "Digit" || variableType == "BoolVal"){
+			if(variableType == "Int" || variableType == "BoolVal"){
 				this.addNextOpCode("01");
 			}
 			else if(variableType == "String"){
@@ -353,8 +341,7 @@ module JOEC {
 			//+1 to account for the off by 1 issue
 			heapPointer++;
 
-			console.log("JOE THE HEAP POINT IS ");
-			console.log(this.decimalToHex(heapPointer + ""));
+			
 
 			// Load the value into the accumulator
 			this.addNextOpCode(this.decimalToHex(heapPointer + ""));
@@ -415,6 +402,25 @@ module JOEC {
 				}
 
 			}
+		}
+		public identifierAssignment(value1, value2){
+
+			// AD
+			this.addNextOpCode("AD");
+
+			// Memory Location
+			var variablePos1 = this.lookupStaticVariablePos(value2);
+			this.addNextOpCode("T" + variablePos1);
+			this.addNextOpCode("XX");
+
+			// 8D
+			this.addNextOpCode("8D");
+
+			// Memory Location
+			var variablePos2 = this.lookupStaticVariablePos(value1);
+			this.addNextOpCode("T" + variablePos2);
+			this.addNextOpCode("XX");
+
 		}
 		public booleanAssignment(value1, value2){
 
@@ -479,6 +485,8 @@ module JOEC {
 				var rightSide = this.evaluateExpression(node.children[1]);
 				var leftSide = node.children[0];
 
+				console.log("The right hand side eqauls");
+				console.log(rightSide);
 				if(rightSide.type == "Digit"){
 					this.intAssignment(leftSide.name , rightSide.name);
 				}
@@ -487,6 +495,9 @@ module JOEC {
 				}
 				else if(rightSide.type == "BoolVal"){
 					this.booleanAssignment(leftSide.name, rightSide.name);
+				}
+				else if(rightSide.type == "Identifier"){
+					this.identifierAssignment(leftSide.name, rightSide.name);
 				}
 				else{
 					console.log("This should never happen");
@@ -498,8 +509,7 @@ module JOEC {
 				// Evaluate out the expression
 				var evaluation = this.evaluateExpression(node.children[0]);
 				var evalType = evaluation.type;
-				console.log("EVAL TYPE");
-				console.log(evalType);
+				
 
 				// If the expression is a integer constant
 				if(evalType == "Digit"){
@@ -518,7 +528,7 @@ module JOEC {
 				}
 				// If the expression is a identifer
 				else if (evalType == "Identifier") {
-					console.log("TESTING LEAGUE OPSDF");
+					
 					// Generate Code for a identifer print statement
 					this.generateIdentifierPrintCode(evaluation.name, evaluation.type);
 				}	
@@ -554,9 +564,6 @@ module JOEC {
 		 *  Expression
 		 */
 		public evaluateExpression(node: JOEC.TreeNode) {
-
-			console.log('Evaluating the expression...');
-			console.log(node);
 
 			// Integer Expression
 			if (node.name == "+") {

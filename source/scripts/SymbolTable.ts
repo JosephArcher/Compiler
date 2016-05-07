@@ -14,7 +14,7 @@ module JOEC {
 
 		public addNewScope() { 
 			
-			console.log("ADDING NEW SCOPE");
+			//console.log("ADDING NEW SCOPE");
 			// Make a new scope node
 			var node: JOEC.ScopeNode = new JOEC.ScopeNode();
 
@@ -47,7 +47,7 @@ module JOEC {
 			}
 		}
 		public endScope() {
-			console.log("Ending Scope");
+			//console.log("Ending Scope");
 			// ... by moving "up" to our parent node (if possible).
 			if ((this.currentScope.parent !== null) && (this.currentScope.parent.scopeLevel !== undefined)) {
 				this.currentScope = this.currentScope.parent;
@@ -58,7 +58,7 @@ module JOEC {
 			}
 		}
 		public declareVariable(variableName: string , variableType: string){
-			console.log("Declare " + variableName  + "   with a type of " + variableType);
+			//console.log("Declare " + variableName  + "   with a type of " + variableType);
 			this.currentScope.addNewVariable(variableName, variableType);
 		}
 		public assignVariable(variableName:string, variableValue: string) {

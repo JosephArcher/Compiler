@@ -22,7 +22,7 @@ var JOEC;
         };
         SemanticAnalyzer.prototype.scopeCheck = function () {
             this.generateSymbolTable();
-            console.log(this.SymbolTable);
+            //console.log(this.SymbolTable);
         };
         SemanticAnalyzer.prototype.typeCheck = function () {
             // Create a type checker
@@ -36,8 +36,8 @@ var JOEC;
             this.evaluateBlock(this.CST.rootNode.children[0]);
         };
         SemanticAnalyzer.prototype.checkForUnusedIdentifiers = function () {
-            console.log("Checking for unused identifiers");
-            console.log(this.SymbolTable);
+            //console.log("Checking for unused identifiers");
+            //console.log(this.SymbolTable);
             // Make a new stack to use while iterating over the tree
             var nodeStack = new JOEC.Stack();
             // Add the root node to the stack to start the iteration
@@ -99,7 +99,7 @@ var JOEC;
             if (node.name == "VarDecl") {
                 // Look up the variable to make sure that it does not already exist
                 var variable = this.SymbolTable.currentScope.lookupVariable(node.children[1].children[0].name);
-                console.log("THE VARIABLE " + variable);
+                //console.log("THE VARIABLE " + variable);
                 if (variable == null) {
                     // Declare a new variable
                     this.SymbolTable.declareVariable(node.children[1].children[0].name, node.children[0].children[0].name);
@@ -120,7 +120,7 @@ var JOEC;
             else if (node.name == "AssignmentStatement") {
                 //First lookup the variable to see if one is in scope
                 var variable = this.SymbolTable.lookupVariable(node.children[0].children[0].name);
-                console.log("variable " + variable);
+                //console.log("variable " + variable);
                 // If a variable exists
                 if (variable != null) {
                     // // Get the type of the variable
@@ -147,8 +147,8 @@ var JOEC;
         };
         SemanticAnalyzer.prototype.evaluateExpression = function (node) {
             var childNode = node.children[0];
-            console.log(" THE TEST NODE IS ");
-            console.log(childNode);
+            //console.log(" THE TEST NODE IS ");
+            //console.log(childNode);
             // Integer Expression
             if (childNode.name == "IntegerExpression") {
                 if (childNode.children.length == 1) {
