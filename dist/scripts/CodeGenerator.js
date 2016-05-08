@@ -20,12 +20,15 @@ var JOEC;
             this.programCounter = 0;
             this.heapPointer = 255;
             this.hasErrors = false;
+            this.collapseString = "";
             this.staticTable = {};
             this.jumpTable = {};
-            // Initalize the program code arrray
+            // Initialize the program code array
             for (var i = 0; i < 256; i++) {
                 this.programCode[i] = "00";
             }
+            // Create static table entry to use for int math
+            this.newStaticVariable("TEST", "TEST", "TEST");
         }
         /**
          * writeDataIntoHeap
@@ -153,6 +156,11 @@ var JOEC;
                     var search = "T" + i;
                     this.FindAndReplace(search, replace);
                 }
+                else if (nextRow.type == "TEST") {
+                    var replace = this.writeStaticInt(this.programCounter, nextRow.Var + nextRow.Var);
+                    var search = "T" + i;
+                    this.FindAndReplace(search, replace);
+                }
             }
         };
         CodeGenerator.prototype.FindAndReplace = function (search, replace) {
@@ -189,6 +197,144 @@ var JOEC;
             // Make a system call to output the results
             this.addNextOpCode("FF");
         };
+        CodeGenerator.prototype.intAssignment = function (value1, value2) {
+            var variablePos = this.lookupStaticVariablePos(value1);
+            // A9
+            this.addNextOpCode("A9");
+            // Value
+            this.addNextOpCode("0" + value2);
+            // 8D
+            this.addNextOpCode("8D");
+            // T0
+            this.addNextOpCode("T" + variablePos);
+            // XX
+            this.addNextOpCode("XX");
+        };
+        CodeGenerator.prototype.advancedIntAssignment = function (value1, value2) {
+            console.log("Advanced Int Assignemnt stuff");
+            console.log("Value1: " + value1);
+            console.log("Value2: " + value2);
+            var variablePos = this.lookupStaticVariablePos(value1);
+            this.generateIntExpressionStringCode(value2);
+            // 8D
+            this.addNextOpCode("8D");
+            // T0
+            this.addNextOpCode("T" + variablePos);
+            // XX
+            this.addNextOpCode("XX");
+        };
+        CodeGenerator.prototype.generateIntExpressionStringCode = function (value) {
+            console.log("Generating Code for the Integer Expression String " + value);
+            // Keep a counter for the number of plus signs
+            var counter = 0;
+            var nextChar = "";
+            // Loop over the string once to count the number of plus signs for a later loop use
+            for (var i = 0; i < value.length; i++) {
+                nextChar = value.charAt(i);
+                if (nextChar == "+") {
+                    counter++;
+                }
+            }
+            console.log("The number of + signs is " + counter);
+            // Get the first two values
+            var firstValue = value.charAt(0);
+            var secondValue = value.charAt(2);
+            var pos = 2;
+            // Load the first value into the accumulator
+            this.addNextOpCode("A9"); // Load
+            this.addNextOpCode("0" + firstValue); // Value
+            // Store that value into the present temp variable T0
+            this.addNextOpCode("8D");
+            this.addNextOpCode("T0");
+            this.addNextOpCode("XX");
+            // Load the second value into the accumulator 
+            this.addNextOpCode("A9");
+            this.addNextOpCode("0" + secondValue);
+            // Add the accumulator with the temp0 value
+            this.addNextOpCode("6D");
+            this.addNextOpCode("T0");
+            this.addNextOpCode("XX");
+            // Decrement the counter once
+            counter--;
+            // Loop until no more left m9
+            while (counter > 0) {
+                // Get the new value
+                var newValue = pos + 2;
+                // Store the original value
+                this.addNextOpCode("8D");
+                this.addNextOpCode("T0");
+                this.addNextOpCode("XX");
+                // Load the second value into the accumulator 
+                this.addNextOpCode("A9");
+                this.addNextOpCode("0" + value.charAt(newValue));
+                // Add the accumulator with the temp0 value
+                this.addNextOpCode("6D");
+                this.addNextOpCode("T0");
+                this.addNextOpCode("XX");
+                // decrement the counter
+                counter--;
+            }
+        };
+        // public generateIntExpressionPrintCode(value:string) {
+        // 	console.log("Printing advanced int expressoin with a value of " + value);
+        // 	var counter = 0;
+        // 	var nextChar = "";
+        // 	for (var i = 0; i < value.length; i++){
+        // 		nextChar = value.charAt(i);
+        // 		if(nextChar == "+"){
+        // 			counter++;
+        // 		}
+        // 	}
+        // 	console.log("The number of + signs is " + counter);
+        // 	// Get the first two values
+        // 	var firstValue = value.charAt(0);
+        // 	var secondValue = value.charAt(2);
+        // 	var pos = 2;
+        // 	// Load the first value into the accumulator
+        // 	this.addNextOpCode("A9"); // Load
+        // 	this.addNextOpCode("0" + firstValue);  // Value
+        // 	// Store that value into the present temp variable T0
+        // 	this.addNextOpCode("8D");
+        // 	this.addNextOpCode("T0");
+        // 	this.addNextOpCode("XX");
+        // 	// Load the second value into the accumulator 
+        // 	this.addNextOpCode("A9");
+        // 	this.addNextOpCode("0" + secondValue);
+        // 	// Add the accumulator with the temp0 value
+        // 	this.addNextOpCode("6D");
+        // 	this.addNextOpCode("T0");
+        // 	this.addNextOpCode("XX");
+        // 	// Decrement the counter once
+        // 	counter--;
+        // 	// Loop until no more left m9
+        // 	while(counter > 0){
+        // 		// Get the new value
+        // 		var newValue = pos + 2;
+        // 		console.log("INSIDE THE LOOP" + value.charAt(newValue));
+        // 		// Store the original value
+        // 		this.addNextOpCode("8D");
+        // 		this.addNextOpCode("T0");
+        // 		this.addNextOpCode("XX");
+        // 		// Load the second value into the accumulator 
+        // 		this.addNextOpCode("A9");
+        // 		this.addNextOpCode("0" + value.charAt(newValue));
+        // 		// Add the accumulator with the temp0 value
+        // 		this.addNextOpCode("6D");
+        // 		this.addNextOpCode("T0");
+        // 		this.addNextOpCode("XX");
+        // 		// decrement the counter
+        // 		counter--;
+        // 	} 
+        // 	this.addNextOpCode("A2");
+        // 	this.addNextOpCode("01");
+        // 	this.addNextOpCode("8D");
+        // 	this.addNextOpCode("T0");
+        // 	this.addNextOpCode("XX");
+        // 	this.addNextOpCode("AC");
+        // 	this.addNextOpCode("T0");
+        // 	this.addNextOpCode("XX");
+        // 	this.addNextOpCode("FF");
+        // }
         CodeGenerator.prototype.generateConstantBooleanPrintCode = function (value) {
             // Load the y register withn a constant
             this.addNextOpCode("A0");
@@ -305,19 +451,6 @@ var JOEC;
             // XX
             this.addNextOpCode("XX");
         };
-        CodeGenerator.prototype.intAssignment = function (value1, value2) {
-            var variablePos = this.lookupStaticVariablePos(value1);
-            // A9
-            this.addNextOpCode("A9");
-            // Value
-            this.addNextOpCode("0" + value2);
-            // 8D
-            this.addNextOpCode("8D");
-            // T0
-            this.addNextOpCode("T" + variablePos);
-            // XX
-            this.addNextOpCode("XX");
-        };
         CodeGenerator.prototype.lookupStaticVariablePos = function (name) {
             var len = Object.keys(this.staticTable).length;
             var nextVariable;
@@ -406,8 +539,11 @@ var JOEC;
                 // Evaluate the Right Hand Side of the statement
                 var rightSide = this.evaluateExpression(node.children[1]);
                 var leftSide = node.children[0];
-                console.log("The right hand side eqauls");
-                console.log(rightSide);
+                if (rightSide.name == "+") {
+                    var test = this.collapseString;
+                    this.advancedIntAssignment(leftSide.name, test);
+                    this.collapseString = "";
+                }
                 if (rightSide.type == "Digit") {
                     this.intAssignment(leftSide.name, rightSide.name);
                 }
@@ -432,9 +568,22 @@ var JOEC;
                 // Evaluate out the expression
                 var evaluation = this.evaluateExpression(node.children[0]);
                 var evalType = evaluation.type;
-                console.log(evaluation);
-                // If the expression is a integer constant
-                if (evalType == "Digit") {
+                // If the expression is a int expression
+                if (evaluation.name == "+") {
+                    var test = this.collapseString;
+                    this.generateIntExpressionStringCode(test);
+                    this.collapseString = "";
+                    this.addNextOpCode("A2");
+                    this.addNextOpCode("01");
+                    this.addNextOpCode("8D");
+                    this.addNextOpCode("T0");
+                    this.addNextOpCode("XX");
+                    this.addNextOpCode("AC");
+                    this.addNextOpCode("T0");
+                    this.addNextOpCode("XX");
+                    this.addNextOpCode("FF");
+                }
+                else if (evalType == "Digit") {
                     // Generate Code for a constant integer print statement
                     this.generateConstantIntPrintCode(evaluation.name);
                 }
@@ -509,7 +658,11 @@ var JOEC;
         CodeGenerator.prototype.evaluateExpression = function (node) {
             // Integer Expression
             if (node.name == "+") {
-                return this.evaluateExpression(node.children[1]);
+                console.log("THE NODE IS");
+                console.log(node);
+                var collapsedIntExpression = this.collapseIntegerExpression(node);
+                console.log(this.collapseString);
+                return node;
             }
             else if (node.name == "==" || node.name == "!=") {
                 return this.evaluateBooleanExpression(node);
@@ -524,6 +677,31 @@ var JOEC;
                 return node;
             }
             else if (node.type == "Identifier") {
+                return node;
+            }
+        };
+        CodeGenerator.prototype.collapseIntegerExpression = function (node) {
+            console.log("Collapsing Int Expression");
+            if (node.name == "+") {
+                // Digit
+                var digit = node.children[0].name;
+                var expr = node.children[1];
+                // Append a digit
+                this.collapseString = this.collapseString + digit;
+                // Check to see if another + is coming
+                if (expr.name == "+") {
+                    // Append a + sign
+                    this.collapseString = this.collapseString + expr.name;
+                    // recurse
+                    this.collapseIntegerExpression(expr);
+                }
+                else {
+                    this.collapseString = this.collapseString + "+" + expr.name;
+                    return node;
+                }
+            }
+            else {
+                this.collapseString = this.collapseString + node.name;
                 return node;
             }
         };
