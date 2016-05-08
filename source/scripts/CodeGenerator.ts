@@ -308,6 +308,8 @@ module JOEC {
 			var secondValue = value.charAt(2);
 			var pos = 2;
 
+			console.log("SecondValue: " + secondValue);
+
 			// Load the first value into the accumulator
 			this.addNextOpCode("A9"); // Load
 			this.addNextOpCode("0" + firstValue);  // Value
@@ -316,16 +318,26 @@ module JOEC {
 			this.addNextOpCode("8D");
 			this.addNextOpCode("T0");
 			this.addNextOpCode("XX");
-
-			// Load the second value into the accumulator 
-			this.addNextOpCode("A9");
-			this.addNextOpCode("0" + secondValue);
+			
+			// Check to see if the second value is a int or identifier
+			if(Utils.isInt(secondValue)) {
+				// Load the second value into the accumulator 
+				this.addNextOpCode("A9");
+				this.addNextOpCode("0" + secondValue);
+			}
+			else{
+				// Look up the value in the static table
+				var variablePos = this.lookupStaticVariablePos(secondValue);
+				this.addNextOpCode("AD")
+				this.addNextOpCode("T" + variablePos);
+				this.addNextOpCode("XX");
+			}
 
 			// Add the accumulator with the temp0 value
 			this.addNextOpCode("6D");
 			this.addNextOpCode("T0");
 			this.addNextOpCode("XX");
-
+			
 			// Decrement the counter once
 			counter--;
 
@@ -333,17 +345,27 @@ module JOEC {
 			while (counter > 0) {
 
 				// Get the new value
-				var newValue = pos + 2;
+				var newPos = pos + 2;
+				var newValue = value.charAt(newPos);
 
 				// Store the original value
 				this.addNextOpCode("8D");
 				this.addNextOpCode("T0");
 				this.addNextOpCode("XX");
 
-				// Load the second value into the accumulator 
-				this.addNextOpCode("A9");
-				this.addNextOpCode("0" + value.charAt(newValue));
-
+				// Check to see if the newValue is a int or identifier
+				if(Utils.isInt(newValue)){
+					this.addNextOpCode("A9");
+					this.addNextOpCode("0" + newValue);
+				}
+				else{
+					// Look up the value in the static table
+					var variablePos = this.lookupStaticVariablePos(newValue);
+					this.addNextOpCode("AD")
+					this.addNextOpCode("T" + variablePos);
+					this.addNextOpCode("XX");
+				}
+			
 				// Add the accumulator with the temp0 value
 				this.addNextOpCode("6D");
 				this.addNextOpCode("T0");
@@ -353,80 +375,6 @@ module JOEC {
 				counter--;
 			} 
 		}
-		// public generateIntExpressionPrintCode(value:string) {
-
-		// 	console.log("Printing advanced int expressoin with a value of " + value);
-		// 	var counter = 0;
-		// 	var nextChar = "";
-		// 	for (var i = 0; i < value.length; i++){
-		// 		nextChar = value.charAt(i);
-		// 		if(nextChar == "+"){
-		// 			counter++;
-		// 		}
-		// 	}
-		// 	console.log("The number of + signs is " + counter);
-		// 	// Get the first two values
-		// 	var firstValue = value.charAt(0);
-		// 	var secondValue = value.charAt(2);
-		// 	var pos = 2;
-		// 	// Load the first value into the accumulator
-		// 	this.addNextOpCode("A9"); // Load
-		// 	this.addNextOpCode("0" + firstValue);  // Value
-
-		// 	// Store that value into the present temp variable T0
-		// 	this.addNextOpCode("8D");
-		// 	this.addNextOpCode("T0");
-		// 	this.addNextOpCode("XX");
-
-		// 	// Load the second value into the accumulator 
-		// 	this.addNextOpCode("A9");
-		// 	this.addNextOpCode("0" + secondValue);
-
-		// 	// Add the accumulator with the temp0 value
-		// 	this.addNextOpCode("6D");
-		// 	this.addNextOpCode("T0");
-		// 	this.addNextOpCode("XX");
-			
-		// 	// Decrement the counter once
-		// 	counter--;
-
-		// 	// Loop until no more left m9
-		// 	while(counter > 0){
-
-		// 		// Get the new value
-		// 		var newValue = pos + 2;
-
-		// 		console.log("INSIDE THE LOOP" + value.charAt(newValue));
-		// 		// Store the original value
-		// 		this.addNextOpCode("8D");
-		// 		this.addNextOpCode("T0");
-		// 		this.addNextOpCode("XX");
-
-		// 		// Load the second value into the accumulator 
-		// 		this.addNextOpCode("A9");
-		// 		this.addNextOpCode("0" + value.charAt(newValue));
-
-		// 		// Add the accumulator with the temp0 value
-		// 		this.addNextOpCode("6D");
-		// 		this.addNextOpCode("T0");
-		// 		this.addNextOpCode("XX");
-
-		// 		// decrement the counter
-		// 		counter--;
-		// 	} 
-		// 	this.addNextOpCode("A2");
-		// 	this.addNextOpCode("01");
-
-		// 	this.addNextOpCode("8D");
-		// 	this.addNextOpCode("T0");
-		// 	this.addNextOpCode("XX");
-
-		// 	this.addNextOpCode("AC");
-		// 	this.addNextOpCode("T0");
-		// 	this.addNextOpCode("XX");
-
-		// 	this.addNextOpCode("FF");
-		// }
 		public generateConstantBooleanPrintCode(value){
 
 			// Load the y register withn a constant
@@ -703,7 +651,7 @@ module JOEC {
 				var leftSide = node.children[0];
 
 				if(rightSide.name == "+"){
-					
+
 					var test = this.collapseString;
 					this.advancedIntAssignment(leftSide.name, test);
 					this.collapseString = "";
@@ -787,10 +735,10 @@ module JOEC {
 			else if (node.name == "If") {
 
 				// Evaluate out the boolean expression
-				var booleanEval = this.evaluateBooleanExpression(node.children[0]);
+				this.evaluateBooleanExpression(node.children[0]);
 
-				// Branch on not equal
-				this.addNextOpCode("DO");
+				// Branch on not equal	
+				this.addNextOpCode("D0");
 
 				// Create a new variable for the jump table
 				var jumpVariableNumber = this.newJumpVariable();
@@ -806,12 +754,53 @@ module JOEC {
 				var after = this.programCounter;
 
 				// Update the variable in jump table
-				console.log("TSETING THE TEST");
 				this.jumpTable[jumpVariableNumber].address = after - before + 1;
 				console.log(this.jumpTable[jumpVariableNumber]);
 			}	
 		}
 		public evaluateBooleanExpression(node: JOEC.TreeNode) {
+
+			// First check for the number of children
+			if(node.children.length == 2) {
+				console.log("another compare");
+				console.log(node);
+
+			}
+
+			else if(node.children.length == 0) {
+				console.log("another constant");
+
+				// Check for the most basic case first
+				if (node.name == "true" || node.name == "false") {
+
+					// Load the accumulator with a 1 or 0
+					this.addNextOpCode("A9");
+					if(node.name == "true"){
+						this.addNextOpCode("01");
+					}
+					else{
+						this.addNextOpCode("00");
+					}
+					
+					// Store the 1 at the temp address
+					this.addNextOpCode("8D");
+					this.addNextOpCode("T0");
+				 	this.addNextOpCode("XX");
+
+				 	// Load the x register with a 1
+					this.addNextOpCode("A2");	
+					this.addNextOpCode("01");
+
+					// Compare them
+					this.addNextOpCode("EC");
+					this.addNextOpCode("T0");
+					this.addNextOpCode("XX");
+				}
+			}
+
+
+
+
 
 			if (node.name != "==" && node.name != "!=") {
 
@@ -821,30 +810,59 @@ module JOEC {
 			var expressionOne = this.evaluateExpression(node.children[0]);
 			var expressionTwo = this.evaluateExpression(node.children[1]);
 
-			// Handles Identifier comparison
-			if (expressionOne.type == "Identifier" && expressionTwo.type == "Identifier"){
+			/* Handle Expression One */
 
+			// Identifier
+			if(expressionOne.type == "Identifier"){
+
+				// Load the x register from memory
 				this.addNextOpCode("AE");
 
 				// Memory Location
 				var variablePos1 = this.lookupStaticVariablePos(expressionOne.name);
 				this.addNextOpCode("T" + variablePos1);
 				this.addNextOpCode("XX");
+			}
+			else if(expressionOne.type == "Digit"){
 
-				// Compare the next contents of the x register
-				this.addNextOpCode("EC");
+				// Load the x register with a constant
+				this.addNextOpCode("A2");
+
+				// Constant value
+				this.addNextOpCode("0" + expressionOne.name);
+
+			}
+			else if(expressionOne.type == "BoolVal"){
+
+				// Load the x register with a constant
+				this.addNextOpCode("A2");
+
+				if(expressionOne.name == "true"){
+					// Constant value
+					this.addNextOpCode("01");
+				}
+				else {
+					this.addNextOpCode("00");
+				}
+			}
+
+			// Compare the next contents of the x register
+			this.addNextOpCode("EC");
+
+			/* Handle Second Expression */
+
+			if(expressionTwo.type == "Identifier"){
 
 				// With this memory location
 				var variablePos2 = this.lookupStaticVariablePos(expressionTwo.name);
 				this.addNextOpCode("T" + variablePos2);
 				this.addNextOpCode("XX");
-
+			}
+			else if (expressionTwo.type  == "Digit"){
+				// Load the digit into the temporary address
 
 			}
-			else if(expressionOne.type == "BoolVal" && expressionTwo.type == "BoolVal"){
 
-
-			}
 			console.log("Comparing Expressions");
 			console.log(expressionOne);
 			console.log(expressionTwo);
@@ -884,6 +902,12 @@ module JOEC {
 			// Identifier
 			else if (node.type == "Identifier") {
 				return node;
+			}
+		}
+		public test(node){
+
+			if(node.name == "=="){
+
 			}
 		}
 		public collapseIntegerExpression(node: JOEC.TreeNode){
