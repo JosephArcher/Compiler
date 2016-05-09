@@ -562,8 +562,29 @@ var JOEC;
                 }
             }
             else if (node.name == "While") {
+                //Evaluate out the boolean expression
                 var booleanEval = this.evaluateBooleanExpression(node.children[0]);
+                // Get the program counter before the jump
+                var before = this.programCounter;
+                // Branch on not equal
+                this.addNextOpCode("D0");
+                // Create a new variable for the jump table
+                var jumpVariableNumber = this.newJumpVariable();
+                this.addNextOpCode("J" + jumpVariableNumber);
+                // Evaluate out the block
                 var blockEval = this.evaluateBlock(node.children[1]);
+                // Get the program counter after the jump
+                var after = this.programCounter;
+                this.jumpTable[jumpVariableNumber].address = after - before;
+                this.addNextOpCode("A2");
+                this.addNextOpCode("01");
+                this.addNextOpCode("EC");
+                this.addNextOpCode("FF");
+                this.addNextOpCode("00");
+                this.addNextOpCode("D0");
+                var joe = (256 + before) - after - 1;
+                var test = this.decimalToHex(joe + "");
+                this.addNextOpCode(test);
             }
             else if (node.name == "If") {
                 // Evaluate out the boolean expression
@@ -682,6 +703,20 @@ var JOEC;
                     this.addNextOpCode("XX");
                 }
             }
+            // Check to see if the node is != and we need to flip this thang
+            if (node.name == "!=") {
+                console.log(" JOE FOUND ONE  TEST THANG");
+                this.addNextOpCode("A9");
+                this.addNextOpCode("00");
+                this.addNextOpCode("8D");
+                this.addNextOpCode("T0");
+                this.addNextOpCode("XX");
+                this.addNextOpCode("A2");
+                this.addNextOpCode("01");
+                this.addNextOpCode("EC");
+                this.addNextOpCode("T0");
+                this.addNextOpCode("XX");
+            }
             return node;
         };
         /*
@@ -712,10 +747,6 @@ var JOEC;
                 return node;
             }
         };
-        CodeGenerator.prototype.test = function (node) {
-            if (node.name == "==") {
-            }
-        };
         CodeGenerator.prototype.collapseIntegerExpression = function (node) {
             console.log("Collapsing Int Expression");
             if (node.name == "+") {
@@ -740,15 +771,6 @@ var JOEC;
                 this.collapseString = this.collapseString + node.name;
                 return node;
             }
-        };
-        /*
-         * Create new string variable
-         */
-        CodeGenerator.prototype.createNewStringVariable = function (variableName) {
-        };
-        CodeGenerator.prototype.simplifyBooleanExpression = function () {
-        };
-        CodeGenerator.prototype.simplifyIntegerExpression = function () {
         };
         return CodeGenerator;
     })();

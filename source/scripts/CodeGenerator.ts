@@ -728,8 +728,39 @@ module JOEC {
 			}
 			// While
 			else if (node.name == "While") {
+
+				//Evaluate out the boolean expression
 				var booleanEval = this.evaluateBooleanExpression(node.children[0]);
+
+				// Get the program counter before the jump
+				var before = this.programCounter;
+
+				// Branch on not equal
+				this.addNextOpCode("D0");
+
+				// Create a new variable for the jump table
+				var jumpVariableNumber = this.newJumpVariable();
+				this.addNextOpCode("J" + jumpVariableNumber);
+
+				// Evaluate out the block
 				var blockEval = this.evaluateBlock(node.children[1]);
+
+				// Get the program counter after the jump
+				var after = this.programCounter;
+
+				this.jumpTable[jumpVariableNumber].address = after - before;
+
+				
+				this.addNextOpCode("A2");
+				this.addNextOpCode("01");
+				this.addNextOpCode("EC");
+				this.addNextOpCode("FF");
+				this.addNextOpCode("00");
+				this.addNextOpCode("D0");
+				var joe = (256 + before) - after - 1;
+				var test = this.decimalToHex(joe + "");
+				this.addNextOpCode(test);
+
 			}
 			// If
 			else if (node.name == "If") {
@@ -875,6 +906,24 @@ module JOEC {
 					this.addNextOpCode("XX");
 				}
 			}
+
+			// Check to see if the node is != and we need to flip this thang
+			if(node.name == "!="){
+				console.log(" JOE FOUND ONE  TEST THANG");
+				this.addNextOpCode("A9");
+				this.addNextOpCode("00");
+
+				this.addNextOpCode("8D");
+				this.addNextOpCode("T0");
+				this.addNextOpCode("XX");
+
+				this.addNextOpCode("A2");
+				this.addNextOpCode("01");
+
+				this.addNextOpCode("EC");
+				this.addNextOpCode("T0");
+				this.addNextOpCode("XX");
+			}
 			return node;
 		}
 		/*
@@ -912,12 +961,6 @@ module JOEC {
 				return node;
 			}
 		}
-		public test(node){
-
-			if(node.name == "=="){
-
-			}
-		}
 		public collapseIntegerExpression(node: JOEC.TreeNode){
 
 			console.log("Collapsing Int Expression");
@@ -943,25 +986,11 @@ module JOEC {
 					this.collapseString = this.collapseString + "+" +  expr.name;
 					return node;
 				}
-
 			}
 			else {
 				this.collapseString = this.collapseString + node.name;
 				return node;
 			}
-
 		}
-		/*
-		 * Create new string variable
-		 */
-		 public createNewStringVariable(variableName: string){
-
-		 }
-		 public simplifyBooleanExpression(){
-
-		 }
-		 public simplifyIntegerExpression(){
-
-		 }
 	}	
 }
