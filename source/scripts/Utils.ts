@@ -212,6 +212,10 @@ module JOEC {
 			var symbolTableArea = <HTMLTextAreaElement>document.getElementById("symbolTableArea");
 			symbolTableArea.innerHTML = "";
 
+			// Code Output
+			var codeOutputArea = <HTMLTextAreaElement>document.getElementById("programOutput");
+			codeOutputArea.innerHTML = "";
+
 		}
 		public static isInt(value: string) {
 

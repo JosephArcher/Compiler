@@ -753,8 +753,10 @@ module JOEC {
 				// Get the program counter after the jump
 				var after = this.programCounter;
 
+				console.log("Before : " + before);
+				console.log("After : " + after);
 				// Update the variable in jump table
-				this.jumpTable[jumpVariableNumber].address = after - before + 1;
+				this.jumpTable[jumpVariableNumber].address = after - before;
 				console.log(this.jumpTable[jumpVariableNumber]);
 			}	
 		}
@@ -762,11 +764,87 @@ module JOEC {
 
 			// First check for the number of children
 			if(node.children.length == 2) {
-				console.log("another compare");
-				console.log(node);
 
+				var first = node.children[0];
+				var second = node.children[1];
+				/* first expression */
+				console.log("First");
+				console.log(first);
+				console.log("Second");
+				console.log(second);
+				// Check to see if the first is an identifier
+				if(first.type == "Identifier"){
+					var variablePos = this.lookupStaticVariablePos(first.name);
+
+					// Load the x register from memory
+					this.addNextOpCode("AE");
+					this.addNextOpCode("T" + variablePos);
+					this.addNextOpCode("XX");
+				}
+				else if(first.type == "BoolVal"){
+
+					// Load the x register with a constant
+					this.addNextOpCode("A2");
+
+					if(first.name == "true"){
+						this.addNextOpCode("01");
+					}
+					else {
+						this.addNextOpCode("00");
+					}
+				}
+				else if(first.type == "Digit"){
+					this.addNextOpCode("A2");
+					this.addNextOpCode("0" + first.name);
+				}
+
+
+				/* Second Expression */
+				if(second.type == "Identifier"){
+
+					//Compare
+					this.addNextOpCode("EC");
+
+					var variablePos = this.lookupStaticVariablePos(second.name);
+
+					this.addNextOpCode("T" + variablePos);
+					this.addNextOpCode("XX");
+				}
+				else if (second.type == "BoolVal") {
+
+					// Load the accum with a constant
+					this.addNextOpCode("A9");
+
+					if (second.name == "true") {
+						this.addNextOpCode("01");
+					}
+					else {
+						this.addNextOpCode("00");
+					}
+					// Write it to temp address
+					this.addNextOpCode("8D");
+					this.addNextOpCode("T0");
+					this.addNextOpCode("XX");
+
+					// Compare
+					this.addNextOpCode("EC");
+					this.addNextOpCode("T0");
+					this.addNextOpCode("XX");
+				}
+				else if (second.type == "Digit") {
+					this.addNextOpCode("A9");
+					this.addNextOpCode("0" + second.name);
+					// Write it to temp address
+					this.addNextOpCode("8D");
+					this.addNextOpCode("T0");
+					this.addNextOpCode("XX");
+
+					// Compare
+					this.addNextOpCode("EC");
+					this.addNextOpCode("T0");
+					this.addNextOpCode("XX");
+				}
 			}
-
 			else if(node.children.length == 0) {
 				console.log("another constant");
 
@@ -797,76 +875,6 @@ module JOEC {
 					this.addNextOpCode("XX");
 				}
 			}
-
-
-
-
-
-			if (node.name != "==" && node.name != "!=") {
-
-				return node;
-			} 
-			// Get both of the expression that need to be compared and evaluate them
-			var expressionOne = this.evaluateExpression(node.children[0]);
-			var expressionTwo = this.evaluateExpression(node.children[1]);
-
-			/* Handle Expression One */
-
-			// Identifier
-			if(expressionOne.type == "Identifier"){
-
-				// Load the x register from memory
-				this.addNextOpCode("AE");
-
-				// Memory Location
-				var variablePos1 = this.lookupStaticVariablePos(expressionOne.name);
-				this.addNextOpCode("T" + variablePos1);
-				this.addNextOpCode("XX");
-			}
-			else if(expressionOne.type == "Digit"){
-
-				// Load the x register with a constant
-				this.addNextOpCode("A2");
-
-				// Constant value
-				this.addNextOpCode("0" + expressionOne.name);
-
-			}
-			else if(expressionOne.type == "BoolVal"){
-
-				// Load the x register with a constant
-				this.addNextOpCode("A2");
-
-				if(expressionOne.name == "true"){
-					// Constant value
-					this.addNextOpCode("01");
-				}
-				else {
-					this.addNextOpCode("00");
-				}
-			}
-
-			// Compare the next contents of the x register
-			this.addNextOpCode("EC");
-
-			/* Handle Second Expression */
-
-			if(expressionTwo.type == "Identifier"){
-
-				// With this memory location
-				var variablePos2 = this.lookupStaticVariablePos(expressionTwo.name);
-				this.addNextOpCode("T" + variablePos2);
-				this.addNextOpCode("XX");
-			}
-			else if (expressionTwo.type  == "Digit"){
-				// Load the digit into the temporary address
-
-			}
-
-			console.log("Comparing Expressions");
-			console.log(expressionOne);
-			console.log(expressionTwo);
-
 			return node;
 		}
 		/*

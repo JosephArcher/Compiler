@@ -39,7 +39,7 @@ module JOEC {
 			// Clear/Reset the Interface and Sidebar
 			Utils.resetCompilerStatusBar();
 			Utils.resetUISideBar();
-
+			
 			Utils.createNewMessage("Starting Up Joe's Compiler!\n");
 
 			// Get the source code
