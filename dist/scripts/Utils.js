@@ -197,6 +197,9 @@ var JOEC;
             // Code Output
             var codeOutputArea = document.getElementById("programOutput");
             codeOutputArea.innerHTML = "";
+            // Code Output
+            var consoleArea = document.getElementById("console");
+            consoleArea.innerHTML = "";
         };
         Utils.isInt = function (value) {
             if (value == "0" || value == "1" || value == "2" || value == "3" || value == "4" ||

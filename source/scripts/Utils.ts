@@ -216,6 +216,10 @@ module JOEC {
 			var codeOutputArea = <HTMLTextAreaElement>document.getElementById("programOutput");
 			codeOutputArea.innerHTML = "";
 
+			// Code Output
+			var consoleArea = <HTMLTextAreaElement>document.getElementById("console");
+			consoleArea.innerHTML = "";
+
 		}
 		public static isInt(value: string) {
 

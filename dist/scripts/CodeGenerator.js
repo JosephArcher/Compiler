@@ -29,6 +29,8 @@ var JOEC;
             }
             // Create static table entry to use for int math
             this.newStaticVariable("TEST", "TEST", "TEST");
+            // Create static table entry to use for int math
+            this.newStaticVariable("TEST1", "TEST1", "TEST1");
         }
         /**
          * writeDataIntoHeap
@@ -686,6 +688,29 @@ var JOEC;
                     this.addNextOpCode("T0");
                     this.addNextOpCode("XX");
                 }
+                this.addNextOpCode('A9');
+                this.addNextOpCode('00');
+                this.addNextOpCode('D0');
+                this.addNextOpCode('02');
+                this.addNextOpCode('A9');
+                this.addNextOpCode('01');
+                // If you need to flip the z flag
+                if (node.name == '!=') {
+                    console.log("not equals was found");
+                    // Load the x register with 0
+                    this.addNextOpCode('A2');
+                    this.addNextOpCode('00');
+                    // Store the accumulator in t0
+                    this.addNextOpCode('8D');
+                    this.addNextOpCode('T0');
+                    this.addNextOpCode('XX');
+                    // Compare
+                    this.addNextOpCode('EC');
+                    this.addNextOpCode('T0');
+                    this.addNextOpCode('XX');
+                }
+                else {
+                }
             }
             else if (node.children.length == 0) {
                 console.log("another constant");
@@ -711,20 +736,6 @@ var JOEC;
                     this.addNextOpCode("T0");
                     this.addNextOpCode("XX");
                 }
-            }
-            // Check to see if the node is != and we need to flip this thang
-            if (node.name == "!=") {
-                console.log(" JOE FOUND ONE  TEST THANG");
-                this.addNextOpCode("A9");
-                this.addNextOpCode("00");
-                this.addNextOpCode("8D");
-                this.addNextOpCode("T0");
-                this.addNextOpCode("XX");
-                this.addNextOpCode("A2");
-                this.addNextOpCode("01");
-                this.addNextOpCode("EC");
-                this.addNextOpCode("T0");
-                this.addNextOpCode("XX");
             }
             return node;
         };
