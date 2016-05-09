@@ -107,6 +107,11 @@ module JOEC {
 
 			var hexNumber = decimalNumber.toString(16);
 
+			console.log("The hex number is .. " + hexNumber);
+			if(hexNumber.length == 1){
+				hexNumber = "0" + hexNumber;
+			}
+
 			return hexNumber.toUpperCase();
 
         }
@@ -155,10 +160,6 @@ module JOEC {
 
 					// Convert to hex
 					var hexOutput = this.decimalToHex(jumpTableEntry.address + "");
-
-					if(hexOutput.length == 1){
-						hexOutput = "0" + hexOutput;
-					}
 
 					// backpatch the jump adress finally
 					this.programCode[i] = hexOutput;
@@ -729,37 +730,47 @@ module JOEC {
 			// While
 			else if (node.name == "While") {
 
-				//Evaluate out the boolean expression
+				// Get the starting point before anything happens
+				var startingPlace = this.programCounter;
+
+				// Evaluate out the boolean expression
 				var booleanEval = this.evaluateBooleanExpression(node.children[0]);
 
-				// Get the program counter before the jump
-				var before = this.programCounter;
-
-				// Branch on not equal
+				//Branch on not equal
 				this.addNextOpCode("D0");
 
 				// Create a new variable for the jump table
 				var jumpVariableNumber = this.newJumpVariable();
 				this.addNextOpCode("J" + jumpVariableNumber);
 
+				// /Get the program counter before the block
+				var before = this.programCounter;
+
 				// Evaluate out the block
 				var blockEval = this.evaluateBlock(node.children[1]);
 
-				// Get the program counter after the jump
-				var after = this.programCounter;
-
-				this.jumpTable[jumpVariableNumber].address = after - before;
-
-				
+				// Code to jump back to the top
 				this.addNextOpCode("A2");
 				this.addNextOpCode("01");
 				this.addNextOpCode("EC");
 				this.addNextOpCode("FF");
 				this.addNextOpCode("00");
 				this.addNextOpCode("D0");
-				var joe = (256 + before) - after - 1;
-				var test = this.decimalToHex(joe + "");
+
+				// Calculate how to jump backwords
+				var joe = (255 - this.programCounter) + startingPlace;
+			 	var test = this.decimalToHex(joe + "");
+
 				this.addNextOpCode(test);
+
+				// Get the program counter after the jump
+				var after = this.programCounter;
+				console.log("Before : " + before);
+				console.log("After : " + after);
+				var calc = (after - before) + "";
+
+				console.log("The calc is " + calc);
+				this.jumpTable[jumpVariableNumber].address = calc;
 
 			}
 			// If
