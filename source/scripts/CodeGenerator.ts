@@ -918,7 +918,7 @@ module JOEC {
 					this.addNextOpCode("XX");
 				}
 
-
+				// Need this bit of code every time in order to make the nots work
 				this.addNextOpCode('A9');
 				this.addNextOpCode('00');
 				this.addNextOpCode('D0');
