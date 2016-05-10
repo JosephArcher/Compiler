@@ -9,6 +9,7 @@
 /// <reference path="TypeChecker.ts" />
 /// <reference path="StaticTableEntry.ts" />
 /// <reference path="JumpTableEntry.ts" />
+/// <reference path="SymbolTable.ts" />
 module JOEC {
    /*
 	* Code Generator
@@ -20,10 +21,14 @@ module JOEC {
 		public heapPointer = 255;
 		public hasErrors: boolean = false;
 		public collapseString = "";
+		public symbolTable: JOEC.SymbolTable;
 		public staticTable = {};
 		public jumpTable = {};
 
-		public constructor() {
+		public constructor(_symbolTable) {
+
+			// Get a copy of the symbol table for scope stuff
+			this.symbolTable = _symbolTable;
 
 			// Initialize the program code array
 			for (var i = 0; i < 256; i++){
@@ -33,7 +38,7 @@ module JOEC {
 			// Create static table entry to use for int math
 			this.newStaticVariable("TEST", "TEST", "TEST");
 			// Create static table entry to use for int math
-			this.newStaticVariable("TEST1", "TEST1", "TEST1");
+			//this.newStaticVariable("TEST1", "TEST1", "TEST1");
 		}
 		/**
 		 * writeDataIntoHeap
@@ -59,6 +64,12 @@ module JOEC {
 			}
 		}
 		public newStaticVariable(name,type, scope){
+
+			console.log("B4 look up the scope id is ... " + this.symbolTable.currentScope.id);
+			var testjoe = this.symbolTable.lookupVariableScopeNumber(name);
+			console.log("AF look up the scope id is ... " + this.symbolTable.currentScope.id);
+			console.log(" THE TEST FOR JOE IS  "  + testjoe);
+			console.log(testjoe);
 
 			// Get length of the table
 			var staticVariableNumber = Object.keys(this.staticTable).length;
@@ -130,6 +141,9 @@ module JOEC {
 		  * @returns Array - An array of 6502a op codes
 		  */
 		 public generateCode(AST: JOEC.Tree) {
+
+		 	// Set the current node to null in order to make sure the pointer is correct
+			this.symbolTable.currentScope = null;
 
 		 	this.evaluateBlock(AST.rootNode);
 
@@ -223,6 +237,9 @@ module JOEC {
 		*/
 		public evaluateBlock(node: JOEC.TreeNode) {
 
+			// Joe fix this is because you need a different is vistied thing
+			this.symbolTable.nextChildScope2();
+
 			// Get the number of statements that the block has
 			var len = node.children.length;
 
@@ -230,6 +247,8 @@ module JOEC {
 			for (var i = 0; i < len; i++) {
 				this.evaluateStatement(node.children[i]);
 			}
+
+			this.symbolTable.endScope();
 		}
 		public generateConstantIntPrintCode(value){
 			
@@ -555,6 +574,9 @@ module JOEC {
 		}
 		public lookupStaticVariable(name) {
 
+			console.log("Looking up the static variable " + name);
+			var test = this.symbolTable.lookupVariableScopeNumber(name);
+			console.log("Output is for joe:  "  + test);
 			var len = Object.keys(this.staticTable).length;
 			var nextVariable;
 			for (var i = 0; i < len; i++) {

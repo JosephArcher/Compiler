@@ -9,14 +9,17 @@ module JOEC {
 		*/
 		public currentScope: JOEC.ScopeNode = null;
 		public rootScope: JOEC.ScopeNode = null;
+		public scopeCounter = 0;
 
 		public constructor () {}
 
 		public addNewScope() { 
 			
-			//console.log("ADDING NEW SCOPE");
 			// Make a new scope node
-			var node: JOEC.ScopeNode = new JOEC.ScopeNode();
+			var node: JOEC.ScopeNode = new JOEC.ScopeNode(this.scopeCounter);
+
+			// Increment the counter
+			this.scopeCounter++;
 
 			// Check to see if it needs to be the root node.
 			if ((this.rootScope == null) || (!this.rootScope)) {
@@ -34,6 +37,7 @@ module JOEC {
 
 			// Update the current scope
 			this.currentScope = node;
+
 		}
 		public nextChildScope() {
 			if(this.currentScope == null){
@@ -41,6 +45,18 @@ module JOEC {
 			}
 			else{
 				var nextPossibleNode = this.currentScope.getNextUnvistedChildNode();
+				if (nextPossibleNode != null) {
+					this.currentScope = nextPossibleNode;
+				}
+			}
+		}
+		public nextChildScope2() {
+
+			if (this.currentScope == null) {
+				this.currentScope = this.rootScope;
+			}
+			else {
+				var nextPossibleNode = this.currentScope.getNextUnvistedChildNode2();
 				if (nextPossibleNode != null) {
 					this.currentScope = nextPossibleNode;
 				}
@@ -95,6 +111,34 @@ module JOEC {
 					this.currentScope = testing;
 					return null;
 				}
+		}
+		public lookupVariableScopeNumber(variableName: string) {
+
+			// save the curretn scope
+			var testing = this.currentScope;
+
+			// Check the current scope
+			if (this.currentScope.lookupVariable(variableName) != null) {
+				this.currentScope = testing;
+				return this.currentScope.lookupScopeId(variableName);
+			}
+			else {
+				// Check to see if the
+				while (this.currentScope.parent != null) {
+
+					this.currentScope = this.currentScope.parent;
+					// Check the current scope
+					if (this.currentScope.lookupVariable(variableName) != null) {
+						// Save the output 
+						var answer = this.currentScope.lookupScopeId(variableName);
+						// reset the scope
+						this.currentScope = testing;
+						return answer;
+					}
+				}
+				this.currentScope = testing;
+				return null;
+			}
 		}
 	}
 }

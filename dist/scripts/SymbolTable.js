@@ -8,11 +8,13 @@ var JOEC;
             */
             this.currentScope = null;
             this.rootScope = null;
+            this.scopeCounter = 0;
         }
         SymbolTable.prototype.addNewScope = function () {
-            //console.log("ADDING NEW SCOPE");
             // Make a new scope node
-            var node = new JOEC.ScopeNode();
+            var node = new JOEC.ScopeNode(this.scopeCounter);
+            // Increment the counter
+            this.scopeCounter++;
             // Check to see if it needs to be the root node.
             if ((this.rootScope == null) || (!this.rootScope)) {
                 // We are the root node.
@@ -35,6 +37,17 @@ var JOEC;
             }
             else {
                 var nextPossibleNode = this.currentScope.getNextUnvistedChildNode();
+                if (nextPossibleNode != null) {
+                    this.currentScope = nextPossibleNode;
+                }
+            }
+        };
+        SymbolTable.prototype.nextChildScope2 = function () {
+            if (this.currentScope == null) {
+                this.currentScope = this.rootScope;
+            }
+            else {
+                var nextPossibleNode = this.currentScope.getNextUnvistedChildNode2();
                 if (nextPossibleNode != null) {
                     this.currentScope = nextPossibleNode;
                 }
@@ -75,6 +88,31 @@ var JOEC;
                     if (this.currentScope.lookupVariable(variableName) != null) {
                         // Save the output 
                         var answer = this.currentScope.lookupVariable(variableName);
+                        // reset the scope
+                        this.currentScope = testing;
+                        return answer;
+                    }
+                }
+                this.currentScope = testing;
+                return null;
+            }
+        };
+        SymbolTable.prototype.lookupVariableScopeNumber = function (variableName) {
+            // save the curretn scope
+            var testing = this.currentScope;
+            // Check the current scope
+            if (this.currentScope.lookupVariable(variableName) != null) {
+                this.currentScope = testing;
+                return this.currentScope.lookupScopeId(variableName);
+            }
+            else {
+                // Check to see if the
+                while (this.currentScope.parent != null) {
+                    this.currentScope = this.currentScope.parent;
+                    // Check the current scope
+                    if (this.currentScope.lookupVariable(variableName) != null) {
+                        // Save the output 
+                        var answer = this.currentScope.lookupScopeId(variableName);
                         // reset the scope
                         this.currentScope = testing;
                         return answer;

@@ -182,8 +182,9 @@ var JOEC;
             //***************************************************\\
             //                  Code Generation                  \\
             //***************************************************\\
+            console.log(SemanticAnalyzer.SymbolTable);
             // Create the code generator
-            var CodeGenerator = new JOEC.CodeGenerator();
+            var CodeGenerator = new JOEC.CodeGenerator(SemanticAnalyzer.SymbolTable);
             // Start to generate code
             CodeGenerator.generateCode(Par.AST);
             // Check to see if any errors
