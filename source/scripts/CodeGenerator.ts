@@ -65,16 +65,13 @@ module JOEC {
 		}
 		public newStaticVariable(name,type, scope){
 
-			console.log("B4 look up the scope id is ... " + this.symbolTable.currentScope.id);
-			var testjoe = this.symbolTable.lookupVariableScopeNumber(name);
-			console.log("AF look up the scope id is ... " + this.symbolTable.currentScope.id);
-			console.log(" THE TEST FOR JOE IS  "  + testjoe);
-			console.log(testjoe);
+			var testScope = this.symbolTable.lookupVariableScopeNumber(name);
+			console.log("The scope of the variable is   " + testScope);
 
 			// Get length of the table
 			var staticVariableNumber = Object.keys(this.staticTable).length;
 
-			this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry(name, type, scope);
+			this.staticTable[staticVariableNumber] = new JOEC.StaticTableEntry(name, type, testScope);
 
 			return staticVariableNumber;
 		}
@@ -237,7 +234,7 @@ module JOEC {
 		*/
 		public evaluateBlock(node: JOEC.TreeNode) {
 
-			// Joe fix this is because you need a different is vistied thing
+			// Joe fix this is because you need a different is visited thing
 			this.symbolTable.nextChildScope2();
 
 			// Get the number of statements that the block has
@@ -560,6 +557,11 @@ module JOEC {
 
 		public lookupStaticVariablePos(name){
 
+			console.log("Looking up the static variable " + name);
+
+			var test = this.symbolTable.lookupVariableScopeNumber(name);
+			console.log("The scope to match is ... " + test);
+
 			var len = Object.keys(this.staticTable).length;
 			var nextVariable;
 			for (var i = 0; i < len; i++){
@@ -567,7 +569,9 @@ module JOEC {
 
 				// Check to see if they match
 				if(name == nextVariable.Var){
-					return i;
+					if (test == nextVariable.Scope) {
+						return i;
+					}
 				}
 				
 			}
@@ -575,8 +579,9 @@ module JOEC {
 		public lookupStaticVariable(name) {
 
 			console.log("Looking up the static variable " + name);
+
 			var test = this.symbolTable.lookupVariableScopeNumber(name);
-			console.log("Output is for joe:  "  + test);
+			console.log("The scope to match is ... " + test);
 			var len = Object.keys(this.staticTable).length;
 			var nextVariable;
 			for (var i = 0; i < len; i++) {
@@ -584,7 +589,9 @@ module JOEC {
 
 				// Check to see if they match
 				if (name == nextVariable.Var) {
-					return nextVariable;
+					if(test == nextVariable.Scope){
+						return nextVariable;
+					}
 				}
 
 			}
